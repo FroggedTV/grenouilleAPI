@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Script
+SQLAlchemy
+psycopg2
+tornado

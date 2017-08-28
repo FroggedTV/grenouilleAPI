@@ -1,0 +1,9 @@
+.idea
+.venv
+
+docker/grenouilleapi_postgres/conf.env
+api/cfg/settings.cfg
+
+*~
+*.pyc
+__pycache__

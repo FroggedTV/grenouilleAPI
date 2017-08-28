@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  grenouilleapi_postgres:
+    image: grenouilleapi_postgres
+    container_name: "grenouilleapi_postgres"
+    build:
+      context: grenouilleapi_postgres
+    volumes:
+      - "/home/docker/grenouilleapi_postgres/data:/var/lib/postgresql/data"
+    env_file:
+      - './grenouilleapi_postgres/conf.env'
+    ports:
+      - '9998:5432'
+    networks:
+      - grenouilleapi_network
+
+networks:
+  grenouilleapi_network:

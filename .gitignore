@@ -2,7 +2,7 @@
 .venv
 
 docker/grenouilleapi_postgres/conf.env
-api/cfg/settings.cfg
+backend/cfg/settings.cfg
 
 *~
 *.pyc

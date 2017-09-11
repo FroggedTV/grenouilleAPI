@@ -2,14 +2,11 @@
 
 dev-install:
 	virtualenv -p python3 .venv
-	.venv/bin/pip3 install -r requirements.txt
+	.venv/bin/pip3 install -r backend/requirements.txt
 	make dev-path-install
 
 dev-path-install:
-	$(foreach dir, $(wildcard .venv/lib/*), echo $(shell pwd)/api > $(dir)/site-packages/grenouilleapi.pth &&) echo
-
-dev-run:
-	.venv/bin/python3 api/app.py
+	$(foreach dir, $(wildcard .venv/lib/*), echo $(shell pwd)/backend > $(dir)/site-packages/grenouilleapi.pth &&) echo
 
 dev-clean:
 	rm -rf .venv
@@ -31,10 +28,29 @@ db-downgrade:
 db-migrate: db-upgrade
 	FLASK_APP=api/app.py .venv/bin/flask db migrate --directory api/migrations
 
-# Prod
+# Backend
+
+dev-backend-run:
+	.venv/bin/python3 backend/app.py
+
+prod-backend-start:
+	# TODO
+
+prod-backend-stop:
+	# TODO
+
+# Frontend
+
+prod-frontend-start:
+	# TODO
+
+prod-frontend-stop:
+	# TODO
+
+# ALL
 
 prod-start:
-	# TODO
+	docker-compose -p grenouilleapi -f docker/docker-compose.yml up --build
 
 prod-stop:
-	# TODO
+	docker-compose -p grenouilleapi -f docker/docker-compose.yml down

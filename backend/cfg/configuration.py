@@ -16,11 +16,14 @@ class Config(object):
 
     DEBUG = True
     TESTING = True
+    SECRET_KEY = 'secret_key'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = 'sqlite://:memory:'
     HOST = '127.0.0.1'
     PORT = 9999
     SERVERNAME = 'http://127.0.0.1:9999'
+    STEAM_KEY='XXX'
+    FRONTEND_LOGIN_REDIRECT='http://127.0.0.1:9999/api/auth/token_test'
 
 
 def load_config(config):

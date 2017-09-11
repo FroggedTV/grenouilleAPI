@@ -3,6 +3,7 @@
 #####################
 
 from flask import Flask, jsonify
+from flask_openid import OpenID
 from flask_migrate import Migrate
 
 from cfg.configuration import load_config
@@ -17,6 +18,7 @@ def create_app():
     return app
 
 app = create_app()
+oid = OpenID(app, store_factory=lambda: None)
 migrate = Migrate(app, db)
 
 ##########
@@ -24,7 +26,9 @@ migrate = Migrate(app, db)
 ##########
 
 from routes.user import build_api_user
+from routes.auth import build_api_auth
 
+build_api_auth(app, oid)
 build_api_user(app)
 
 ########################

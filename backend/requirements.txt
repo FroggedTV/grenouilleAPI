@@ -7,4 +7,5 @@ SQLAlchemy
 psycopg2
 tornado
 pyjwt
+steam
 dota2

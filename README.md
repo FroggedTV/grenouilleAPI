@@ -1,6 +1,12 @@
 # GrenouilleAPI
 
 ## Backend
+
+### Documentation
+
+The full API documentation is generated with the command `make refresh-docs` in the `/docs` folder.
+This is a simple web page to open in a browser.
+
 ### Development Environment
 
 Install system dependencies

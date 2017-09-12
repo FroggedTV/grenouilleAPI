@@ -20,13 +20,13 @@ db-docker-stop:
 	docker-compose -p grenouilleapi -f docker/docker-compose.yml down
 
 db-upgrade:
-	FLASK_APP=api/app.py .venv/bin/flask db upgrade --directory api/migrations
+	FLASK_APP=backend/app.py .venv/bin/flask db upgrade --directory backend/migrations
 
 db-downgrade:
-	FLASK_APP=api/app.py .venv/bin/flask db downgrade --directory api/migrations
+	FLASK_APP=backend/app.py .venv/bin/flask db downgrade --directory backend/migrations
 
 db-migrate: db-upgrade
-	FLASK_APP=api/app.py .venv/bin/flask db migrate --directory api/migrations
+	FLASK_APP=backend/app.py .venv/bin/flask db migrate --directory backend/migrations
 
 # Backend
 
@@ -54,3 +54,7 @@ prod-start:
 
 prod-stop:
 	docker-compose -p grenouilleapi -f docker/docker-compose.yml down
+
+# DOCS
+refresh-docs:
+	apidoc -i backend/routes -o docs/

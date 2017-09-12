@@ -63,6 +63,10 @@ class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.BigInteger(), primary_key=True)
+    nickname = db.Column(db.String(), nullable=False)
+    avatar = db.Column(db.String(), nullable=True)
+    avatar_medium = db.Column(db.String(), nullable=True)
+    avatar_full = db.Column(db.String(), nullable=True)
 
     def __init__(self, id):
         """Instantiate a new user with default values.

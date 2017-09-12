@@ -2,7 +2,7 @@
   {
     "type": "get",
     "url": "/api/auth/token_test",
-    "title": "1.2 - Dummy display a Refresh Token",
+    "title": "1.2 - Dummy display of a Refresh Token",
     "name": "DisplayToken",
     "group": "Authentication",
     "description": "<p>Test function used to display the token generated after the steam login. This must not be used in production, but only as a token displayer in dev.</p>",
@@ -72,6 +72,13 @@
     "error": {
       "fields": {
         "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidHeader",
+            "description": "<p>Authorization header not well formated.</p>"
+          },
           {
             "group": "Errors",
             "type": "String",

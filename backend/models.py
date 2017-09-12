@@ -39,7 +39,8 @@ class UserRefreshToken(db.Model):
         if refresh_token is None:
             refresh_token = UserRefreshToken()
             refresh_token.id = id
-            refresh_token.refresh_token = token
+            db.session.add(refresh_token)
+        refresh_token.refresh_token = token
         db.session.commit()
 
         return refresh_token

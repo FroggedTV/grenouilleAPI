@@ -79,14 +79,61 @@ def build_api_auth(app, oid):
 
         @apiSuccess {String} auth_token Authentication token short lived to access data.
 
+        @apiError (Errors){String} InvalidHeader Authorization header not well formated.
         @apiError (Errors){String} NoRefreshToken There is no refresh token provided.
         @apiError (Errors){String} ExpiredRefreshToken Refresh token has expired and user should log again.
         @apiError (Errors){String} InvalidRefreshToken Token is invalid (decode, rights, signature...).
         """
-        # TODO
+        header_token = request.headers.get('Authorization', None)
+        if (header_token is None
+            or len(header_token) < 8
+            or header_token[0:7] != 'Bearer '):
+            return jsonify({'success': 'no',
+                            'error': 'InvalidHeader',
+                            'payload': {}
+                            }), 200
+        raw_token = header_token[7:]
+        try:
+            token = jwt.decode(raw_token,
+                               app.config['SECRET_KEY'],
+                               audience='refresh')
+        except jwt.InvalidAudienceError:
+            return jsonify({'success': 'no',
+                            'error': 'NoRefreshToken',
+                            'payload': {}
+                            }), 200
+        except jwt.ExpiredSignatureError:
+            return jsonify({'success': 'no',
+                            'error': 'ExpiredRefreshToken',
+                            'payload': {}
+                            }), 200
+        except Exception as e:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidRefreshToken',
+                            'payload': {}
+                            }), 200
+
+        steam_id = int(token['steamid'])
+
+        # Check if this is the only valid refresh token
+        user_refresh_token = UserRefreshToken.get(steam_id)
+        if (user_refresh_token is None
+            or user_refresh_token.refresh_token != raw_token):
+            return jsonify({'success': 'no',
+                            'error': 'ExpiredRefreshToken',
+                            'payload': {}
+                            }), 200
+
+        auth_token = {
+            'steamid': str(steam_id),
+            'aud': 'auth',
+            'exp': datetime.utcnow() + timedelta(hours=1)
+        }
+        auth_token = jwt.encode(auth_token, app.config['SECRET_KEY'])
+
         return jsonify({'success': 'yes',
                         'error': '',
-                        'payload': {'token': 'tata'}
+                        'payload': {'token': auth_token.decode('utf-8')}
                         }), 200
 
     @app.route('/api/auth/token_test', methods=['GET'])

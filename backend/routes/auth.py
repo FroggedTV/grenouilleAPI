@@ -7,6 +7,7 @@ from steam import SteamID, WebAPI
 
 from flask import jsonify, redirect, request
 
+from helpers import UrlImageToBase64
 from models import db, UserRefreshToken, User
 
 def build_api_auth(app, oid):
@@ -56,9 +57,7 @@ def build_api_auth(app, oid):
             api = WebAPI(key=app.config['STEAM_KEY'])
             resp = api.ISteamUser.GetPlayerSummaries_v2(steamids=steam_id)
             user.nickname = resp['response']['players'][0]['personaname']
-            user.avatar = resp['response']['players'][0]['avatar']
-            user.avatar_medium = resp['response']['players'][0]['avatarmedium']
-            user.avatar_full = resp['response']['players'][0]['avatarfull']
+            user.avatar = UrlImageToBase64(resp['response']['players'][0]['avatarfull'])
             db.session.add(user)
             db.session.commit()
 

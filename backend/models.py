@@ -60,14 +60,16 @@ class User(db.Model):
 
     Attributes:
         id: Steam unique identifier 64bits.
+        nickname: user nickname.
+        avatar: user avatar as a 64bits string.
+        verified_nickname: boolean if the user is validated (nickname locked).
     """
     __tablename__ = 'user'
 
     id = db.Column(db.BigInteger(), primary_key=True)
-    nickname = db.Column(db.String(), nullable=False)
-    avatar = db.Column(db.String(), nullable=True)
-    avatar_medium = db.Column(db.String(), nullable=True)
-    avatar_full = db.Column(db.String(), nullable=True)
+    nickname = db.Column(db.String(), nullable=False, default="Anonymous", server_default="Anonymous")
+    nickname_verified = db.Column(db.Boolean(), nullable=False, default=False, server_default="False")
+    avatar = db.Column(db.String(), nullable=False, default="", server_default="")
 
     def __init__(self, id):
         """Instantiate a new user with default values.

@@ -11,13 +11,19 @@ dev-path-install:
 dev-clean:
 	rm -rf .venv
 
+dev-backend-run:
+	.venv/bin/python3 backend/app.py
+
+dev-frontend-run:
+	TODO
+
 # DATABASE
 
 db-docker-start:
-	docker-compose -p grenouilleapi -f docker/docker-compose.yml up --build -d grenouilleapi_postgres
+	docker-compose -p grenouille -f docker/docker-compose.yml up --build -d grenouilleapi_postgres
 
 db-docker-stop:
-	docker-compose -p grenouilleapi -f docker/docker-compose.yml down
+	docker-compose -p grenouille -f docker/docker-compose.yml down
 
 db-upgrade:
 	FLASK_APP=backend/app.py .venv/bin/flask db upgrade --directory backend/migrations
@@ -28,32 +34,13 @@ db-downgrade:
 db-migrate: db-upgrade
 	FLASK_APP=backend/app.py .venv/bin/flask db migrate --directory backend/migrations
 
-# Backend
-
-dev-backend-run:
-	.venv/bin/python3 backend/app.py
-
-prod-backend-start:
-	# TODO
-
-prod-backend-stop:
-	# TODO
-
-# Frontend
-
-prod-frontend-start:
-	# TODO
-
-prod-frontend-stop:
-	# TODO
-
-# ALL
+# PROD
 
 prod-start:
-	docker-compose -p grenouilleapi -f docker/docker-compose.yml up --build
+	docker-compose -p grenouille -f docker/docker-compose.yml up --build -d
 
 prod-stop:
-	docker-compose -p grenouilleapi -f docker/docker-compose.yml down
+	docker-compose -p grenouille -f docker/docker-compose.yml down
 
 # DOCS
 refresh-docs:

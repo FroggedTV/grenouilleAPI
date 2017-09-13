@@ -29,5 +29,17 @@ services:
     depends_on:
       - grenouilleapi_postgres
 
+  grenouille:
+    image: grenouille
+    container_name: "grenouille"
+    build:
+      context: ..
+      dockerfile: docker/grenouille/Dockerfile
+    ports:
+      - "9997:8080"
+    entrypoint: nginx -g "daemon off;"
+    networks:
+      - grenouille_network
+
 networks:
   grenouille_network:

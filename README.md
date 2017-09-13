@@ -11,7 +11,7 @@ This is a simple web page to open in a browser.
 
 Install system dependencies
 ```
-sudo apt install make python3 python3-venv libpq-dev
+sudo apt install make python3 python3-venv python-devpython-virtualenv libpq-dev libssl-dev libffi-dev 
 ```
 or  
 ```

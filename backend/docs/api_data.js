@@ -146,14 +146,28 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "id",
-            "description": "<p>SteamID (64bits)</p>"
+            "description": "<p>SteamID (64bits).</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "nickname",
-            "description": "<p>Username</p>"
+            "description": "<p>Username.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "nickname_verified",
+            "description": "<p>True if user nickname is locked because verified.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "avatar",
+            "description": "<p>User avatar as a 64bits string.</p>"
           }
         ]
       }
@@ -161,6 +175,20 @@ define({ "api": [
     "error": {
       "fields": {
         "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingIdParameter",
+            "description": "<p>Id is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidIdParameter",
+            "description": "<p>Invalid id value (not an int).</p>"
+          },
           {
             "group": "Errors",
             "type": "String",

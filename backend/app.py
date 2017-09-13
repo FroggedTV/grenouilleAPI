@@ -2,7 +2,7 @@
 # Application Setup #
 #####################
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_openid import OpenID
 from flask_migrate import Migrate
 
@@ -24,6 +24,10 @@ migrate = Migrate(app, db)
 ##########
 # Routes #
 ##########
+
+@app.route('/docs/<path:path>')
+def access_docs(path):
+    return send_from_directory('docs', path)
 
 from routes.user import build_api_user
 from routes.auth import build_api_auth

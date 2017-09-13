@@ -44,4 +44,4 @@ prod-stop:
 
 # DOCS
 refresh-docs:
-	apidoc -i backend/routes -o docs/
+	apidoc -i backend/routes -o backend/docs/

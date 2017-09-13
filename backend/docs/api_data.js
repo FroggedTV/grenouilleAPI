@@ -42,7 +42,7 @@ define({ "api": [
     "title": "2 - Get a Auth Token from a Refresh Token",
     "name": "GetAuthToken",
     "group": "Authentication",
-    "description": "<p>Refresh tokens are long lived but auth tokens are long lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
+    "description": "<p>Refresh tokens are long lived but auth tokens are short lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
     "header": {
       "fields": {
         "Header": [

@@ -71,7 +71,7 @@ def build_api_auth(app, oid):
         @api {get} /api/auth/token 2 - Get a Auth Token from a Refresh Token
         @apiName GetAuthToken
         @apiGroup Authentication
-        @apiDescription Refresh tokens are long lived but auth tokens are long lived.
+        @apiDescription Refresh tokens are long lived but auth tokens are short lived.
         Using a valid refresh token, this api delivers an auth token to access data endpoints.
 
         @apiHeader {String} Authorization 'Bearer <refresh_token>'

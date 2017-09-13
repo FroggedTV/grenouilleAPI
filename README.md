@@ -21,7 +21,7 @@ sudo pip install virtualenv
 
 Install virtual environment in a `.venv` directory:
 ```
-make dev-install
+make dev-backend-install
 ```
 
 Simply run the code inside dev environment:
@@ -81,26 +81,39 @@ Generate a new migration file into `backend/migrations/versions` by comparing `b
 make db-migrate
 ```
 
+## Frontend
+
+The frontend is a Vuejs application.
+
+### Development Environment
+
+Install the dev environment:
+```
+make dev-frontend-install
+```
+Run the frontend in dev on the port `8080` with:
+```
+make dev-frontend-run
+```
+Unit tests are available with the automatically generated project:
+```
+make dev-frontend-unit
+make dev-frontend-teste2e
+```
+
+## Deployment
+
+
 ### Production Environment
 
-Production run inside docker images. The python code is packaged into the docker image.
-Start the production services with
+Production run inside docker images: tornado python image for the backend, and nginx for the frontend.
 ```
-make prod-backend-start
+make prod-start
 ```
 And stop the production services with
 ```
-make prod-backend-stop
+make prod-stop
 ```
 
 NOTE: You can even use these commands in development because docker ensure isolation.
 However, the docker image is built after each code modification, so it's not efficient.
-
-## Frontend
-### Development Environment
-
-TODO
-
-### Production Environment
-
-TODO

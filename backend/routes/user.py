@@ -9,7 +9,7 @@ def build_api_user(app):
     """Factory to setup the routes for the user api."""
 
     @app.route('/api/user/details', methods=['GET'])
-    def get_details():
+    def get_user_details():
         """
         @api {get} /api/user/details GetUserDetails
         @apiName GetUserDetails

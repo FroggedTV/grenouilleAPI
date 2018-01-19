@@ -18,7 +18,7 @@ class Config(object):
     TESTING = True
     SECRET_KEY = 'secret_key'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite://:memory:'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}/sqlite.db'.format(os.path.join(os.path.dirname(__file__)))
     HOST = '127.0.0.1'
     PORT = 9999
     SERVERNAME = 'http://127.0.0.1:9999'

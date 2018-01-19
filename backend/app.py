@@ -31,9 +31,11 @@ def access_docs(path):
 
 from routes.user import build_api_user
 from routes.auth import build_api_auth
+from routes.game import build_api_game
 
 build_api_auth(app, oid)
 build_api_user(app)
+build_api_game(app)
 
 ########################
 # Default Error Routes #

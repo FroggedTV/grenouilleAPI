@@ -1,6 +1,6 @@
 # DEVELOPMENT
 
-dev-backend-install:
+dev-install:
 	virtualenv -p python3 .venv
 	.venv/bin/pip3 install -r backend/requirements.txt
 	make dev-path-install
@@ -8,23 +8,11 @@ dev-backend-install:
 dev-path-install:
 	$(foreach dir, $(wildcard .venv/lib/*), echo $(shell pwd)/backend > $(dir)/site-packages/grenouilleapi.pth &&) echo
 
-dev-backend-run:
+dev-run:
 	.venv/bin/python3 backend/app.py
 
-dev-backend-clean:
+dev-clean:
 	rm -rf .venv
-
-dev-frontend-install:
-	cd frontend && npm install
-
-dev-frontend-run:
-	cd frontend && npm run dev
-
-dev-frontend-unit:
-	cd frontend && npm run unit
-
-dev-frontend-teste2e:
-	cd frontend && npm run e2e
 
 # DATABASE
 

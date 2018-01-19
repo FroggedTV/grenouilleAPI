@@ -27,7 +27,7 @@ class UserRefreshToken(db.Model):
 
     @staticmethod
     def upsert(id, token):
-        """Update the current refresh token valid for a user.
+        """Upsert the current refresh token valid for a user.
 
         Args:
             id: Steam unique identifier of the user.
@@ -35,15 +35,15 @@ class UserRefreshToken(db.Model):
         Returns:
             UserRefreshToken of the target user, with the token updated.
         """
-        refresh_token = UserRefreshToken.get(id)
-        if refresh_token is None:
-            refresh_token = UserRefreshToken()
-            refresh_token.id = id
-            db.session.add(refresh_token)
-        refresh_token.refresh_token = token
+        user_refresh_token = UserRefreshToken.get(id)
+        if user_refresh_token is None:
+            user_refresh_token = UserRefreshToken()
+            user_refresh_token.id = id
+            db.session.add(user_refresh_token)
+        user_refresh_token.refresh_token = token
         db.session.commit()
 
-        return refresh_token
+        return user_refresh_token
 
     @staticmethod
     def revoke(id):

@@ -120,6 +120,307 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/game/details",
+    "title": "GameDetails",
+    "name": "GameDetails",
+    "group": "Game",
+    "description": "<p>Request game details.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API-KEY",
+            "description": "<p>Restricted API-KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyError",
+            "description": "<p>Missing or invalid API-KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingHostIdParameter",
+            "description": "<p>hostId is not present.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidHostIdParameter",
+            "description": "<p>hostId is not a valid id or not present.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "hostId",
+            "description": "<p>Id of the game hosted by bots.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hostId",
+            "description": "<p>Id of the game hosted by bots.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team1",
+            "description": "<p>Name of the first team</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team1Ids",
+            "description": "<p>SteamID (64bits) of first team players, separated by ','</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team2",
+            "description": "<p>Name of the second team</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team2Ids",
+            "description": "<p>SteamID (64bits) of second team  players, separated by ','</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "spectatorIds",
+            "description": "<p>SteamID (64bits) of spectator players, separated by ',' (Optional)</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Game status. Possible values are 'waiting bot', 'creation in progress', 'waiting for players', 'game in progress', 'completed', 'canceled'.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "valveId",
+            "description": "<p>Game Id in Valve database.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "coinTossWinner",
+            "description": "<p>Winner of the coin toss: 'team1' or 'team2'.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team1Choice",
+            "description": "<p>Choice after the coin toss for team1: 'fp', 'sp', 'radiant' or 'dire'</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team2Choice",
+            "description": "<p>Choice after the coin toss for team2: 'fp', 'sp', 'radiant' or 'dire'</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "winner",
+            "description": "<p>Winner of the game: 'team1' or 'team2'.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "team1NoJoin",
+            "description": "<p>Number of players who didn't join the lobby from team1.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "team2NoJoin",
+            "description": "<p>Number of players who didn't join the lobby from team2.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "backend/routes/game.py",
+    "groupTitle": "Game"
+  },
+  {
+    "type": "post",
+    "url": "/api/game/host",
+    "title": "HostGame",
+    "name": "HostGame",
+    "group": "Game",
+    "description": "<p>Queue a game to host by bots.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API-KEY",
+            "description": "<p>Restricted API-KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyError",
+            "description": "<p>Missing or invalid API-KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam1Parameter",
+            "description": "<p>team1 is not present.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam1IdsParameter",
+            "description": "<p>team1Ids is not present.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidTeam1IdsParameter",
+            "description": "<p>team1Ids is not a list of steamIds.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam2Parameter",
+            "description": "<p>team2 is not present.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam2IdsParameter",
+            "description": "<p>team2Ids is not present.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidTeam2IdsParameter",
+            "description": "<p>team2Ids is not a list of steamIds.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "team1",
+            "description": "<p>Name of the first team</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "team1Ids",
+            "description": "<p>SteamID (64bits) of first team players, separated by ','</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "team2",
+            "description": "<p>Name of the second team</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "team2Ids",
+            "description": "<p>SteamID (64bits) of second team  players, separated by ','</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "spectatorIds",
+            "description": "<p>SteamID (64bits) of spectator players, separated by ',' (Optional)</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hostId",
+            "description": "<p>Id of the game hosted by bots for further requests.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "backend/routes/game.py",
+    "groupTitle": "Game"
+  },
+  {
+    "type": "get",
     "url": "/api/user/details",
     "title": "GetUserDetails",
     "name": "GetUserDetails",

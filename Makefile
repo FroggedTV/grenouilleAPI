@@ -33,8 +33,8 @@ db-migrate: db-upgrade
 
 # PROD
 
-prod-start-force:
-	docker-compose -p grenouille -f docker/docker-compose.yml up --build --no-cache -d
+build-force:
+	docker-compose -p grenouille -f docker/docker-compose.yml build --no-cache
 
 prod-start:
 	docker-compose -p grenouille -f docker/docker-compose.yml up --build -d

@@ -12,8 +12,6 @@ services:
       - './grenouilleapi_postgres/conf.env'
     ports:
       - '9998:5432'
-    networks:
-      - grenouille_network
 
   grenouilleapi:
     image: grenouilleapi
@@ -24,10 +22,5 @@ services:
     ports:
       - "9999:9999"
     entrypoint: python3 /grenouille/backend/app.py
-    networks:
-      - grenouille_network
     depends_on:
       - grenouilleapi_postgres
-
-networks:
-  grenouille_network:

@@ -23,6 +23,12 @@ db-docker-start:
 db-docker-stop:
 	docker-compose -p grenouille -f docker/docker-compose.yml down
 
+db-docker-upgrade:
+	docker run --network grenouille_default -e FLASK_APP=grenouille/backend/app.py grenouilleapi flask db upgrade --directory grenouille/backend/migrations
+
+db-docker-downgrade:
+	docker run --network grenouille_default -e FLASK_APP=grenouille/backend/app.py grenouilleapi flask db downgrade --directory grenouille/backend/migrations
+
 db-upgrade:
 	FLASK_APP=backend/app.py .venv/bin/flask db upgrade --directory backend/migrations
 

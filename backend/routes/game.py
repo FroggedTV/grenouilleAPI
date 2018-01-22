@@ -312,7 +312,7 @@ def build_api_game(app):
     @app.route('/api/game/vip/add', methods=['POST'])
     def add_game_vip():
         """
-        @api {get} /api/game/vip/add AddGameVIP
+        @api {post} /api/game/vip/add AddGameVIP
         @apiName AddGameVIP
         @apiGroup Game
         @apiDescription Add a new game VIP.
@@ -411,7 +411,7 @@ def build_api_game(app):
     @app.route('/api/game/vip/remove', methods=['POST'])
     def remove_game_vip():
         """
-        @api {get} /api/game/vip/remove RemoveGameVIP
+        @api {post} /api/game/vip/remove RemoveGameVIP
         @apiName RemoveGameVIP
         @apiGroup Game
         @apiDescription Remove a new game VIP.

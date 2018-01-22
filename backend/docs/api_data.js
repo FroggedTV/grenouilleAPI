@@ -119,7 +119,7 @@ define({ "api": [
     "groupTitle": "Authentication"
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/api/game/vip/add",
     "title": "AddGameVIP",
     "name": "AddGameVIP",
@@ -692,7 +692,7 @@ define({ "api": [
     "groupTitle": "Game"
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/api/game/vip/remove",
     "title": "RemoveGameVIP",
     "name": "RemoveGameVIP",

@@ -4,6 +4,7 @@ Flask-Migrate
 Flask-Script
 Flask-OpenID
 SQLAlchemy
+sqlalchemy-utils
 psycopg2
 tornado
 pyjwt

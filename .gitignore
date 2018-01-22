@@ -3,6 +3,7 @@
 docker/grenouilleapi_postgres/conf.env
 backend/cfg/settings.cfg
 backend/cfg/sqlite.db
+test.py
 
 # Editor directories and files
 .idea

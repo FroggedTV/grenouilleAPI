@@ -120,11 +120,11 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/game/details",
-    "title": "GameDetails",
-    "name": "GameDetails",
+    "url": "/api/game/vip/add",
+    "title": "AddGameVIP",
+    "name": "AddGameVIP",
     "group": "Game",
-    "description": "<p>Request game details.</p>",
+    "description": "<p>Add a new game VIP.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -132,8 +132,8 @@ define({ "api": [
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API-KEY",
-            "description": "<p>Restricted API-KEY necessary to call the endpoint.</p>"
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
           }
         ]
       }
@@ -145,22 +145,64 @@ define({ "api": [
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "KeyError",
-            "description": "<p>Missing or invalid API-KEY header.</p>"
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingHostIdParameter",
-            "description": "<p>hostId is not present.</p>"
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidHostIdParameter",
-            "description": "<p>hostId is not a valid id or not present.</p>"
+            "field": "MissingId",
+            "description": "<p>id is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidId",
+            "description": "<p>id is invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "VIPWithIdAlreadyExists",
+            "description": "<p>VIP with id is already in database invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingType",
+            "description": "<p>type is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidType",
+            "description": "<p>type is not valid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingName",
+            "description": "<p>name is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidName",
+            "description": "<p>name is not valid.</p>"
           }
         ]
       }
@@ -170,114 +212,28 @@ define({ "api": [
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "hostId",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "hostId",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team1",
-            "description": "<p>Name of the first team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team1Ids",
-            "description": "<p>SteamID (64bits) of first team players, separated by ','</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team2",
-            "description": "<p>Name of the second team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players, separated by ','</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "spectatorIds",
-            "description": "<p>SteamID (64bits) of spectator players, separated by ',' (Optional)</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "status",
-            "description": "<p>Game status. Possible values are 'waiting bot', 'creation in progress', 'waiting for players', 'game in progress', 'completed', 'canceled'.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "valveId",
-            "description": "<p>Game Id in Valve database.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "coinTossWinner",
-            "description": "<p>Winner of the coin toss: 'team1' or 'team2'.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team1Choice",
-            "description": "<p>Choice after the coin toss for team1: 'fp', 'sp', 'radiant' or 'dire'</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team2Choice",
-            "description": "<p>Choice after the coin toss for team2: 'fp', 'sp', 'radiant' or 'dire'</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "winner",
-            "description": "<p>Winner of the game: 'team1' or 'team2'.</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "team1NoJoin",
-            "description": "<p>Number of players who didn't join the lobby from team1.</p>"
+            "field": "id",
+            "description": "<p>SteamId of the vip to add.</p>"
           },
           {
-            "group": "Success 200",
-            "type": "Integer",
+            "group": "Parameter",
+            "type": "String",
+            "allowedValues": [
+              "\"CASTER\"",
+              "\"ADMIN\""
+            ],
             "optional": false,
-            "field": "team2NoJoin",
-            "description": "<p>Number of players who didn't join the lobby from team2.</p>"
+            "field": "type",
+            "description": "<p>Type of the vip to add.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[1..]",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the vip to add.</p>"
           }
         ]
       }
@@ -288,11 +244,11 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/api/game/host",
-    "title": "HostGame",
-    "name": "HostGame",
+    "url": "/api/game/create",
+    "title": "CreateGame",
+    "name": "CreateGame",
     "group": "Game",
-    "description": "<p>Queue a game to host by bots.</p>",
+    "description": "<p>Queue a game to be host by bots.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -300,8 +256,8 @@ define({ "api": [
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API-KEY",
-            "description": "<p>Restricted API-KEY necessary to call the endpoint.</p>"
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
           }
         ]
       }
@@ -313,50 +269,99 @@ define({ "api": [
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "KeyError",
-            "description": "<p>Missing or invalid API-KEY header.</p>"
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingTeam1Parameter",
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam1",
             "description": "<p>team1 is not present.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingTeam1IdsParameter",
+            "field": "InvalidTeam1",
+            "description": "<p>team1 is invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam1Ids",
             "description": "<p>team1Ids is not present.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidTeam1IdsParameter",
-            "description": "<p>team1Ids is not a list of steamIds.</p>"
+            "field": "InvalidTeam1Ids",
+            "description": "<p>team1Ids is not an array of integers. Must be of len &gt; 0.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingTeam2Parameter",
+            "field": "MissingTeam2",
             "description": "<p>team2 is not present.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingTeam2IdsParameter",
+            "field": "InvalidTeam2",
+            "description": "<p>team2 is invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeam2Ids",
             "description": "<p>team2Ids is not present.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidTeam2IdsParameter",
-            "description": "<p>team2Ids is not a list of steamIds.</p>"
+            "field": "InvalidTeam2Ids",
+            "description": "<p>team2Ids is not an array of integers. Must be of len &gt; 0.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingName",
+            "description": "<p>name is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidName",
+            "description": "<p>name is not valid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingPassword",
+            "description": "<p>password is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidPassword",
+            "description": "<p>password is not valid.</p>"
           }
         ]
       }
@@ -366,38 +371,136 @@ define({ "api": [
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "String[1..]",
             "optional": false,
             "field": "team1",
             "description": "<p>Name of the first team</p>"
           },
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "Number[]",
             "optional": false,
             "field": "team1Ids",
-            "description": "<p>SteamID (64bits) of first team players, separated by ','</p>"
+            "description": "<p>SteamID (64bits) of first team players</p>"
           },
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "String[1..]",
             "optional": false,
             "field": "team2",
             "description": "<p>Name of the second team</p>"
           },
           {
             "group": "Parameter",
-            "type": "String",
+            "type": "Number[]",
             "optional": false,
             "field": "team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players, separated by ','</p>"
+            "description": "<p>SteamID (64bits) of second team  players</p>"
           },
           {
             "group": "Parameter",
+            "type": "String[1..]",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the game lobby.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[1..]",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password for the lobby.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number[2]",
+            "optional": false,
+            "field": "ids",
+            "description": "<p>Ids of the game that will be hosted by bots.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "backend/routes/game.py",
+    "groupTitle": "Game"
+  },
+  {
+    "type": "get",
+    "url": "/api/game/details",
+    "title": "GetGameDetails",
+    "name": "GetGameDetails",
+    "group": "Game",
+    "description": "<p>Request game details.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "spectatorIds",
-            "description": "<p>SteamID (64bits) of spectator players, separated by ',' (Optional)</p>"
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingId",
+            "description": "<p>Id is not present.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidId",
+            "description": "<p>Id is not an integer.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "NoGameWithId",
+            "description": "<p>Id is not present in database.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>Id of the game hosted by bots.</p>"
           }
         ]
       }
@@ -409,8 +512,255 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "hostId",
-            "description": "<p>Id of the game hosted by bots for further requests.</p>"
+            "field": "id",
+            "description": "<p>Id of the game hosted by bots.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team1",
+            "description": "<p>Name of the first team</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team1Ids",
+            "description": "<p>SteamID (64bits) of first team players, separated by ','</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team2",
+            "description": "<p>Name of the second team</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team2Ids",
+            "description": "<p>SteamID (64bits) of second team  players, separated by ','</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>Game status.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "waitedGame",
+            "description": "<p>Game waited to start (if status 'GameStatus.WAITING_FOR_OTHER_GAME')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "valveId",
+            "description": "<p>Game Id in Valve database. (if status 'GameStatus.COMPLETED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "coinTossWinner",
+            "description": "<p>Winner of the coin toss: 'team1' or 'team2' (if status 'GameStatus.COMPLETED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team1Choice",
+            "description": "<p>Choice after the coin toss for team1: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "team2Choice",
+            "description": "<p>Choice after the coin toss for team2: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "winner",
+            "description": "<p>Winner of the game: 'team1' or 'team2'. (if status 'GameStatus.COMPLETED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "team1NoJoin",
+            "description": "<p>Number of players missing from team1. (if status 'GameStatus.CANCELLED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "team2NoJoin",
+            "description": "<p>Number of players missing from team2. (if status 'GameStatus.CANCELLED')</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "backend/routes/game.py",
+    "groupTitle": "Game"
+  },
+  {
+    "type": "get",
+    "url": "/api/game/vip/list",
+    "title": "ListGameVIPs",
+    "name": "ListGameVIPs",
+    "group": "Game",
+    "description": "<p>Get the list of all VIPs</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "vips",
+            "description": "<p>List of the VIPs authorized in all games.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "vips.id",
+            "description": "<p>Steam Id of the VIP.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "vips.type",
+            "description": "<p>Type of the VIP, 'GameVIPType.CASTER' or 'GameVIPType.ADMIN'.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "vips.name",
+            "description": "<p>Name of the VIP.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "backend/routes/game.py",
+    "groupTitle": "Game"
+  },
+  {
+    "type": "get",
+    "url": "/api/game/vip/remove",
+    "title": "RemoveGameVIP",
+    "name": "RemoveGameVIP",
+    "group": "Game",
+    "description": "<p>Remove a new game VIP.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingId",
+            "description": "<p>id is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidId",
+            "description": "<p>id is invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "VIPDoesNotExist",
+            "description": "<p>VIP with id does not exist in the database.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>SteamId of the vip to remove.</p>"
           }
         ]
       }

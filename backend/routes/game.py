@@ -414,7 +414,7 @@ def build_api_game(app):
         @api {post} /api/game/vip/remove RemoveGameVIP
         @apiName RemoveGameVIP
         @apiGroup Game
-        @apiDescription Remove a new game VIP.
+        @apiDescription Remove a game VIP.
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
         @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.

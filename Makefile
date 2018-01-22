@@ -7,7 +7,7 @@ dev-install:
 	make dev-path-install
 
 dev-path-install:
-	$(foreach dir, $(wildcard .venv/lib/*), echo $(shell pwd)/backend > $(dir)/site-packages/grenouilleapi.pth &&) echo
+	$(foreach dir, $(wildcard .venv/lib/python3.*), echo $(shell pwd)/backend > $(dir)/site-packages/grenouilleapi.pth &&) echo
 
 dev-run:
 	.venv/bin/python3 backend/app.py

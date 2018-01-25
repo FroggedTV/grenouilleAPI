@@ -24,3 +24,13 @@ services:
     entrypoint: python3 /grenouille/backend/app.py
     depends_on:
       - grenouilleapi_postgres
+
+  grenouilleapi_bot:
+    image: grenouilleapi_bot
+    container_name: "grenouilleapi_bot"
+    build:
+      context: ..
+      dockerfile: docker/grenouilleapi/Dockerfile
+    entrypoint: python3 /dazzar/grenouilleapi/bot_app.py
+    depends_on:
+      - grenouilleapi_postgres

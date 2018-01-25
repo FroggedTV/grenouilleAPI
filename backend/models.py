@@ -70,9 +70,9 @@ class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.BigInteger(), primary_key=True)
-    nickname = db.Column(db.String(), nullable=False, default="Anonymous", server_default="Anonymous")
-    nickname_verified = db.Column(db.Boolean(), nullable=False, default=False, server_default="False")
-    avatar = db.Column(db.String(), nullable=False, default="", server_default="")
+    nickname = db.Column(db.String(), nullable=False)
+    nickname_verified = db.Column(db.Boolean(), nullable=False)
+    avatar = db.Column(db.String(), nullable=False)
 
     def __init__(self, id):
         """Instantiate a new user with default values.
@@ -111,28 +111,25 @@ class Game(db.Model):
     name = db.Column(db.String(), nullable=False)
     password = db.Column(db.String(), nullable=False)
 
-    team1 = db.Column(db.String(), nullable=False)
-    team2 = db.Column(db.String(), nullable=False)
+    team1 = db.Column(db.Integer(), nullable=False)
+    team2 = db.Column(db.Integer(), nullable=False)
     team1_ids = db.Column(ScalarListType(int), nullable=False)
     team2_ids = db.Column(ScalarListType(int), nullable=False)
 
     status = db.Column(db.Enum(GameStatus), nullable=False)
-    waited_game = db.Column(db.BigInteger(), nullable=True)
+    team_choosing_first = db.Column(db.Integer(), nullable=False)
 
     valve_id = db.Column(db.BigInteger(), nullable=True)
 
-    def __init__(self, name, password, team1, team2, team1_ids, team2_ids, waited_game=None):
+    def __init__(self, name, password, team1, team2, team1_ids, team2_ids, team_choosing_first=1):
         self.name = name
         self.password = password
         self.team1 = team1
         self.team2 = team2
         self.team1_ids = team1_ids
         self.team2_ids = team2_ids
-        if waited_game is not None:
-            self.waited_game = waited_game
-            self.status = GameStatus.WAITING_FOR_OTHER_GAME
-        else:
-            self.status = GameStatus.WAITING_FOR_BOT
+        self.status = GameStatus.WAITING_FOR_BOT
+        self.team_choosing_first = team_choosing_first
         self.valve_id = None
 
 class GameVIPType(enum.Enum):

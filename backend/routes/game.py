@@ -21,10 +21,10 @@ def build_api_game(app):
         @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
         @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiParam {String[1..]} team1 Name of the first team
-        @apiParam {Number[]} team1Ids SteamID (64bits) of first team players
-        @apiParam {String[1..]} team2 Name of the second team
-        @apiParam {Number[]} team2Ids SteamID (64bits) of second team  players
+        @apiParam {Integer} team1 Id of the first team
+        @apiParam {Integer[]} team1Ids SteamID (64bits) of first team players
+        @apiParam {Integer} team2 Id of the second team
+        @apiParam {Integer[]} team2Ids SteamID (64bits) of second team  players
 
         @apiError (Errors){String} MissingTeam1 team1 is not present.
         @apiError (Errors){String} InvalidTeam1 team1 is invalid.
@@ -41,8 +41,11 @@ def build_api_game(app):
         @apiParam {String[1..]} password Password for the lobby.
         @apiError (Errors){String} MissingPassword password is not specified.
         @apiError (Errors){String} InvalidPassword password is not valid.
+        @apiParam {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first.
+        @apiError (Errors){String} MissingTeamChoosingFirst teamChoosingFirst is not specified.
+        @apiError (Errors){String} InvalidTeamChoosingFirst teamChoosingFirst is not valid.
 
-        @apiSuccess {Number[2]} ids Ids of the game that will be hosted by bots.
+        @apiSuccess {Integer} id Id of the game that will be hosted by bots.
         """
         # Header checks
         header_key = request.headers.get('API_KEY', None)
@@ -66,12 +69,7 @@ def build_api_game(app):
                             'error': 'MissingTeam1',
                             'payload': {}
                             }), 200
-        if not isinstance(team1, str):
-            return jsonify({'success': 'no',
-                            'error': 'InvalidTeam1',
-                            'payload': {}
-                            }), 200
-        if len(team1) == 0:
+        if not isinstance(team1, int):
             return jsonify({'success': 'no',
                             'error': 'InvalidTeam1',
                             'payload': {}
@@ -84,16 +82,12 @@ def build_api_game(app):
                             'error': 'MissingTeam2',
                             'payload': {}
                             }), 200
-        if not isinstance(team2, str):
+        if not isinstance(team2, int):
             return jsonify({'success': 'no',
                             'error': 'InvalidTeam2',
                             'payload': {}
                             }), 200
-        if len(team2) == 0:
-            return jsonify({'success': 'no',
-                            'error': 'InvalidTeam2',
-                            'payload': {}
-                            }), 200
+
         # team1Ids checks
         team1Ids = data.get('team1Ids', None)
         if team1Ids is None:
@@ -168,19 +162,33 @@ def build_api_game(app):
                             'payload': {}
                             }), 200
 
-        # Create game in database
-        game1 = Game(name, password, team1, team2, team1Ids, team2Ids)
-        db.session().add(game1)
-        db.session().commit()
+        # teamChoosingFirst
+        team_choosing_first = data.get('teamChoosingFirst', None)
+        if team_choosing_first is None:
+            return jsonify({'success': 'no',
+                            'error': 'MissingTeamChoosingFirst',
+                            'payload': {}
+                            }), 200
+        if not isinstance(team_choosing_first, int):
+            return jsonify({'success': 'no',
+                            'error': 'InvalidTeamChoosingFirst',
+                            'payload': {}
+                            }), 200
+        if team_choosing_first not in [1, 2]:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidTeamChoosingFirst',
+                            'payload': {}
+                            }), 200
 
-        game2 = Game(name, password, team1, team2, team1Ids, team2Ids, game1.id)
-        db.session().add(game2)
+        # Create game in database
+        game = Game(name, password, team1, team2, team1Ids, team2Ids, team_choosing_first)
+        db.session().add(game)
         db.session().commit()
 
         # Return ids
         return jsonify({'success': 'yes',
                         'payload': {
-                            'ids': [game1.id, game2.id]
+                            'id': game.id
                         }
                         }), 200
 
@@ -201,15 +209,14 @@ def build_api_game(app):
         @apiError (Errors){String} InvalidId Id is not an integer.
         @apiError (Errors){String} NoGameWithId Id is not present in database.
 
-        @apiSuccess {String} id Id of the game hosted by bots.
-        @apiSuccess {String} team1 Name of the first team
-        @apiSuccess {String} team1Ids SteamID (64bits) of first team players, separated by ','
-        @apiSuccess {String} team2 Name of the second team
-        @apiSuccess {String} team2Ids SteamID (64bits) of second team  players, separated by ','
+        @apiSuccess {Integer} id Id of the game hosted by bots.
+        @apiSuccess {Integer} team1 Id of the first team
+        @apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
+        @apiSuccess {Integer} team2 Id of the second team
+        @apiSuccess {Integer[]} team2Ids SteamID (64bits) of second team  players
         @apiSuccess {String} status Game status.
-        @apiSuccess {String} waitedGame Game waited to start (if status 'GameStatus.WAITING_FOR_OTHER_GAME')
-        @apiSuccess {String} valveId Game Id in Valve database. (if status 'GameStatus.COMPLETED')
-        @apiSuccess {String} coinTossWinner Winner of the coin toss: 'team1' or 'team2' (if status 'GameStatus.COMPLETED')
+        @apiSuccess {Integer} teamChoosingFirst Team choosing 'side'/'pick order' first
+        @apiSuccess {Integer} valveId Game Id in Valve database. (if status 'GameStatus.COMPLETED')
         @apiSuccess {String} team1Choice Choice after the coin toss for team1: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')
         @apiSuccess {String} team2Choice Choice after the coin toss for team2: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')
         @apiSuccess {String} winner Winner of the game: 'team1' or 'team2'. (if status 'GameStatus.COMPLETED')
@@ -259,10 +266,9 @@ def build_api_game(app):
             'team1Ids': game.team1_ids,
             'team2': game.team2,
             'team2Ids': game.team2_ids,
-            'status': str(game.status)
+            'status': str(game.status),
+            'teamChoosingFirst': game.team_choosing_first
         }
-        if game.waited_game is not None:
-            payload['waitedGame'] = game.waited_game
         if game.valve_id is not None:
             payload['valveId'] = game.valve_id
         return jsonify({'success': 'yes',

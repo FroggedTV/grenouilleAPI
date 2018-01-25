@@ -12,6 +12,9 @@ dev-path-install:
 dev-run:
 	.venv/bin/python3 backend/app.py
 
+dev-botrun:
+	.venv/bin/python3 backend/bot_app.py
+
 dev-clean:
 	rm -rf .venv
 

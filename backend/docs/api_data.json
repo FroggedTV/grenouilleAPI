@@ -362,6 +362,20 @@
             "optional": false,
             "field": "InvalidPassword",
             "description": "<p>password is not valid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingTeamChoosingFirst",
+            "description": "<p>teamChoosingFirst is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidTeamChoosingFirst",
+            "description": "<p>teamChoosingFirst is not valid.</p>"
           }
         ]
       }
@@ -371,28 +385,28 @@
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String[1..]",
+            "type": "Integer",
             "optional": false,
             "field": "team1",
-            "description": "<p>Name of the first team</p>"
+            "description": "<p>Id of the first team</p>"
           },
           {
             "group": "Parameter",
-            "type": "Number[]",
+            "type": "Integer[]",
             "optional": false,
             "field": "team1Ids",
             "description": "<p>SteamID (64bits) of first team players</p>"
           },
           {
             "group": "Parameter",
-            "type": "String[1..]",
+            "type": "Integer",
             "optional": false,
             "field": "team2",
-            "description": "<p>Name of the second team</p>"
+            "description": "<p>Id of the second team</p>"
           },
           {
             "group": "Parameter",
-            "type": "Number[]",
+            "type": "Integer[]",
             "optional": false,
             "field": "team2Ids",
             "description": "<p>SteamID (64bits) of second team  players</p>"
@@ -410,6 +424,17 @@
             "optional": false,
             "field": "password",
             "description": "<p>Password for the lobby.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "allowedValues": [
+              "1",
+              "2"
+            ],
+            "optional": false,
+            "field": "teamChoosingFirst",
+            "description": "<p>Team choosing 'side'/'pick order' first.</p>"
           }
         ]
       }
@@ -419,10 +444,10 @@
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "Number[2]",
+            "type": "Integer",
             "optional": false,
-            "field": "ids",
-            "description": "<p>Ids of the game that will be hosted by bots.</p>"
+            "field": "id",
+            "description": "<p>Id of the game that will be hosted by bots.</p>"
           }
         ]
       }
@@ -510,38 +535,38 @@
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
             "field": "id",
             "description": "<p>Id of the game hosted by bots.</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
             "field": "team1",
-            "description": "<p>Name of the first team</p>"
+            "description": "<p>Id of the first team</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer[]",
             "optional": false,
             "field": "team1Ids",
-            "description": "<p>SteamID (64bits) of first team players, separated by ','</p>"
+            "description": "<p>SteamID (64bits) of first team players</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
             "field": "team2",
-            "description": "<p>Name of the second team</p>"
+            "description": "<p>Id of the second team</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer[]",
             "optional": false,
             "field": "team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players, separated by ','</p>"
+            "description": "<p>SteamID (64bits) of second team  players</p>"
           },
           {
             "group": "Success 200",
@@ -552,24 +577,17 @@
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
-            "field": "waitedGame",
-            "description": "<p>Game waited to start (if status 'GameStatus.WAITING_FOR_OTHER_GAME')</p>"
+            "field": "teamChoosingFirst",
+            "description": "<p>Team choosing 'side'/'pick order' first</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
             "optional": false,
             "field": "valveId",
             "description": "<p>Game Id in Valve database. (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "coinTossWinner",
-            "description": "<p>Winner of the coin toss: 'team1' or 'team2' (if status 'GameStatus.COMPLETED')</p>"
           },
           {
             "group": "Success 200",
@@ -697,7 +715,7 @@
     "title": "RemoveGameVIP",
     "name": "RemoveGameVIP",
     "group": "Game",
-    "description": "<p>Remove a new game VIP.</p>",
+    "description": "<p>Remove a game VIP.</p>",
     "header": {
       "fields": {
         "Header": [

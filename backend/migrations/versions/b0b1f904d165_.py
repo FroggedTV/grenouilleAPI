@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('team2', sa.Integer(), nullable=False),
     sa.Column('team1_ids', ScalarListType(), nullable=False),
     sa.Column('team2_ids', ScalarListType(), nullable=False),
-    sa.Column('status', sa.Enum('WAITING_FOR_OTHER_GAME', 'WAITING_FOR_BOT', 'CREATION_IN_PROGRESS', 'WAITING_FOR_PLAYERS', 'GAME_IN_PROGRESS', 'COMPLETED', 'CANCELLED', name='gamestatus'), nullable=False),
+    sa.Column('status', sa.Enum('WAITING_FOR_BOT', 'CREATION_IN_PROGRESS', 'WAITING_FOR_PLAYERS', 'GAME_IN_PROGRESS', 'COMPLETED', 'CANCELLED', name='gamestatus'), nullable=False),
     sa.Column('team_choosing_first', sa.Integer(), nullable=False),
     sa.Column('valve_id', sa.BigInteger(), nullable=True),
     sa.PrimaryKeyConstraint('id')

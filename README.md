@@ -1,8 +1,20 @@
 # GrenouilleAPI
 
-## Backend
+## TODO
 
-### Documentation
+### API
+
+- [ ] Add `limit` and `offset` to `ListGameVIPs`
+
+### BOT
+
+- [ ] VIPs enter lobby, CASTER to casting slots, ADMIN to spec
+- [ ] Retry if someone does not connect. 3 retries, 5min between each.
+- [ ] !ready to start game, and not when players all in position
+- [ ] Bot secure cancel
+- [ ] Refactor main loop
+
+## Technical Documentation
 
 The full API documentation is generated with the command `make refresh-docs` in the `/docs` folder.
 This is a simple web page to open in a browser.

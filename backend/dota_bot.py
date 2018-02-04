@@ -32,7 +32,7 @@ class DotaBot(Greenlet):
         credential: `Credential` used to connect to steam.
     """
 
-    def __init__(self, worker_manager, credential, id, name, password, team1, team2, team1_ids, team2_ids,
+    def __init__(self, worker_manager, credential, vips, id, name, password, team1, team2, team1_ids, team2_ids,
                  team_choosing_first):
         """Initialize the Dota bot thread for a unique job process.
 
@@ -66,11 +66,12 @@ class DotaBot(Greenlet):
             'server_region': int(dota2.enums.EServerRegion.Europe),
             'fill_with_bots': False,
             'allow_spectating': True,
-            'allow_cheats': False,
+            #'allow_cheats': False,
+            'allow_cheats': True,
             'allchat': False,
-            'dota_tv_delay': 2,
+            'dota_tv_delay': 3,
             'pause_setting': 1,
-            'leagueid': 4947
+            #'leagueid': 4947 # FTV LEAGUE SEASON 1
         }
 
         # Choices
@@ -222,7 +223,7 @@ class DotaBot(Greenlet):
 
         sleep(10) # Wait for setup
 
-        remaining_time = 330 #1800 # Attente 30 min au max
+        remaining_time = 1800 # Attente 30 min au max
 
         # P1: Wait for people to join for 25 minutes, P2 if slots are filled (X=min remaining )
         self.print_info('P1: Waiting for players.')
@@ -298,7 +299,7 @@ class DotaBot(Greenlet):
                 self.team_choices[self.team_choosing_now - 1])
         else:
             # Choice
-            msg = '{0} Team {1} a choisi {2}.'.format(
+            msg = '{0} Team {1} a choisi {2}. Lancement dès que les deux équipes sont prêtes.'.format(
                 self.remaining_time_to_string(remaining_time),
                 self.team_choosing_now,
                 self.team_choices[self.team_choosing_now - 1])
@@ -315,18 +316,14 @@ class DotaBot(Greenlet):
             self.lobby_options['cm_pick'] = DOTA_CM_PICK.DOTA_CM_GOOD_GUYS
         else:
             self.lobby_options['cm_pick'] = DOTA_CM_PICK.DOTA_CM_BAD_GUYS
-        self.dota.config_practice_lobby(options=options)
+        self.dota.config_practice_lobby(options=self.lobby_options)
         self.machine_state = DotaBotState.WAITING_FOR_READY
 
         # Resync time to modulo 30
-        msg = '{0} Lancement dès que les deux équipes sont !ready.'.format(
-            self.remaining_time_to_string(remaining_time))
-        self.dota.channels.lobby.send(msg)
         sleep(remaining_time % 30)
         remaining_time -= remaining_time % 30
 
-
-        # P3: Give min(1, 30-X-2) min for teams to get into slots, starts when both teams ready, or time passed
+        # P3: Give min(1, 30-X-2) min for teams to get into slots, starts when both teams ready
         team_names, missing_players = self.check_teams()
         while (remaining_time > 0 and (team_names[0] is False or
                                        team_names[1] is False or
@@ -337,6 +334,7 @@ class DotaBot(Greenlet):
             remaining_time -= 30
             team_names, missing_players = self.check_teams()
 
+        # Cancel lobby test
         if remaining_time <= 0:
             self.dota.channels.lobby.send('Joueurs manquants, lobby annulé.')
             with self.app.app_context():
@@ -348,40 +346,40 @@ class DotaBot(Greenlet):
             self.end_bot()
             return
 
+        # Start and retry
         self.dota.channels.lobby.send('Démarrage de la partie...')
-        sleep(15)
+        self.dota.launch_practice_lobby()
+        trys = 1
+        sleep(30)
 
-        # P4: wait for game to finish
+        if self.lobby_status.state == 0:
+            # RETRY 3 times and kill lobby if 3 fails
+            pass
 
-        # P5: report results
-        self.end_bot()
+        # IN GAME WAIT
+        with self.app.app_context():
+            game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
+            if game is not None:
+                game.status = GameStatus.GAME_IN_PROGRESS
+                db.session().commit()
+        while self.lobby_status.state != 3:
+            sleep(30)
 
-        """
-            start = self.manage_player_waiting()
-
-            if not start:
-                self.dota.send_message(self.lobby_channel_id, 'Annulation de la partie.')
-                self.process_game_dodge()
-            else:
-                self.dota.send_message(self.lobby_channel_id, 'Tous les joueurs sont présents.')
-                self.start_game()
-
-                # Waiting PostGame = 3 or UI = 0 (means no loading)
-                while self.game_status.state != 0 and self.game_status.state != 3:
-                    sleep(5)
-
-                if self.game_status.state == 0:
-                    self.process_game_dodge()
-                elif self.game_status.state == 3:
-                    self.process_endgame_results()
-
-            if self.lobby_channel_id is not None:
-                self.dota.leave_channel(self.lobby_channel_id)
-                self.lobby_channel_id = None
-
-            self.dota.leave_practice_lobby()
-            self.end_job_processing()
-            """
+        # Game over
+        if self.lobby_status.state == 3:
+            self.print_info(self.lobby_status)
+            with self.app.app_context():
+                game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
+                if game is not None:
+                    game.status = GameStatus.COMPLETED
+                    game.valve_id = self.lobby_status.match_id
+                    if ((self.lobby_status.match_outcome == 2 and not self.team_inverted) or
+                        (self.lobby_status.match_outcome == 3 and self.team_inverted)):
+                        game.winner = 1
+                    else:
+                        game.winner = 2
+                    db.session().commit()
+            self.end_bot()
 
     def game_update(self, message):
         """Callback fired when the game lobby change, update local information."""

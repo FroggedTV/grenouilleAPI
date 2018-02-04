@@ -174,7 +174,7 @@
             "type": "String",
             "optional": false,
             "field": "VIPWithIdAlreadyExists",
-            "description": "<p>VIP with id is already in database invalid.</p>"
+            "description": "<p>VIP with id is already in database.</p>"
           },
           {
             "group": "Errors",
@@ -215,7 +215,7 @@
             "type": "Integer",
             "optional": false,
             "field": "id",
-            "description": "<p>SteamId of the vip to add.</p>"
+            "description": "<p>SteamId (64bits) of the vip to add.</p>"
           },
           {
             "group": "Parameter",
@@ -571,6 +571,14 @@
           {
             "group": "Success 200",
             "type": "String",
+            "allowedValues": [
+              "\"GameStatus.WAITING_FOR_BOT\"",
+              "\"GameStatus.CREATION_IN_PROGRESS\"",
+              "\"GameStatus.WAITING_FOR_PLAYERS\"",
+              "\"GameStatus.GAME_IN_PROGRESS\"",
+              "\"GameStatus.COMPLETED\"",
+              "\"GameStatus.CANCELLED\""
+            ],
             "optional": false,
             "field": "status",
             "description": "<p>Game status.</p>"
@@ -578,6 +586,10 @@
           {
             "group": "Success 200",
             "type": "Integer",
+            "allowedValues": [
+              "1",
+              "2"
+            ],
             "optional": false,
             "field": "teamChoosingFirst",
             "description": "<p>Team choosing 'side'/'pick order' first</p>"
@@ -587,42 +599,18 @@
             "type": "Integer",
             "optional": false,
             "field": "valveId",
-            "description": "<p>Game Id in Valve database. (if status 'GameStatus.COMPLETED')</p>"
+            "description": "<p>Game Id in Valve database (if status 'GameStatus.COMPLETED')</p>"
           },
           {
             "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team1Choice",
-            "description": "<p>Choice after the coin toss for team1: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "team2Choice",
-            "description": "<p>Choice after the coin toss for team2: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
+            "type": "Integer",
+            "allowedValues": [
+              "1",
+              "2"
+            ],
             "optional": false,
             "field": "winner",
-            "description": "<p>Winner of the game: 'team1' or 'team2'. (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "team1NoJoin",
-            "description": "<p>Number of players missing from team1. (if status 'GameStatus.CANCELLED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "team2NoJoin",
-            "description": "<p>Number of players missing from team2. (if status 'GameStatus.CANCELLED')</p>"
+            "description": "<p>Team winning the game (if status 'GameStatus.COMPLETED')</p>"
           }
         ]
       }
@@ -691,9 +679,13 @@
           {
             "group": "Success 200",
             "type": "String",
+            "allowedValues": [
+              "\"GameVIPType.CASTER\"",
+              "\"GameVIPType.ADMIN\""
+            ],
             "optional": false,
             "field": "vips.type",
-            "description": "<p>Type of the VIP, 'GameVIPType.CASTER' or 'GameVIPType.ADMIN'.</p>"
+            "description": "<p>Type of the VIP.</p>"
           },
           {
             "group": "Success 200",

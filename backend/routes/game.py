@@ -214,15 +214,14 @@ def build_api_game(app):
         @apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
         @apiSuccess {Integer} team2 Id of the second team
         @apiSuccess {Integer[]} team2Ids SteamID (64bits) of second team  players
-        @apiSuccess {String} status Game status.
-        @apiSuccess {Integer} teamChoosingFirst Team choosing 'side'/'pick order' first
-        @apiSuccess {Integer} valveId Game Id in Valve database. (if status 'GameStatus.COMPLETED')
-        @apiSuccess {String} team1Choice Choice after the coin toss for team1: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')
-        @apiSuccess {String} team2Choice Choice after the coin toss for team2: 'fp', 'sp', 'radiant' or 'dire' (if status 'GameStatus.COMPLETED')
-        @apiSuccess {String} winner Winner of the game: 'team1' or 'team2'. (if status 'GameStatus.COMPLETED')
-        @apiSuccess {Integer} team1NoJoin Number of players missing from team1. (if status 'GameStatus.CANCELLED')
-        @apiSuccess {Integer} team2NoJoin Number of players missing from team2. (if status 'GameStatus.CANCELLED')
+        @apiSuccess {String="GameStatus.WAITING_FOR_BOT", "GameStatus.CREATION_IN_PROGRESS",
+         "GameStatus.WAITING_FOR_PLAYERS", "GameStatus.GAME_IN_PROGRESS", "GameStatus.COMPLETED",
+         "GameStatus.CANCELLED"} status Game status.
+        @apiSuccess {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first
+        @apiSuccess {Integer} valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
+        @apiSuccess {Integer=1,2} winner Team winning the game (if status 'GameStatus.COMPLETED')
         """
+
         # Header checks
         header_key = request.headers.get('API_KEY', None)
         if header_key is None:
@@ -289,7 +288,7 @@ def build_api_game(app):
 
         @apiSuccess {Object[]} vips List of the VIPs authorized in all games.
         @apiSuccess {Integer} vips.id Steam Id of the VIP.
-        @apiSuccess {String} vips.type Type of the VIP, 'GameVIPType.CASTER' or 'GameVIPType.ADMIN'.
+        @apiSuccess {String="GameVIPType.CASTER","GameVIPType.ADMIN"} vips.type Type of the VIP.
         @apiSuccess {String} vips.name Name of the VIP.
         """
         # Header checks
@@ -306,11 +305,7 @@ def build_api_game(app):
                             }), 200
 
         # Return ids
-        vips = []
-        for vip in db.session().query(GameVIP).all():
-            vips.append({'id': vip.id,
-                         'type': str(vip.type),
-                         'name': vip.name})
+        vips = GameVIP.get_all_vips()
         return jsonify({'success': 'yes',
                         'payload': {'vips': vips}
                         }), 200
@@ -327,10 +322,10 @@ def build_api_game(app):
         @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
         @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiParam {Integer} id SteamId of the vip to add.
+        @apiParam {Integer} id SteamId (64bits) of the vip to add.
         @apiError (Errors){String} MissingId id is not specified.
         @apiError (Errors){String} InvalidId id is invalid.
-        @apiError (Errors){String} VIPWithIdAlreadyExists VIP with id is already in database invalid.
+        @apiError (Errors){String} VIPWithIdAlreadyExists VIP with id is already in database.
 
         @apiParam {String="CASTER","ADMIN"} type Type of the vip to add.
         @apiError (Errors){String} MissingType type is not specified.

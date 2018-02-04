@@ -5,7 +5,7 @@ from gevent import Greenlet, sleep
 
 from app import create_app
 from dota_bot import DotaBot
-from models import db, Game, GameStatus
+from models import db, Game, GameStatus, GameVIP
 from threading import Lock
 
 # Log
@@ -68,14 +68,17 @@ class WorkerManager(Greenlet):
         """Start the main loop of the thread, creating Dota bots to process available jobs."""
         while True:
             with self.app.app_context():
+                vips = GameVIP.get_all_vips()
+
                 for game in db.session().query(Game)\
                                         .filter(Game.status==GameStatus.WAITING_FOR_BOT)\
                                         .order_by(Game.id).all():
                     if len(self.credentials) == 0:
                         continue
+
                     self.mutex.acquire()
                     credential = self.credentials.pop(random.randint(0, len(self.credentials) - 1))
-                    g = DotaBot(self, credential, game.id, game.name, game.password, game.team1, game.team2,
+                    g = DotaBot(self, credential, vips, game.id, game.name, game.password, game.team1, game.team2,
                                 game.team1_ids, game.team2_ids, game.team_choosing_first)
                     self.working_bots[credential.login] = g
                     game.status = GameStatus.CREATION_IN_PROGRESS

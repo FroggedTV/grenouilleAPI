@@ -95,7 +95,6 @@ class User(db.Model):
         return User.query.filter_by(id=id).one_or_none()
 
 class GameStatus(enum.Enum):
-    WAITING_FOR_OTHER_GAME = 'Waiting for other game to be over to start a new one.'
     WAITING_FOR_BOT = 'Waiting for a bot to start and pick the game.'
     CREATION_IN_PROGRESS = 'Bot is creating the game inside the client.'
     WAITING_FOR_PLAYERS = 'Game is created, waiting for players to join.'
@@ -120,6 +119,7 @@ class Game(db.Model):
     team_choosing_first = db.Column(db.Integer(), nullable=False)
 
     valve_id = db.Column(db.BigInteger(), nullable=True)
+    winner = db.Column(db.Integer(), nullable=True)
 
     def __init__(self, name, password, team1, team2, team1_ids, team2_ids, team_choosing_first=1):
         self.name = name
@@ -131,6 +131,7 @@ class Game(db.Model):
         self.status = GameStatus.WAITING_FOR_BOT
         self.team_choosing_first = team_choosing_first
         self.valve_id = None
+        self.winner = None
 
 class GameVIPType(enum.Enum):
     CASTER = 'CASTER'
@@ -148,3 +149,13 @@ class GameVIP(db.Model):
         self.id = id
         self.type = GameVIPType[type]
         self.name = name
+
+    @staticmethod
+    def get_all_vips():
+        """Get the list of all VIPs authorized to get inside all lobbies."""
+        vips = []
+        for vip in db.session().query(GameVIP).all():
+            vips.append({'id': vip.id,
+                         'type': str(vip.type),
+                         'name': vip.name})
+        return vips

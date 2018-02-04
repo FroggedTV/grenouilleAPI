@@ -1,10 +1,11 @@
 import logging
 import enum
+import random
 from gevent import Greenlet, sleep
 
 from steam import SteamClient, SteamID
 import dota2
-from dota2.enums import DOTA_GC_TEAM, EMatchOutcome
+from dota2.enums import DOTA_GC_TEAM, DOTA_CM_PICK, EMatchOutcome
 
 from app import create_app
 from models import db, Game, GameStatus
@@ -58,7 +59,26 @@ class DotaBot(Greenlet):
         self.team1_ids = team1_ids
         self.team2_ids = team2_ids
         self.vips = []
+        self.lobby_options = {
+            'game_name': self.name,
+            'pass_key': self.password,
+            'game_mode': dota2.enums.DOTA_GameMode.DOTA_GAMEMODE_CM,
+            'server_region': int(dota2.enums.EServerRegion.Europe),
+            'fill_with_bots': False,
+            'allow_spectating': True,
+            'allow_cheats': False,
+            'allchat': False,
+            'dota_tv_delay': 2,
+            'pause_setting': 1,
+            'leagueid': 4947
+        }
+
+        # Choices
         self.team_choosing_first = team_choosing_first
+        self.team_choosing_now = team_choosing_first
+        self.team_choices = [None, None]
+        self.team_choices_possibilities = ['!radiant', '!dire', '!fp', '!sp']
+        self.team_inverted = False
 
         # State machine variables
         self.machine_state = DotaBotState.STARTING
@@ -169,10 +189,19 @@ class DotaBot(Greenlet):
         command = message.text[1:].strip().split(' ')
         if len(command) == 0:
             return
+
+        message_steam_id = SteamID(message.account_id).as_64
         if command[0] == 'philaeux':
             self.dota.channels.lobby.send('Respectez mon créateur ou je vous def lose.')
         elif command[0] == 'autodestruction':
             self.end_bot()
+        elif command[0] == 'fp' or command[0] == 'sp' or command[0] == 'radiant' or command[0] == 'dire':
+            if '!{0}'.format(command[0]) in self.team_choices_possibilities:
+                if self.machine_state == DotaBotState.PICKING_SIDE_ORDER:
+                    compare = self.team1_ids if self.team_choosing_now == 1 else self.team2_ids
+                    if message_steam_id in compare:
+                        self.team_choices[self.team_choosing_now-1] = command[0]
+
 
     # Hosting events
     def host_game(self):
@@ -193,8 +222,7 @@ class DotaBot(Greenlet):
 
         sleep(10) # Wait for setup
 
-        refresh_rate = 30
-        remaining_time = 1800
+        remaining_time = 330 #1800 # Attente 30 min au max
 
         # P1: Wait for people to join for 25 minutes, P2 if slots are filled (X=min remaining )
         self.print_info('P1: Waiting for players.')
@@ -204,13 +232,124 @@ class DotaBot(Greenlet):
                                          missing_players[0] != 0 or
                                          missing_players[1] != 0)):
             self.display_status(remaining_time, missing_players, team_names)
-            sleep(refresh_rate)
-            remaining_time = remaining_time - refresh_rate
+            sleep(30)
+            remaining_time -= 30
             team_names, missing_players = self.check_teams()
 
         # P2: Give 1min for each teams to pick sides/picks
+        self.print_info('P2: Choix side/order.')
+        self.machine_state = DotaBotState.PICKING_SIDE_ORDER
+        msg = '{0} Choix du side/ordre, team {1} choisit entre {2}.'.format(
+            self.remaining_time_to_string(remaining_time),
+            self.team_choosing_now,
+            ', '.join(self.team_choices_possibilities))
+        self.dota.channels.lobby.send(msg)
+
+        team_choice_remaining_time = [60, 60]
+        while team_choice_remaining_time[self.team_choosing_now-1]:
+            sleep(1)
+            remaining_time -= 1
+            team_choice_remaining_time[self.team_choosing_now-1] -= 1
+            if self.team_choices[self.team_choosing_now-1] is not None:
+                break
+
+        if self.team_choices[self.team_choosing_now - 1] is None:
+            # RANDOM
+            self.team_choices[self.team_choosing_now - 1] = random.choice(self.team_choices_possibilities)[1:]
+            msg = '{0} Team {1} a random {2}.'.format(
+                self.remaining_time_to_string(remaining_time),
+                self.team_choosing_now,
+                self.team_choices[self.team_choosing_now - 1])
+        else:
+            # Choice
+            msg = '{0} Team {1} a choisi {2}.'.format(
+                self.remaining_time_to_string(remaining_time),
+                self.team_choosing_now,
+                self.team_choices[self.team_choosing_now - 1])
+
+        self.team_choices_possibilities.remove('!{0}'.format(self.team_choices[self.team_choosing_now - 1]))
+        complementary = {
+            'fp': '!sp',
+            'sp': '!fp',
+            'radiant': '!dire',
+            'dire': '!radiant'
+        }
+        self.team_choices_possibilities.remove(complementary[self.team_choices[self.team_choosing_now - 1]])
+        self.team_choosing_now = (self.team_choosing_now % 2) + 1
+        msg = '{0} Team {1} choisit entre {2}.'.format(
+            msg,
+            self.team_choosing_now,
+            ', '.join(self.team_choices_possibilities))
+        self.dota.channels.lobby.send(msg)
+
+        while team_choice_remaining_time[self.team_choosing_now-1]:
+            sleep(1)
+            remaining_time -= 1
+            team_choice_remaining_time[self.team_choosing_now-1] -= 1
+            if self.team_choices[self.team_choosing_now-1] is not None:
+                break
+
+        if self.team_choices[self.team_choosing_now - 1] is None:
+            # RANDOM
+            self.team_choices[self.team_choosing_now - 1] = random.choice(self.team_choices_possibilities)[1:]
+            msg = '{0} Team {1} a random {2}.'.format(
+                self.remaining_time_to_string(remaining_time),
+                self.team_choosing_now,
+                self.team_choices[self.team_choosing_now - 1])
+        else:
+            # Choice
+            msg = '{0} Team {1} a choisi {2}.'.format(
+                self.remaining_time_to_string(remaining_time),
+                self.team_choosing_now,
+                self.team_choices[self.team_choosing_now - 1])
+        self.dota.channels.lobby.send(msg)
+
+        # Config
+        if self.team_choices[0] == 'dire' or self.team_choices[1] == 'radiant':
+            self.team_inverted = True
+            self.dota.flip_lobby_teams()
+        if ((self.team_choices[0] == 'fp' and self.team_choices[1] == 'dire') or
+            (self.team_choices[0] == 'sp' and self.team_choices[1] == 'radiant') or
+            (self.team_choices[0] == 'radiant' and self.team_choices[1] == 'sp') or
+            (self.team_choices[0] == 'dire' and self.team_choices[1] == 'fp')):
+            self.lobby_options['cm_pick'] = DOTA_CM_PICK.DOTA_CM_GOOD_GUYS
+        else:
+            self.lobby_options['cm_pick'] = DOTA_CM_PICK.DOTA_CM_BAD_GUYS
+        self.dota.config_practice_lobby(options=options)
+        self.machine_state = DotaBotState.WAITING_FOR_READY
+
+        # Resync time to modulo 30
+        msg = '{0} Lancement dès que les deux équipes sont !ready.'.format(
+            self.remaining_time_to_string(remaining_time))
+        self.dota.channels.lobby.send(msg)
+        sleep(remaining_time % 30)
+        remaining_time -= remaining_time % 30
+
 
         # P3: Give min(1, 30-X-2) min for teams to get into slots, starts when both teams ready, or time passed
+        team_names, missing_players = self.check_teams()
+        while (remaining_time > 0 and (team_names[0] is False or
+                                       team_names[1] is False or
+                                       missing_players[0] != 0 or
+                                       missing_players[1] != 0)):
+            self.display_status(remaining_time, missing_players, team_names)
+            sleep(30)
+            remaining_time -= 30
+            team_names, missing_players = self.check_teams()
+
+        if remaining_time <= 0:
+            self.dota.channels.lobby.send('Joueurs manquants, lobby annulé.')
+            with self.app.app_context():
+                game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
+                if game is not None:
+                    game.status = GameStatus.CANCELLED
+                    db.session().commit()
+            sleep(15)
+            self.end_bot()
+            return
+
+        self.dota.channels.lobby.send('Démarrage de la partie...')
+        sleep(15)
 
         # P4: wait for game to finish
 
@@ -256,11 +395,18 @@ class DotaBot(Greenlet):
                 member.id not in self.team2_ids and
                 member.id not in self.vips):
                 self.dota.practice_lobby_kick(SteamID(member.id).as_32)
-            if ((member.team == DOTA_GC_TEAM.GOOD_GUYS and member.id not in self.team1_ids) or
-                (member.team == DOTA_GC_TEAM.BAD_GUYS and member.id not in self.team2_ids) or
-                (member.team == DOTA_GC_TEAM.SPECTATOR) or
+            if ((member.team == DOTA_GC_TEAM.SPECTATOR) or
                 (member.team == DOTA_GC_TEAM.BROADCASTER and member.id not in self.vips)):
                 self.dota.practice_lobby_kick_from_team(SteamID(member.id).as_32)
+            else:
+                if self.team_inverted:
+                    if ((member.team == DOTA_GC_TEAM.BAD_GUYS and member.id not in self.team1_ids) or
+                        (member.team == DOTA_GC_TEAM.GOOD_GUYS and member.id not in self.team2_ids)):
+                        self.dota.practice_lobby_kick_from_team(SteamID(member.id).as_32)
+                else:
+                    if ((member.team == DOTA_GC_TEAM.GOOD_GUYS and member.id not in self.team1_ids) or
+                        (member.team == DOTA_GC_TEAM.BAD_GUYS and member.id not in self.team2_ids)):
+                        self.dota.practice_lobby_kick_from_team(SteamID(member.id).as_32)
 
     def initialize_lobby(self):
         """Setup the game lobby with the good options, and change status in database."""
@@ -268,20 +414,7 @@ class DotaBot(Greenlet):
 
         self.dota.channels.join_lobby_channel()
         self.dota.join_practice_lobby_team()
-        options = {
-            'game_name': self.name,
-            'pass_key': self.password,
-            'game_mode': dota2.enums.DOTA_GameMode.DOTA_GAMEMODE_CM,
-            'server_region': int(dota2.enums.EServerRegion.Europe),
-            'fill_with_bots': False,
-            'allow_spectating': True,
-            'allow_cheats': False,
-            'allchat': False,
-            'dota_tv_delay': 2,
-            'pause_setting': 1,
-            'leagueid': 4947
-        }
-        self.dota.config_practice_lobby(options=options)
+        self.dota.config_practice_lobby(options=self.lobby_options)
         with self.app.app_context():
             game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
             if game is not None:
@@ -300,7 +433,10 @@ class DotaBot(Greenlet):
             elif member.team == DOTA_GC_TEAM.BAD_GUYS:
                 missing_players[1] = missing_players[1] - 1
         i = 0
-        compare = [self.team1, self.team2]
+        if self.team_inverted:
+            compare = [self.team2, self.team1]
+        else:
+            compare = [self.team1, self.team2]
         for team_detail in self.lobby_status.team_details:
             team_names[i] = team_detail.team_id == compare[i]
             i = i+1
@@ -308,7 +444,7 @@ class DotaBot(Greenlet):
 
     def display_status(self, remaining_time, missing_players, team_names):
         """Display status in chat."""
-        msg = '{0}m{1:02d}s -'.format(remaining_time//60, remaining_time%60)
+        msg = self.remaining_time_to_string(remaining_time)
         if not team_names[0]:
             msg = msg + " Le Radiant n'a pas la bonne team."
         if missing_players[0] == 1:
@@ -322,6 +458,11 @@ class DotaBot(Greenlet):
         elif missing_players[1] > 1:
             msg = msg + " {0} joueurs Dire manquants.".format(missing_players[1])
         self.dota.channels.lobby.send(msg)
+
+    @staticmethod
+    def remaining_time_to_string(remaining_time):
+        return '{0}m{1:02d}s -'.format(remaining_time//60, remaining_time%60)
+
 
     # def process_game_dodge(self):
     #     """Punish players stopping game start."""
@@ -365,54 +506,4 @@ class DotaBot(Greenlet):
     #             match.server = self.game_status.server_id
     #         db.session.commit()
     #     sleep(10)
-    #
-    # def process_endgame_results(self):
-    #     """After a game, process lobby results into database."""
-    #     self.print_info('Game %s over.' % self.job.match_id)
-    #
-    #     with self.app.app_context():
-    #         match = Match.query.filter_by(id=self.job.match_id).first()
-    #         match.status = constants.MATCH_STATUS_ENDED
-    #         match.server = None
-    #         if self.game_status.match_outcome == 2:
-    #             match.radiant_win = True
-    #         elif self.game_status.match_outcome == 3:
-    #             match.radiant_win = False
-    #         else:
-    #             match.radiant_win = None
-    #
-    #         self.players = {}
-    #         for player in PlayerInMatch.query. \
-    #                 options(joinedload_all('player')). \
-    #                 filter(PlayerInMatch.match_id == self.job.match_id). \
-    #                 all():
-    #             if player.player.current_match == self.job.match_id:
-    #                 player.player.current_match = None
-    #             self.players[player.player_id] = player
-    #
-    #         # Process scoreboard updates
-    #         for player_id, player in self.players.items():
-    #             score = Scoreboard.query.filter_by(ladder_name=match.section, user_id=player_id).first()
-    #             if score is None:
-    #                 score = Scoreboard(user=player.player, ladder_name=match.section)
-    #                 db.session.add(score)
-    #             score.matches += 1
-    #         for player in self.game_status.members:
-    #             if player.id == self.dota.steam_id:
-    #                 continue
-    #             id = player.id
-    #             score = Scoreboard.query.filter_by(ladder_name=match.section, user_id=id).first()
-    #             if (self.players[id].is_radiant and self.game_status.match_outcome == 2) or \
-    #                     (not self.players[id].is_radiant and self.game_status.match_outcome == 3):
-    #                 score.points += 1
-    #                 score.win += 1
-    #             elif (self.players[id].is_radiant and self.game_status.match_outcome == 3) or \
-    #                     (not self.players[id].is_radiant and self.game_status.match_outcome == 2):
-    #                 score.loss += 1
-    #         for player in self.game_status.left_members:
-    #             score = Scoreboard.query.filter_by(ladder_name=match.section, user_id=player.id).first()
-    #             self.players[player.id].is_leaver = True
-    #             score.points -= 3
-    #             score.leave += 1
-    #
-    #         db.session.commit()
+

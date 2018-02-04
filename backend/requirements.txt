@@ -9,4 +9,4 @@ psycopg2
 tornado
 pyjwt
 steam
-git+https://github.com/Philaeux/dota2.git#egg=dota2
+git+https://github.com/ValvePython/dota2.git#egg=dota2

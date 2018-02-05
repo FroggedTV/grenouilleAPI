@@ -1,11 +1,23 @@
-# Backend
+###########
+# Backend #
+###########
+
+# Virtual Environment
 .venv
+
+# Configs
 docker/grenouilleapi_postgres/conf.env
 backend/cfg/settings.cfg
+
+# Dev database
 backend/cfg/sqlite.db
+
+# Python file to run tests
 test.py
 
-# Editor directories and files
+################################
+# Editor directories and files #
+################################
 .idea
 *.suo
 *.ntvs*

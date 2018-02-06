@@ -20,7 +20,7 @@ Features:
 - [X] Add a !destroy command so ADMINs can hard cancel a lobby
 
 Code design:
-- [ ] Bot secure cancel, destroy Greenlet and every sleeping events.
+- [X] Bot secure cancel, destroy Greenlet and every sleeping events.
 - [ ] Refactor main loop (player waiting, side/order, waiting again, retry, game waiting, result)
 - [ ] Function documentations
 

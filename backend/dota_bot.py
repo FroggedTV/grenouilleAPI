@@ -13,13 +13,14 @@ from models import db, Game, GameStatus
 class DotaBotState(enum.Enum):
     STARTING = 0
     HOSTING_GAME = 1
-    WAITING_FOR_PLAYERS = 2
-    PICKING_SIDE_ORDER = 3
-    WAITING_FOR_READY = 4
-    LOADING_GAME = 5
-    RETRY_WAITING_FOR_READY = 6
-    GAME_IN_PROGRESS = 7
-    GAME_FINISHED = 8
+    SETUP_GAME = 2
+    WAITING_FOR_PLAYERS = 3
+    PICKING_SIDE_ORDER = 4
+    WAITING_FOR_READY = 5
+    LOADING_GAME = 6
+    RETRY_WAITING_FOR_READY = 7
+    GAME_IN_PROGRESS = 8
+    GAME_FINISHED = 9
 
     FINISHED = 100
 
@@ -32,7 +33,7 @@ class DotaBot(Greenlet):
         credential: `Credential` used to connect to steam.
     """
 
-    def __init__(self, worker_manager, credential, vips, id, name, password, team1, team2, team1_ids, team2_ids,
+    def __init__(self, worker_manager, credential, admins, casters, id, name, password, team1, team2, team1_ids, team2_ids,
                  team_choosing_first):
         """Initialize the Dota bot thread for a unique job process.
 
@@ -58,7 +59,8 @@ class DotaBot(Greenlet):
         self.team2 = team2
         self.team1_ids = team1_ids
         self.team2_ids = team2_ids
-        self.vips = []
+        self.admins = admins
+        self.casters = casters
         self.lobby_options = {
             'game_name': self.name,
             'pass_key': self.password,
@@ -69,7 +71,7 @@ class DotaBot(Greenlet):
             #'allow_cheats': False,
             'allow_cheats': True,
             'allchat': False,
-            'dota_tv_delay': 3,
+            'dota_tv_delay': 2,
             'pause_setting': 1,
             #'leagueid': 4947 # FTV LEAGUE SEASON 1
         }
@@ -115,112 +117,9 @@ class DotaBot(Greenlet):
         self.print_info('Connecting to Steam...')
         self.client.connect(retry=None)  # Try connecting with infinite retries
 
-        while self.machine_state != DotaBotState.FINISHED:
-            sleep(30)
-
-        self.client.disconnect()
-        self.worker_manager.bot_end(self.credential)
-
-    def end_bot(self):
-        """End the life of the bot."""
-        self.print_info('Bot work over.')
-        self.dota.destroy_lobby()
-        self.dota.leave_practice_lobby()
-        self.machine_state = DotaBotState.FINISHED
-
-    # Helpers
-
-    def print_info(self, trace):
-        """Wrapper of `logging.info` with bot name prefix.
-
-        Args:
-            trace: String to output as INFO.
-        """
-        logging.info('%s: %s', self.credential.login, trace)
-
-    def print_error(self, trace):
-        """Wrapper of `logging.error` with bot name prefix.
-
-        Args:
-            trace: String to output as ERROR.
-        """
-        logging.error("%s: %s", self.credential.login, trace)
-
-    # Callback of Steam and Dota clients
-
-    def steam_connected(self):
-        """Callback fired when the bot is connected to Steam, login user."""
-        self.print_info('Connected to Steam.')
-        self.client.login(self.credential.login, self.credential.password)
-
-    def steam_logged(self):
-        """Callback fired when the bot is logged into Steam, starting Dota."""
-        self.print_info('Logged to Steam.')
-        self.dota.launch()
-
-    def steam_disconnected(self):
-        """Callback fired when the bot is disconnected from Steam"""
-        self.print_info('Disconnected from Steam.')
-
-    def dota_ready(self):
-        """Callback fired when the Dota application is ready, resume the job processing."""
-        self.print_info('Dota application is ready.')
-        sleep(10) # Safety to leave already existing lobby if bot is lost in the matrix
-        self.host_game()
-
-    def closed_dota(self):
-        """Callback fired when the Dota application is closed."""
-        self.print_info('Dota application is closed.')
-
-    # Messaging events
-    def channel_join(self, channel_info):
-        pass
-        #self.print_info('Channel join! {0}'.format(channel_info))
-        """
-        if channel_info.channel_type != dota2.enums.DOTAChatChannelType_t.DOTAChannelType_Lobby:
-            self.dota.leave_channel(channel_info.channel_id)
-        else:
-            if self.game_status is not None:
-                if channel_info.channel_name == 'Lobby_{0}'.format(self.game_status.lobby_id):
-                    self.lobby_channel_id = channel_info.channel_id"""
-
-    def channel_message(self, channel, message):
-        if message.text[0] != '!':
-            return
-        command = message.text[1:].strip().split(' ')
-        if len(command) == 0:
-            return
-
-        message_steam_id = SteamID(message.account_id).as_64
-        if command[0] == 'philaeux':
-            self.dota.channels.lobby.send('Respectez mon créateur ou je vous def lose.')
-        elif command[0] == 'autodestruction':
-            self.end_bot()
-        elif command[0] == 'fp' or command[0] == 'sp' or command[0] == 'radiant' or command[0] == 'dire':
-            if '!{0}'.format(command[0]) in self.team_choices_possibilities:
-                if self.machine_state == DotaBotState.PICKING_SIDE_ORDER:
-                    compare = self.team1_ids if self.team_choosing_now == 1 else self.team2_ids
-                    if message_steam_id in compare:
-                        self.team_choices[self.team_choosing_now-1] = command[0]
-
-
-    # Hosting events
-    def host_game(self):
-        """Start the processing of the job with the appropriate handler."""
-        self.print_info('Hosting game {0} with password {1}'.format(self.name, self.password))
-        self.machine_state = DotaBotState.HOSTING_GAME
-        self.dota.create_practice_lobby(password=self.password)
-
-    def game_hosted(self, message):
-        """Callback fired when the Dota bot enters a lobby."""
-        if self.machine_state != DotaBotState.HOSTING_GAME:
-            self.dota.destroy_lobby()
-            self.dota.leave_practice_lobby() # Sometimes the bot get back to an old lobby at startup
-            return
-
-        self.lobby_status = message
+        while self.machine_state != DotaBotState.SETUP_GAME:
+            sleep(5)
         self.initialize_lobby()
-
         sleep(10) # Wait for setup
 
         remaining_time = 1800 # Attente 30 min au max
@@ -344,19 +243,27 @@ class DotaBot(Greenlet):
                     db.session().commit()
             sleep(15)
             self.end_bot()
-            return
 
         # Start and retry
         self.dota.channels.lobby.send('Démarrage de la partie...')
+        self.machine_state = DotaBotState.LOADING_GAME
         self.dota.launch_practice_lobby()
-        trys = 1
+        tries = 1
         sleep(30)
 
         if self.lobby_status.state == 0:
-            # RETRY 3 times and kill lobby if 3 fails
-            pass
+            self.machine_state = DotaBotState.RETRY_WAITING_FOR_READY
+            # TODO RETRY 3 times and kill lobby if 3 fails
+            self.dota.channels.lobby.send('Retry non codé, fin du lobby.')
+            with self.app.app_context():
+                game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
+                if game is not None:
+                    game.status = GameStatus.CANCELLED
+                    db.session().commit()
+            self.end_bot()
 
         # IN GAME WAIT
+        self.machine_state = DotaBotState.GAME_IN_PROGRESS
         with self.app.app_context():
             game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
             if game is not None:
@@ -364,22 +271,170 @@ class DotaBot(Greenlet):
                 db.session().commit()
         while self.lobby_status.state != 3:
             sleep(30)
+        self.machine_state = DotaBotState.GAME_FINISHED
 
         # Game over
-        if self.lobby_status.state == 3:
-            self.print_info(self.lobby_status)
-            with self.app.app_context():
-                game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
-                if game is not None:
-                    game.status = GameStatus.COMPLETED
-                    game.valve_id = self.lobby_status.match_id
-                    if ((self.lobby_status.match_outcome == 2 and not self.team_inverted) or
-                        (self.lobby_status.match_outcome == 3 and self.team_inverted)):
-                        game.winner = 1
-                    else:
-                        game.winner = 2
-                    db.session().commit()
-            self.end_bot()
+        self.print_info(self.lobby_status)
+        with self.app.app_context():
+            game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
+            if game is not None:
+                game.status = GameStatus.COMPLETED
+                game.valve_id = self.lobby_status.match_id
+                if ((self.lobby_status.match_outcome == 2 and not self.team_inverted) or
+                    (self.lobby_status.match_outcome == 3 and self.team_inverted)):
+                    game.winner = 1
+                else:
+                    game.winner = 2
+                db.session().commit()
+        self.end_bot()
+
+    def end_bot(self):
+        """End the life of the bot."""
+        self.print_info('Bot work over.')
+        self.machine_state = DotaBotState.FINISHED
+
+        self.dota.destroy_lobby()
+        sleep(1)
+
+        self.client.disconnect()
+        self.worker_manager.bot_end(self.credential)
+        self.kill()
+
+    # Helpers
+
+    def print_info(self, trace):
+        """Wrapper of `logging.info` with bot name prefix.
+
+        Args:
+            trace: String to output as INFO.
+        """
+        logging.info('%s: %s', self.credential.login, trace)
+
+    def print_error(self, trace):
+        """Wrapper of `logging.error` with bot name prefix.
+
+        Args:
+            trace: String to output as ERROR.
+        """
+        logging.error("%s: %s", self.credential.login, trace)
+
+    # Callback of Steam and Dota clients
+
+    def steam_connected(self):
+        """Callback fired when the bot is connected to Steam, login user."""
+        self.print_info('Connected to Steam.')
+        self.client.login(self.credential.login, self.credential.password)
+
+    def steam_logged(self):
+        """Callback fired when the bot is logged into Steam, starting Dota."""
+        self.print_info('Logged to Steam.')
+        self.dota.launch()
+
+    def steam_disconnected(self):
+        """Callback fired when the bot is disconnected from Steam"""
+        self.print_info('Disconnected from Steam.')
+
+    def dota_ready(self):
+        """Callback fired when the Dota application is ready, resume the job processing."""
+        self.print_info('Dota application is ready.')
+        sleep(10) # Safety to leave already existing lobby if bot is lost in the matrix
+        self.host_game()
+
+    def closed_dota(self):
+        """Callback fired when the Dota application is closed."""
+        self.print_info('Dota application is closed.')
+
+    # Messaging events
+    def channel_join(self, channel_info):
+        pass
+        #self.print_info('Channel join! {0}'.format(channel_info))
+        """
+        if channel_info.channel_type != dota2.enums.DOTAChatChannelType_t.DOTAChannelType_Lobby:
+            self.dota.leave_channel(channel_info.channel_id)
+        else:
+            if self.game_status is not None:
+                if channel_info.channel_name == 'Lobby_{0}'.format(self.game_status.lobby_id):
+                    self.lobby_channel_id = channel_info.channel_id"""
+
+    def channel_message(self, channel, message):
+        if message.text[0] != '!':
+            return
+        command = message.text[1:].strip().split(' ')
+        if len(command) == 0:
+            return
+
+        message_steam_id = SteamID(message.account_id).as_64
+        # Feature commands
+        if command[0] == 'commands':
+            self.dota.channels.lobby.send('Commandes: !cocaster, !commands, !destroy, !standin')
+        elif command[0] == 'philaeux':
+            self.dota.channels.lobby.send('Respectez mon créateur ou je vous def lose.')
+        elif command[0] == 'cocaster':
+            if message_steam_id not in self.admins and message_steam_id not in self.casters:
+                self.dota.channels.lobby.send('Seuls les casters et admins peuvent ajouter un cocaster.')
+                return
+            if len(command) != 2:
+                self.dota.channels.lobby.send('!cocaster X où X est le steamID (64bits) du cocaster.')
+                return
+            if not command[1].isdigit():
+                self.dota.channels.lobby.send('SteamID (64bits) invalide dans la commande !cocaster.')
+            else:
+                self.casters.append(int(command[1]))
+                self.dota.channels.lobby.send('Cocaster {0} ajouté.'.format(command[1]))
+        elif command[0] == 'standin':
+            if message_steam_id not in self.admins:
+                self.dota.channels.lobby.send('Seuls les admins peuvent ajouter un standin.')
+                return
+            if len(command) != 3:
+                self.dota.channels.lobby.send("!standin X Y où X est le steamID (64bits) du standin et Y l'équipe (1 ou 2).")
+                return
+            if not command[1].isdigit():
+                self.dota.channels.lobby.send('SteamID (64bits) invalide dans la commande !standin.')
+                return
+            if command[2] not in ['1', '2']:
+                self.dota.channels.lobby.send('Équipe (1 ou 2) invalide dans la commande !standin.')
+            else:
+                if command[2] == '1':
+                    self.team1_ids.append(int(command[1]))
+                else:
+                    self.team2_ids.append(int(command[1]))
+                self.dota.channels.lobby.send("Standin {0} ajouté à l'équipe {1}.".format(command[1], command[2]))
+        elif command[0] == 'destroy':
+            if message_steam_id not in self.admins:
+                self.dota.channels.lobby.send('Seuls les admins peuvent détruirent le lobby.')
+            else:
+                self.dota.channels.lobby.send('Lobby annulé par un admin.')
+                with self.app.app_context():
+                    game = db.session().query(Game).filter(Game.id == self.id).one_or_none()
+                    if game is not None:
+                        game.status = GameStatus.CANCELLED
+                        db.session().commit()
+                self.end_bot()
+
+        # Main Loop commands
+        elif command[0] == 'fp' or command[0] == 'sp' or command[0] == 'radiant' or command[0] == 'dire':
+            if '!{0}'.format(command[0]) in self.team_choices_possibilities:
+                if self.machine_state == DotaBotState.PICKING_SIDE_ORDER:
+                    compare = self.team1_ids if self.team_choosing_now == 1 else self.team2_ids
+                    if message_steam_id in compare:
+                        self.team_choices[self.team_choosing_now-1] = command[0]
+
+    # Hosting events
+    def host_game(self):
+        """Start the processing of the job with the appropriate handler."""
+        self.print_info('Hosting game {0} with password {1}'.format(self.name, self.password))
+        self.machine_state = DotaBotState.HOSTING_GAME
+        self.dota.create_practice_lobby(password=self.password)
+
+    def game_hosted(self, message):
+        """Callback fired when the Dota bot enters a lobby."""
+        if self.machine_state != DotaBotState.HOSTING_GAME:
+            self.dota.destroy_lobby()
+            self.dota.leave_practice_lobby() # Sometimes the bot get back to an old lobby at startup
+            return
+
+        self.lobby_status = message
+        self.machine_state = DotaBotState.SETUP_GAME
 
     def game_update(self, message):
         """Callback fired when the game lobby change, update local information."""
@@ -391,10 +446,11 @@ class DotaBot(Greenlet):
                 continue
             if (member.id not in self.team1_ids and
                 member.id not in self.team2_ids and
-                member.id not in self.vips):
+                member.id not in self.admins and
+                member.id not in self.casters):
                 self.dota.practice_lobby_kick(SteamID(member.id).as_32)
             if ((member.team == DOTA_GC_TEAM.SPECTATOR) or
-                (member.team == DOTA_GC_TEAM.BROADCASTER and member.id not in self.vips)):
+                (member.team == DOTA_GC_TEAM.BROADCASTER and not (member.id in self.admins or member.id in self.casters))):
                 self.dota.practice_lobby_kick_from_team(SteamID(member.id).as_32)
             else:
                 if self.team_inverted:

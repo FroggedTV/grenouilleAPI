@@ -11,12 +11,13 @@ Endpoints:
 ### BOT
 
 Features:
-- [ ] VIPs enter lobby, CASTER can enter casting slots, ADMIN stay spectator
-- [ ] CASTERs can authorize a co-caster to enter the lobby, with !cocast <SteamID>
-- [ ] ADMINs can authorize standins to enter the lobby, with !standin <SteanID> <Team>
+- [X] VIPs enter lobby, CASTER can enter casting slots, ADMIN stay spectator
+- [X] CASTERs can authorize a co-caster to enter the lobby, with !cocast <SteamID>
+- [X] ADMINs can authorize standins to enter the lobby, with !standin <SteanID> <Team>
 - [ ] Retry if someone does not connect. 3 retries, 5min between each.
 - [ ] !ready to start game, and not when players are all in position
 - [ ] Test host inside S1 Ticket, and host inside S2 ticket if we are sure there is no problem.
+- [X] Add a !destroy command so ADMINs can hard cancel a lobby
 
 Code design:
 - [ ] Bot secure cancel, destroy Greenlet and every sleeping events.
@@ -25,7 +26,7 @@ Code design:
 
 ## General Documentation
 
-The grenouilleAPI repository is composed of 3 mains parts: the **Database**, the **Web API**, the **DotaBOT** section.
+The grenouilleAPI repository is composed of 3 main parts: the **Database**, the **Web API**, the **DotaBOT** section.
  
 The **Database** part is a generic storage for the API and also connected to the DotaBOT. 
 It can take different form: a sqlite file storage for development, or a shared mysql/postgres/maria/..., or the docker image prepared with a postgres database.

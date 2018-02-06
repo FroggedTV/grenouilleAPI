@@ -2,11 +2,12 @@ import logging
 import pickle
 import random
 from gevent import Greenlet, sleep
+from threading import Lock
 
 from app import create_app
 from dota_bot import DotaBot
 from models import db, Game, GameStatus, GameVIP
-from threading import Lock
+from helpers import divide_vip_list_per_type
 
 # Log
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s', level=logging.INFO)
@@ -68,7 +69,7 @@ class WorkerManager(Greenlet):
         """Start the main loop of the thread, creating Dota bots to process available jobs."""
         while True:
             with self.app.app_context():
-                vips = GameVIP.get_all_vips()
+                admins, casters = divide_vip_list_per_type(GameVIP.get_all_vips())
 
                 for game in db.session().query(Game)\
                                         .filter(Game.status==GameStatus.WAITING_FOR_BOT)\
@@ -76,10 +77,11 @@ class WorkerManager(Greenlet):
                     if len(self.credentials) == 0:
                         continue
 
+                    # Start a Dota bot to process the game
                     self.mutex.acquire()
                     credential = self.credentials.pop(random.randint(0, len(self.credentials) - 1))
-                    g = DotaBot(self, credential, vips, game.id, game.name, game.password, game.team1, game.team2,
-                                game.team1_ids, game.team2_ids, game.team_choosing_first)
+                    g = DotaBot(self, credential, admins, casters, game.id, game.name, game.password,
+                                game.team1, game.team2, game.team1_ids, game.team2_ids, game.team_choosing_first)
                     self.working_bots[credential.login] = g
                     game.status = GameStatus.CREATION_IN_PROGRESS
                     db.session().commit()

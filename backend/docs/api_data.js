@@ -666,6 +666,202 @@ define({ "api": [
     "groupTitle": "DotaBots"
   },
   {
+    "type": "get",
+    "url": "/api/game/list",
+    "title": "GameList",
+    "version": "1.0.2",
+    "name": "GameList",
+    "group": "DotaBots",
+    "description": "<p>Get the list of multiple hosted games.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidTotal",
+            "description": "<p>Total is not a positive integer.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidOffset",
+            "description": "<p>Offset is not a positive integer.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidFields",
+            "description": "<p>Fields is not an array.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "1-100",
+            "optional": true,
+            "field": "total",
+            "defaultValue": "10",
+            "description": "<p>Optional number of entries to return.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "0-..",
+            "optional": true,
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>Optional offset for database fetch.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "fields",
+            "defaultValue": "['team1', 'team1Ids', 'team2', 'team2Ids', 'status', 'teamChoosingFirst', 'bot',\n         'valveId', 'winner']",
+            "description": "<p>Optional fields to return.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "games",
+            "description": "<p>List of the Games ordered by decreasing id, with filters applied.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "games.id",
+            "description": "<p>Id of the game hosted by bots.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "games.team1",
+            "description": "<p>Id of the first team</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "games.team1Ids",
+            "description": "<p>SteamID (64bits) of first team players</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "games.team2",
+            "description": "<p>Id of the second team</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer[]",
+            "optional": false,
+            "field": "games.team2Ids",
+            "description": "<p>SteamID (64bits) of second team  players</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"GameStatus.WAITING_FOR_BOT\"",
+              "\"GameStatus.CREATION_IN_PROGRESS\"",
+              "\"GameStatus.WAITING_FOR_PLAYERS\"",
+              "\"GameStatus.GAME_IN_PROGRESS\"",
+              "\"GameStatus.COMPLETED\"",
+              "\"GameStatus.CANCELLED\""
+            ],
+            "optional": false,
+            "field": "games.status",
+            "description": "<p>Game status.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "allowedValues": [
+              "1",
+              "2"
+            ],
+            "optional": false,
+            "field": "games.teamChoosingFirst",
+            "description": "<p>Team choosing 'side'/'pick order' first</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "games.bot",
+            "description": "<p>Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "games.valveId",
+            "description": "<p>Game Id in Valve database (if status 'GameStatus.COMPLETED')</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "allowedValues": [
+              "1",
+              "2"
+            ],
+            "optional": false,
+            "field": "games.winner",
+            "description": "<p>Team winning the game (if status 'GameStatus.COMPLETED')</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/game.py",
+    "groupTitle": "DotaBots"
+  },
+  {
     "type": "post",
     "url": "/api/game/vip/add",
     "title": "GameVIPAdd",

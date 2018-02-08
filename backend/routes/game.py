@@ -279,6 +279,62 @@ def build_api_game(app):
                         'payload': payload
                         }), 200
 
+    @app.route('/api/game/list', methods=['GET'])
+    def list_game():
+        """
+        @api {get} /api/game/list GameList
+        @apiVersion 1.0.2
+        @apiName GameList
+        @apiGroup DotaBots
+        @apiDescription Get the list of multiple hosted games.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiParam {Integer{1-100}} [total=10] Optional number of entries to return.
+        @apiError (Errors){String} InvalidTotal Total is not a positive integer.
+        @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
+        @apiError (Errors){String} InvalidOffset Offset is not a positive integer.
+        @apiParam {String[]} [fields="['team1', 'team1Ids', 'team2', 'team2Ids', 'status', 'teamChoosingFirst', 'bot',
+         'valveId', 'winner']"] Optional fields to return.
+        @apiError (Errors){String} InvalidFields Fields is not an array.
+
+        @apiSuccess {Object[]} games List of the Games ordered by decreasing id, with filters applied.
+        @apiSuccess {Integer} games.id Id of the game hosted by bots.
+        @apiSuccess {Integer} games.team1 Id of the first team
+        @apiSuccess {Integer[]} games.team1Ids SteamID (64bits) of first team players
+        @apiSuccess {Integer} games.team2 Id of the second team
+        @apiSuccess {Integer[]} games.team2Ids SteamID (64bits) of second team  players
+        @apiSuccess {String="GameStatus.WAITING_FOR_BOT", "GameStatus.CREATION_IN_PROGRESS",
+         "GameStatus.WAITING_FOR_PLAYERS", "GameStatus.GAME_IN_PROGRESS", "GameStatus.COMPLETED",
+         "GameStatus.CANCELLED"} games.status Game status.
+        @apiSuccess {Integer=1,2} games.teamChoosingFirst Team choosing 'side'/'pick order' first
+        @apiSuccess {String} games.bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
+        @apiSuccess {Integer} games.valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
+        @apiSuccess {Integer=1,2} games.winner Team winning the game (if status 'GameStatus.COMPLETED')
+        """
+        # Header checks
+        header_key = request.headers.get('API_KEY', None)
+        if header_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyMissing',
+                            'payload': {}
+                            }), 200
+        if header_key != app.config['API_KEY']:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyInvalid',
+                            'payload': {}
+                            }), 200
+
+        data = request.get_json(force=True)
+
+        # TODO HERE
+        payload = {}
+        return jsonify({'success': 'no',
+                        'payload': payload
+                        }), 200
+
     @app.route('/api/game/vip/list', methods=['GET'])
     def list_game_vips():
         """

@@ -84,6 +84,7 @@ class WorkerManager(Greenlet):
                                 game.team1, game.team2, game.team1_ids, game.team2_ids, game.team_choosing_first)
                     self.working_bots[credential.login] = g
                     game.status = GameStatus.CREATION_IN_PROGRESS
+                    game.bot = credential.login
                     db.session().commit()
                     g.start()
                     self.mutex.release()

@@ -5,8 +5,10 @@
 ### API
 
 Endpoints:
-- [ ] Add `limit` and `offset` to `ListGameVIPs(limit, offset)`
+- [X] Change documentation function names
+- [X] Fix versioning in documentation
 - [ ] Add a `ListGames(limit, offset)`, ordered by `id desc`
+- [ ] Add `limit` and `offset` to `ListGameVIPs(limit, offset)`
 
 ### BOT
 
@@ -14,10 +16,15 @@ Features:
 - [X] VIPs enter lobby, CASTER can enter casting slots, ADMIN stay spectator
 - [X] CASTERs can authorize a co-caster to enter the lobby, with !cocast <SteamID>
 - [X] ADMINs can authorize standins to enter the lobby, with !standin <SteanID> <Team>
+- [X] Add a !destroy command so ADMINs can hard cancel a lobby
+- [X] Test host inside S1 Ticket
+- [X] Add bot login to Game entry inside db
+- [X] Test if bots status is inside db
+
 - [ ] Retry if someone does not connect. 3 retries, 5min between each.
 - [ ] !ready to start game, and not when players are all in position
-- [ ] Test host inside S1 Ticket, and host inside S2 ticket if we are sure there is no problem.
-- [X] Add a !destroy command so ADMINs can hard cancel a lobby
+- [ ] Test host inside S2 ticket
+- [ ] Bot leaves chats that are not lobby chat
 
 Code design:
 - [X] Bot secure cancel, destroy Greenlet and every sleeping events.

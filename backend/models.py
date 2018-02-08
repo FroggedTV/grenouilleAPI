@@ -118,6 +118,7 @@ class Game(db.Model):
     status = db.Column(db.Enum(GameStatus), nullable=False)
     team_choosing_first = db.Column(db.Integer(), nullable=False)
 
+    bot = db.Column(db.String(), nullable=True)
     valve_id = db.Column(db.BigInteger(), nullable=True)
     winner = db.Column(db.Integer(), nullable=True)
 
@@ -130,6 +131,7 @@ class Game(db.Model):
         self.team2_ids = team2_ids
         self.status = GameStatus.WAITING_FOR_BOT
         self.team_choosing_first = team_choosing_first
+        self.bot = None
         self.valve_id = None
         self.winner = None
 

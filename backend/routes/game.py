@@ -12,9 +12,10 @@ def build_api_game(app):
     @app.route('/api/game/create', methods=['POST'])
     def create_game():
         """
-        @api {post} /api/game/create CreateGame
-        @apiName CreateGame
-        @apiGroup Game
+        @api {post} /api/game/create GameCreate
+        @apiVersion 1.0.0
+        @apiName GameCreate
+        @apiGroup DotaBots
         @apiDescription Queue a game to be host by bots.
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
@@ -195,9 +196,10 @@ def build_api_game(app):
     @app.route('/api/game/details', methods=['GET'])
     def get_game_details():
         """
-        @api {get} /api/game/details GetGameDetails
-        @apiName GetGameDetails
-        @apiGroup Game
+        @api {get} /api/game/details GameDetails
+        @apiVersion 1.0.1
+        @apiName GameDetails
+        @apiGroup DotaBots
         @apiDescription Request game details.
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
@@ -218,6 +220,7 @@ def build_api_game(app):
          "GameStatus.WAITING_FOR_PLAYERS", "GameStatus.GAME_IN_PROGRESS", "GameStatus.COMPLETED",
          "GameStatus.CANCELLED"} status Game status.
         @apiSuccess {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first
+        @apiSuccess {String} bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
         @apiSuccess {Integer} valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
         @apiSuccess {Integer=1,2} winner Team winning the game (if status 'GameStatus.COMPLETED')
         """
@@ -270,6 +273,8 @@ def build_api_game(app):
         }
         if game.valve_id is not None:
             payload['valveId'] = game.valve_id
+        if game.bot is not None:
+            payload['bot'] = game.bot
         return jsonify({'success': 'yes',
                         'payload': payload
                         }), 200
@@ -277,9 +282,10 @@ def build_api_game(app):
     @app.route('/api/game/vip/list', methods=['GET'])
     def list_game_vips():
         """
-        @api {get} /api/game/vip/list ListGameVIPs
-        @apiName ListGameVIPs
-        @apiGroup Game
+        @api {get} /api/game/vip/list GameVIPList
+        @apiVersion 1.0.0
+        @apiName GameVIPList
+        @apiGroup DotaBots
         @apiDescription Get the list of all VIPs
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
@@ -313,9 +319,10 @@ def build_api_game(app):
     @app.route('/api/game/vip/add', methods=['POST'])
     def add_game_vip():
         """
-        @api {post} /api/game/vip/add AddGameVIP
-        @apiName AddGameVIP
-        @apiGroup Game
+        @api {post} /api/game/vip/add GameVIPAdd
+        @apiVersion 1.0.0
+        @apiName GameVIPAdd
+        @apiGroup DotaBots
         @apiDescription Add a new game VIP.
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
@@ -412,9 +419,10 @@ def build_api_game(app):
     @app.route('/api/game/vip/remove', methods=['POST'])
     def remove_game_vip():
         """
-        @api {post} /api/game/vip/remove RemoveGameVIP
-        @apiName RemoveGameVIP
-        @apiGroup Game
+        @api {post} /api/game/vip/remove GameVIPRemove
+        @apiVersion 1.0.0
+        @apiName GameVIPRemove
+        @apiGroup DotaBots
         @apiDescription Remove a game VIP.
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.

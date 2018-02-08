@@ -12,6 +12,7 @@ def build_api_user(app):
     def get_user_details():
         """
         @api {get} /api/user/details GetUserDetails
+        @apiVersion 1.0.0
         @apiName GetUserDetails
         @apiGroup User
         @apiDescription This method returns multiple information about a user that logged at least one time.

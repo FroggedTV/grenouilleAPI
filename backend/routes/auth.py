@@ -18,6 +18,7 @@ def build_api_auth(app, oid):
     def login():
         """
         @api {get} /api/auth/login 1.1 - Get a Refresh Token with Steam Login
+        @apiVersion 1.0.0
         @apiName GetRefreshToken
         @apiGroup Authentication
         @apiDescription Calling this endpoint redirects to the steam login page.
@@ -69,6 +70,7 @@ def build_api_auth(app, oid):
     def get_auth_token():
         """
         @api {get} /api/auth/token 2 - Get a Auth Token from a Refresh Token
+        @apiVersion 1.0.0
         @apiName GetAuthToken
         @apiGroup Authentication
         @apiDescription Refresh tokens are long lived but auth tokens are short lived.
@@ -139,6 +141,7 @@ def build_api_auth(app, oid):
     def test_token_display():
         """
         @api {get} /api/auth/token_test 1.2 - Dummy display of a Refresh Token
+        @apiVersion 1.0.0
         @apiName DisplayToken
         @apiGroup Authentication
         @apiDescription Test function used to display the token generated after the steam login.

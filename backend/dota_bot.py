@@ -486,19 +486,24 @@ class DotaBot(Greenlet):
 
     def check_teams(self):
         """Check team players and team names."""
-        missing_players = [min(5, len(self.team1_ids)), min(5, len(self.team2_ids))]
-        team_names = [False, False]
-
+        # Check missing players
+        if self.team_inverted:
+            missing_players = [min(5, len(self.team2_ids)), min(5, len(self.team1_ids))]
+        else:
+            missing_players = [min(5, len(self.team1_ids)), min(5, len(self.team2_ids))]
         for member in self.lobby_status.members:
             if member.team == DOTA_GC_TEAM.GOOD_GUYS:
-                missing_players[0] = missing_players[0] - 1
+                missing_players[0] -= 1
             elif member.team == DOTA_GC_TEAM.BAD_GUYS:
-                missing_players[1] = missing_players[1] - 1
-        i = 0
+                missing_players[1] -= 1
+
+        # Check teams
+        team_names = [False, False]
         if self.team_inverted:
             compare = [self.team2, self.team1]
         else:
             compare = [self.team1, self.team2]
+        i = 0
         for team_detail in self.lobby_status.team_details:
             team_names[i] = team_detail.team_id == compare[i]
             i = i+1

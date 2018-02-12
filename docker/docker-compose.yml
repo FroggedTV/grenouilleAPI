@@ -26,7 +26,7 @@ services:
       - grenouilleapi_postgres
 
   grenouilleapi_bot:
-    image: grenouilleapi_bot
+    image: grenouilleapi
     container_name: "grenouilleapi_bot"
     build:
       context: ..

@@ -149,7 +149,7 @@ class GameVIP(db.Model):
 
     def __init__(self, id, type, name):
         self.id = id
-        self.type = GameVIPType[type]
+        self.type = type
         self.name = name
 
     @staticmethod
@@ -161,3 +161,14 @@ class GameVIP(db.Model):
                          'type': str(vip.type),
                          'name': vip.name})
         return vips
+
+    @staticmethod
+    def upsert(id, type, name):
+        vip = db.session().query(GameVIP).filter(GameVIP.id==id).one_or_none()
+        if vip is None:
+            vip = GameVIP(id, type, name)
+            db.session.add(vip)
+        else:
+            vip.type = type
+            vip.name = name
+        db.session.commit()

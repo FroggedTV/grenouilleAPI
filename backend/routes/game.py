@@ -464,7 +464,7 @@ def build_api_game(app):
                             }), 200
 
         # Add VIP
-        game_vip = GameVIP(id, type, name)
+        game_vip = GameVIP(id, GameVIPType[type], name)
         db.session().add(game_vip)
         db.session().commit()
 

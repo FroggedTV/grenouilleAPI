@@ -88,14 +88,6 @@ class DotaBot(Greenlet):
         self.machine_state = DotaBotState.STARTING
         self.lobby_status = {}
 
-        """
-        self.lobby_channel_id = None
-        self.invite_timer = None
-        self.missing_players = None
-        self.missing_players_count = None
-        self.wrong_team_players = None
-        self.wrong_team_players_count = None
-        """
         # Prepare all event handlers
         # - Steam client events
         # - Dota client events

@@ -117,8 +117,10 @@ class DotaBot(Greenlet):
         remaining_time = 2100 # Attente 35 min au max
 
         # P0: waiting for casters
-        self.print_info('Attente des casters.')
+        self.print_info('5 min buffer waiting for casters.')
         while remaining_time > 1800:
+            self.dota.channels.lobby.send("{0} Pause et attente de casters.".format(
+                self.remaining_time_to_string(remaining_time - 1800)))
             sleep(30)
             remaining_time -= 30
 

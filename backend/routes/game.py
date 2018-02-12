@@ -370,7 +370,7 @@ def build_api_game(app):
             if 'team2Ids' in fields: game_json['team2Ids'] = game.team2_ids
             if 'status' in fields: game_json['status'] = str(game.status)
             if 'teamChoosingFirst' in fields: game_json['teamChoosingFirst'] = game.team_choosing_first
-            if 'bot' in fields: game_json['bot'] = game.bot
+            if 'bot' in fields and game.bot is not None: game_json['bot'] = game.bot
             if 'valveId' in fields and game.valve_id is not None: game_json['valveId'] = game.valve_id
             if 'winner' in fields and game.winner is not None: game_json['winner'] = game.winner
             payload['games'].append(game_json)

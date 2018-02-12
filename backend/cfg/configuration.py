@@ -25,7 +25,7 @@ class Config(object):
     API_KEY = 'abc'
     STEAM_BOTS = 'login1@pass1@login2@pass2'
     DOTA_LOBBY_CHEATS = False
-    DOTA_LOBBY_TICKET = 0 # FTV1 is 4947 - FTV2 is 9674
+    DOTA_LOBBY_TICKET = 0 # FTV 1 CUP is 4947 - FTV 2 LEAGUE is 9674
 
 def load_config(config):
     """Load a configuration for the Flask application from a specific file.

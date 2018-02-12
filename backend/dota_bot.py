@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import enum
 import random
@@ -68,14 +69,13 @@ class DotaBot(Greenlet):
             'server_region': int(dota2.enums.EServerRegion.Europe),
             'fill_with_bots': False,
             'allow_spectating': True,
-            #'allow_cheats': False,
-            'allow_cheats': True,
+            'allow_cheats': self.app.config['DOTA_LOBBY_CHEATS'],
             'allchat': False,
             'dota_tv_delay': 2,
             'pause_setting': 1,
-            #'leagueid': 4947 # FTV LEAGUE SEASON 1
-            #'leagueid': 9674 # FTV LEAGUE SEASON 2
         }
+        if self.app.config['DOTA_LOBBY_TICKET'] != 0:
+            self.lobby_options['leagueid'] = self.app.config['DOTA_LOBBY_TICKET']
 
         # Choices
         self.team_choosing_first = team_choosing_first
@@ -104,7 +104,6 @@ class DotaBot(Greenlet):
         self.dota.channels.on(dota2.features.chat.ChannelManager.EVENT_JOINED_CHANNEL, self.channel_join)
         self.dota.channels.on(dota2.features.chat.ChannelManager.EVENT_MESSAGE, self.channel_message)
 
-
     def _run(self):
         """Start the main loop of the thread, connecting to Steam, waiting for the job to finish to close the bot."""
         self.print_info('Connecting to Steam...')
@@ -115,7 +114,13 @@ class DotaBot(Greenlet):
         self.initialize_lobby()
         sleep(10) # Wait for setup
 
-        remaining_time = 1800 # Attente 30 min au max
+        remaining_time = 2100 # Attente 35 min au max
+
+        # P0: waiting for casters
+        self.print_info('Attente des casters.')
+        while remaining_time > 1800:
+            sleep(30)
+            remaining_time -= 30
 
         # P1: Wait for people to join for 25 minutes, P2 if slots are filled (X=min remaining )
         self.print_info('Waiting for players.')
@@ -238,7 +243,14 @@ class DotaBot(Greenlet):
             sleep(15)
             self.end_bot()
 
-        # Start and retry
+        # Kick of unnecessary people before start
+        for member in self.lobby_status.members:
+            if member.id == self.dota.steam_id:
+                continue
+            if member.team == DOTA_GC_TEAM.PLAYER_POOL and not (member.id in self.casters or member.id in self.admins):
+                self.dota.practice_lobby_kick(SteamID(member.id).as_32)
+
+        # Start
         self.dota.channels.lobby.send('Démarrage de la partie...')
         self.machine_state = DotaBotState.LOADING_GAME
         self.dota.launch_practice_lobby()

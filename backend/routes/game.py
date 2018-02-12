@@ -212,6 +212,8 @@ def build_api_game(app):
         @apiError (Errors){String} NoGameWithId Id is not present in database.
 
         @apiSuccess {Integer} id Id of the game hosted by bots.
+        @apiSuccess {String} name Name of the game lobby.
+        @apiSuccess {String} password Password for the lobby.
         @apiSuccess {Integer} team1 Id of the first team
         @apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
         @apiSuccess {Integer} team2 Id of the second team
@@ -292,16 +294,18 @@ def build_api_game(app):
         @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
         @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiParam {Integer{1-100}} [total=10] Optional number of entries to return.
-        @apiError (Errors){String} InvalidTotal Total is not a positive integer.
+        @apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
+        @apiError (Errors){String} InvalidLimit Limit is not a positive integer in waited range.
         @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
-        @apiError (Errors){String} InvalidOffset Offset is not a positive integer.
-        @apiParam {String[]} [fields="['team1', 'team1Ids', 'team2', 'team2Ids', 'status', 'teamChoosingFirst', 'bot',
-         'valveId', 'winner']"] Optional fields to return.
+        @apiError (Errors){String} InvalidOffset Offset is not a positive integer in waited range.
+        @apiParam {String[]} [fields="['name', 'password', 'team1', 'team1Ids', 'team2', 'team2Ids', 'status',
+         'teamChoosingFirst', 'bot', 'valveId', 'winner']"] Optional fields to return.
         @apiError (Errors){String} InvalidFields Fields is not an array.
 
         @apiSuccess {Object[]} games List of the Games ordered by decreasing id, with filters applied.
         @apiSuccess {Integer} games.id Id of the game hosted by bots.
+        @apiSuccess {String} games.name Name of the game lobby.
+        @apiSuccess {String} games.password Password for the lobby.
         @apiSuccess {Integer} games.team1 Id of the first team
         @apiSuccess {Integer[]} games.team1Ids SteamID (64bits) of first team players
         @apiSuccess {Integer} games.team2 Id of the second team
@@ -329,9 +333,49 @@ def build_api_game(app):
 
         data = request.get_json(force=True)
 
-        # TODO HERE
-        payload = {}
-        return jsonify({'success': 'no',
+        # limit check
+        limit = data.get('limit', 10)
+        if not isinstance(limit, int) or limit <= 0 or limit > 100:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidLimit',
+                            'payload': {}
+                            }), 200
+
+        # offset check
+        offset = data.get('offset', 0)
+        if not isinstance(offset, int) or offset < 0 :
+            return jsonify({'success': 'no',
+                            'error': 'InvalidOffset',
+                            'payload': {}
+                            }), 200
+
+        # fields check
+        fields = data.get('fields', ['name', 'password', 'team1', 'team1Ids', 'team2', 'team2Ids', 'status',
+                                     'teamChoosingFirst', 'bot', 'valveId', 'winner'])
+        if not isinstance(fields, list):
+            return jsonify({'success': 'no',
+                            'error': 'InvalidFields',
+                            'payload': {}
+                            }), 200
+
+        # Generate payload
+        payload = {'games': []}
+        for game in db.session().query(Game).order_by(Game.id.desc()).limit(limit).offset(offset).all():
+            game_json = {'id': game.id}
+            if 'name' in fields: game_json['name'] = game.name
+            if 'password' in fields: game_json['password'] = game.password
+            if 'team1' in fields: game_json['team1'] = game.team1
+            if 'team1Ids' in fields: game_json['team1Ids'] = game.team1_ids
+            if 'team2' in fields: game_json['team2'] = game.team2
+            if 'team2Ids' in fields: game_json['team2Ids'] = game.team2_ids
+            if 'status' in fields: game_json['status'] = str(game.status)
+            if 'teamChoosingFirst' in fields: game_json['teamChoosingFirst'] = game.team_choosing_first
+            if 'bot' in fields: game_json['bot'] = game.bot
+            if 'valveId' in fields and game.valve_id is not None: game_json['valveId'] = game.valve_id
+            if 'winner' in fields and game.winner is not None: game_json['winner'] = game.winner
+            payload['games'].append(game_json)
+
+        return jsonify({'success': 'yes',
                         'payload': payload
                         }), 200
 

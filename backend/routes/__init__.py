@@ -18,6 +18,8 @@
 
 @apiSuccess {Integer} id Id of the game hosted by bots.
 @apiSuccess {Integer} team1 Id of the first team
+@apiSuccess {String} name Name of the game lobby.
+@apiSuccess {String} password Password for the lobby.
 @apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
 @apiSuccess {Integer} team2 Id of the second team
 @apiSuccess {Integer[]} team2Ids SteamID (64bits) of second team  players

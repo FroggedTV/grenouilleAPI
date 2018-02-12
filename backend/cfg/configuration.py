@@ -2,7 +2,6 @@ from os.path import isfile
 import os
 import logging
 
-
 class Config(object):
     """Basic configuration used by the application.
 
@@ -13,7 +12,6 @@ class Config(object):
         option.
         DATABASE_URI: Url to the database used in Flask.
     """
-
     DEBUG = True
     TESTING = True
     SECRET_KEY = 'secret_key'
@@ -26,7 +24,8 @@ class Config(object):
     FRONTEND_LOGIN_REDIRECT='http://127.0.0.1:9999/api/auth/token_test'
     API_KEY = 'abc'
     STEAM_BOTS = 'login1@pass1@login2@pass2'
-
+    DOTA_LOBBY_CHEATS = False
+    DOTA_LOBBY_TICKET = 0 # FTV1 is 4947 - FTV2 is 9674
 
 def load_config(config):
     """Load a configuration for the Flask application from a specific file.

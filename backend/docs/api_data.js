@@ -419,6 +419,20 @@ define({ "api": [
           },
           {
             "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the game lobby.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password for the lobby.</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "team1",
@@ -596,6 +610,20 @@ define({ "api": [
           },
           {
             "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name of the game lobby.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Password for the lobby.</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Integer[]",
             "optional": false,
             "field": "team1Ids",
@@ -707,15 +735,15 @@ define({ "api": [
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidTotal",
-            "description": "<p>Total is not a positive integer.</p>"
+            "field": "InvalidLimit",
+            "description": "<p>Limit is not a positive integer in waited range.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
             "field": "InvalidOffset",
-            "description": "<p>Offset is not a positive integer.</p>"
+            "description": "<p>Offset is not a positive integer in waited range.</p>"
           },
           {
             "group": "Errors",
@@ -735,7 +763,7 @@ define({ "api": [
             "type": "Integer",
             "size": "1-100",
             "optional": true,
-            "field": "total",
+            "field": "limit",
             "defaultValue": "10",
             "description": "<p>Optional number of entries to return.</p>"
           },
@@ -753,7 +781,7 @@ define({ "api": [
             "type": "String[]",
             "optional": true,
             "field": "fields",
-            "defaultValue": "['team1', 'team1Ids', 'team2', 'team2Ids', 'status', 'teamChoosingFirst', 'bot',\n         'valveId', 'winner']",
+            "defaultValue": "['name', 'password', 'team1', 'team1Ids', 'team2', 'team2Ids', 'status',\n         'teamChoosingFirst', 'bot', 'valveId', 'winner']",
             "description": "<p>Optional fields to return.</p>"
           }
         ]
@@ -775,6 +803,20 @@ define({ "api": [
             "optional": false,
             "field": "games.id",
             "description": "<p>Id of the game hosted by bots.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "games.name",
+            "description": "<p>Name of the game lobby.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "games.password",
+            "description": "<p>Password for the lobby.</p>"
           },
           {
             "group": "Success 200",

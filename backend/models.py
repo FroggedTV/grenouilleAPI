@@ -156,7 +156,7 @@ class GameVIP(db.Model):
     def get_all_vips():
         """Get the list of all VIPs authorized to get inside all lobbies."""
         vips = []
-        for vip in db.session().query(GameVIP).all():
+        for vip in db.session().query(GameVIP).order_by(GameVIP.id).all():
             vips.append({'id': vip.id,
                          'type': str(vip.type),
                          'name': vip.name})

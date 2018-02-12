@@ -277,6 +277,8 @@ def build_api_game(app):
             payload['valveId'] = game.valve_id
         if game.bot is not None:
             payload['bot'] = game.bot
+        if game.winner is not None:
+            payload['winner'] = game.winner
         return jsonify({'success': 'yes',
                         'payload': payload
                         }), 200

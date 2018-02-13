@@ -56,6 +56,15 @@ def clean_game_database():
     db.session().query(Game).delete()
     db.session().commit()
 
+@manager.command
+def detax_error_clean():
+    game_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    for game in game_ids:
+        g = db.session().query(Game).filter(Game.id==game).one_or_none()
+        if g is not None:
+            db.session().delete(g)
+    db.session().commit()
+
 #######################
 # Setup Manage Script #
 #######################

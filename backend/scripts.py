@@ -17,6 +17,8 @@ manager = Manager(app)
 @manager.command
 def insert_all_vips():
     """Upsert all VIP (admins and caster) for the FroggedTV league season 2."""
+    db.session().query(GameVIP).delete()
+    db.session().commit()
     users = [
         [76561198051212435, GameVIPType.ADMIN, 'Xavier'],
         [76561198211842660, GameVIPType.ADMIN, 'Llewela'],
@@ -44,8 +46,10 @@ def insert_all_vips():
         [76561198045162287, GameVIPType.CASTER, 'Roxa'],
         [76561198073845741, GameVIPType.CASTER, 'PoneySGuito'],
         [76561197966937903, GameVIPType.CASTER, 'Kaeinie'],
-        [76561198047949626, GameVIPType.CASTER, 'Kleber']
-        [76561198078233972, GameVIPType.CASTER, 'Manorot20']
+        [76561198047949626, GameVIPType.CASTER, 'Kleber'],
+        [76561198078233972, GameVIPType.CASTER, 'Manorot20'],
+        [76561198062806656, GameVIPType.CASTER, 'BoomEsport1'],
+        [76561197979979281, GameVIPType.CASTER, 'BoomEsport2']
     ]
     for user in users:
         GameVIP.upsert(user[0], user[1], user[2])
@@ -54,15 +58,6 @@ def insert_all_vips():
 def clean_game_database():
     """Clean all matches from database. BE CAREFULL WITH DIS !!!"""
     db.session().query(Game).delete()
-    db.session().commit()
-
-@manager.command
-def detax_error_clean():
-    game_ids = [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-    for game in game_ids:
-        g = db.session().query(Game).filter(Game.id==game).one_or_none()
-        if g is not None:
-            db.session().delete(g)
     db.session().commit()
 
 #######################

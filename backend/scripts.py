@@ -60,6 +60,16 @@ def clean_game_database():
     db.session().query(Game).delete()
     db.session().commit()
 
+@manager.command
+def clean_games_cancelled_from_patch():
+    game_ids=[19, 20, 21, 24, 25]
+    for id in game_ids:
+        game = db.session().query(Game).filter(Game.id == id).one_or_none()
+        if game is not None:
+            db.session().delete(game)
+    db.session().commit()
+
+
 #######################
 # Setup Manage Script #
 #######################

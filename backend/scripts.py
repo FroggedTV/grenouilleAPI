@@ -27,6 +27,7 @@ def insert_all_vips():
         [76561198038914414, GameVIPType.ADMIN, 'NkZ_'],
         [76561197968638037, GameVIPType.ADMIN, 'DetaX'],
         [76561197990849508, GameVIPType.ADMIN, 'Nark!'],
+        [76561197978959964, GameVIPType.ADMIN, 'Nark!2'],
         [76561198072527807, GameVIPType.ADMIN, 'MLC'],
         [76561197961298382, GameVIPType.ADMIN, 'Philaeux'],
         [76561197993366373, GameVIPType.CASTER, 'Luciqno'],
@@ -59,16 +60,6 @@ def clean_game_database():
     """Clean all matches from database. BE CAREFULL WITH DIS !!!"""
     db.session().query(Game).delete()
     db.session().commit()
-
-@manager.command
-def clean_games_cancelled_from_patch():
-    game_ids=[19, 20, 21, 24, 25]
-    for id in game_ids:
-        game = db.session().query(Game).filter(Game.id == id).one_or_none()
-        if game is not None:
-            db.session().delete(game)
-    db.session().commit()
-
 
 #######################
 # Setup Manage Script #

@@ -217,7 +217,7 @@ define({ "api": [
     "groupTitle": "DotaBots"
   },
   {
-    "type": "get",
+    "type": "post",
     "url": "/api/dynamic/configuration/update",
     "title": "DynamicConfigurationUpdate",
     "version": "1.0.3",

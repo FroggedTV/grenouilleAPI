@@ -172,3 +172,40 @@ class GameVIP(db.Model):
             vip.type = type
             vip.name = name
         db.session.commit()
+
+class DynamicConfiguration(db.Model):
+    """Dynamic configuration used by multiple elements, modified using the API."""
+    __tablename__ = 'dynamic_configuration'
+
+    key = db.Column(db.String(), primary_key=True)
+    value = db.Column(db.String(), nullable=False)
+
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+    @staticmethod
+    def get(key, default_value):
+        """Get the value of a configuration key.
+
+        Attributes:
+            key: key of the configuration.
+            default_value: value if not present in database.
+        Returns:
+            The value associated with the key.
+        """
+        dc = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key==key).one_or_none()
+        if dc is None:
+            return default_value
+        else:
+            return dc.value
+
+    @staticmethod
+    def update(key, value):
+        dc = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key==key).one_or_none()
+        if dc is None:
+            dc = DynamicConfiguration(key, value)
+            db.session().add(dc)
+        dc.value = value
+        db.session().commit()
+        return dc

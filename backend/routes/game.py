@@ -4,7 +4,7 @@ import collections
 from flask import request, jsonify
 
 from helpers import UrlImageToBase64
-from models import db, Game, GameVIP
+from models import db, Game, GameVIP, DynamicConfiguration
 
 def build_api_game(app):
     """Factory to setup the routes for the Dota bots."""
@@ -576,4 +576,134 @@ def build_api_game(app):
 
         return jsonify({'success': 'yes',
                         'payload': {}
+                        }), 200
+
+    @app.route('/api/dynamic/configuration/get', methods=['GET'])
+    def get_dynamic_configuration():
+        """
+        @api {get} /api/dynamic/configuration/get DynamicConfigurationGet
+        @apiVersion 1.0.3
+        @apiName DynamicConfigurationGet
+        @apiGroup DotaBots
+        @apiDescription Get the value of a dynamic configuration.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiParam {String[1..]} key Key of the configuration to return.
+        @apiError (Errors){String} MissingKey key is not specified.
+        @apiError (Errors){String} InvalidKey key is invalid.
+        @apiError (Errors){String} NoSuchKey No dynamic configuration with this key.
+
+        @apiSuccess {String} key Key requested.
+        @apiSuccess {String} value Value of the key requested.
+        """
+        # Header checks
+        header_key = request.headers.get('API_KEY', None)
+        if header_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyMissing',
+                            'payload': {}
+                            }), 200
+        if header_key != app.config['API_KEY']:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyInvalid',
+                            'payload': {}
+                            }), 200
+
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'MissingKey',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key)== 0:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidKey',
+                            'payload': {}
+                            }), 200
+        dc = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key==key).one_or_none()
+        if dc is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoSuchKey',
+                            'payload': {}
+                            }), 200
+
+        return jsonify({'success': 'yes',
+                        'payload': {'key': dc.key, 'value': dc.value}
+                        }), 200
+
+    @app.route('/api/dynamic/configuration/update', methods=['POST'])
+    def update_dynamic_configuration():
+        """
+        @api {post} /api/dynamic/configuration/update DynamicConfigurationUpdate
+        @apiVersion 1.0.3
+        @apiName DynamicConfigurationUpdate
+        @apiGroup DotaBots
+        @apiDescription Update the value of a dynamic configuration.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiParam {String[1..]} key Key of the configuration to return.
+        @apiError (Errors){String} MissingKey key is not specified.
+        @apiError (Errors){String} InvalidKey key is invalid.
+
+        @apiParam {String} value Value of the configuration to return.
+        @apiError (Errors){String} MissingValue value is not specified.
+        @apiError (Errors){String} InvalidValue value is invalid.
+
+        @apiSuccess {String} key Key added.
+        @apiSuccess {String} value Value of the key added.
+        """
+        # Header checks
+        header_key = request.headers.get('API_KEY', None)
+        if header_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyMissing',
+                            'payload': {}
+                            }), 200
+        if header_key != app.config['API_KEY']:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyInvalid',
+                            'payload': {}
+                            }), 200
+
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'MissingKey',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key)== 0:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidKey',
+                            'payload': {}
+                            }), 200
+
+        # value checks
+        value = data.get('value', None)
+        if value is None:
+            return jsonify({'success': 'no',
+                            'error': 'MissingValue',
+                            'payload': {}
+                            }), 200
+        if not isinstance(value, str):
+            return jsonify({'success': 'no',
+                            'error': 'InvalidValue',
+                            'payload': {}
+                            }), 200
+
+        # Update
+        dc = DynamicConfiguration.update(key, value)
+        return jsonify({'success': 'yes',
+                        'payload': {'key': dc.key, 'value': dc.value}
                         }), 200

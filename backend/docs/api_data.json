@@ -119,6 +119,216 @@
     "groupTitle": "Authentication"
   },
   {
+    "type": "get",
+    "url": "/api/dynamic/configuration/get",
+    "title": "DynamicConfigurationGet",
+    "version": "1.0.3",
+    "name": "DynamicConfigurationGet",
+    "group": "DotaBots",
+    "description": "<p>Get the value of a dynamic configuration.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingKey",
+            "description": "<p>key is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidKey",
+            "description": "<p>key is invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "NoSuchKey",
+            "description": "<p>No dynamic configuration with this key.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String[1..]",
+            "optional": false,
+            "field": "key",
+            "description": "<p>Key of the configuration to return.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>Key requested.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "value",
+            "description": "<p>Value of the key requested.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/game.py",
+    "groupTitle": "DotaBots"
+  },
+  {
+    "type": "get",
+    "url": "/api/dynamic/configuration/update",
+    "title": "DynamicConfigurationUpdate",
+    "version": "1.0.3",
+    "name": "DynamicConfigurationUpdate",
+    "group": "DotaBots",
+    "description": "<p>Update the value of a dynamic configuration.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingKey",
+            "description": "<p>key is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidKey",
+            "description": "<p>key is invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingValue",
+            "description": "<p>value is not specified.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidValue",
+            "description": "<p>value is invalid.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String[1..]",
+            "optional": false,
+            "field": "key",
+            "description": "<p>Key of the configuration to return.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "value",
+            "description": "<p>Value of the configuration to return.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>Key added.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "value",
+            "description": "<p>Value of the key added.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/game.py",
+    "groupTitle": "DotaBots"
+  },
+  {
     "type": "post",
     "url": "/api/game/create",
     "title": "GameCreate",

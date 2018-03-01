@@ -6,7 +6,7 @@ from threading import Lock
 
 from app import create_app
 from dota_bot import DotaBot
-from models import db, Game, GameStatus, GameVIP
+from models import db, DynamicConfiguration, Game, GameStatus, GameVIP
 from helpers import divide_vip_list_per_type
 
 # Log
@@ -70,11 +70,11 @@ class WorkerManager(Greenlet):
         while True:
             with self.app.app_context():
                 admins, casters = divide_vip_list_per_type(GameVIP.get_all_vips())
-
+                bot_pause = DynamicConfiguration.get('bot_pause', 'False')
                 for game in db.session().query(Game)\
                                         .filter(Game.status==GameStatus.WAITING_FOR_BOT)\
                                         .order_by(Game.id).all():
-                    if len(self.credentials) == 0:
+                    if len(self.credentials) == 0 or bot_pause == 'True':
                         continue
 
                     # Start a Dota bot to process the game

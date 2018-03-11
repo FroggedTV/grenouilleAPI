@@ -218,9 +218,9 @@ def build_api_game(app):
         @apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
         @apiSuccess {Integer} team2 Id of the second team
         @apiSuccess {Integer[]} team2Ids SteamID (64bits) of second team  players
-        @apiSuccess {String="GameStatus.WAITING_FOR_BOT", "GameStatus.CREATION_IN_PROGRESS",
-         "GameStatus.WAITING_FOR_PLAYERS", "GameStatus.GAME_IN_PROGRESS", "GameStatus.COMPLETED",
-         "GameStatus.CANCELLED"} status Game status.
+        @apiSuccess {String=GameStatus.WAITING_FOR_BOT, GameStatus.CREATION_IN_PROGRESS,
+         GameStatus.WAITING_FOR_PLAYERS, GameStatus.GAME_IN_PROGRESS, GameStatus.COMPLETED,
+         GameStatus.CANCELLED} status Game status.
         @apiSuccess {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first
         @apiSuccess {String} bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
         @apiSuccess {Integer} valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
@@ -312,9 +312,9 @@ def build_api_game(app):
         @apiSuccess {Integer[]} games.team1Ids SteamID (64bits) of first team players
         @apiSuccess {Integer} games.team2 Id of the second team
         @apiSuccess {Integer[]} games.team2Ids SteamID (64bits) of second team  players
-        @apiSuccess {String="GameStatus.WAITING_FOR_BOT", "GameStatus.CREATION_IN_PROGRESS",
-         "GameStatus.WAITING_FOR_PLAYERS", "GameStatus.GAME_IN_PROGRESS", "GameStatus.COMPLETED",
-         "GameStatus.CANCELLED"} games.status Game status.
+        @apiSuccess {String=GameStatus.WAITING_FOR_BOT, GameStatus.CREATION_IN_PROGRESS,
+         GameStatus.WAITING_FOR_PLAYERS, GameStatus.GAME_IN_PROGRESS, GameStatus.COMPLETED,
+         GameStatus.CANCELLED} games.status Game status.
         @apiSuccess {Integer=1,2} games.teamChoosingFirst Team choosing 'side'/'pick order' first
         @apiSuccess {String} games.bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
         @apiSuccess {Integer} games.valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
@@ -396,7 +396,7 @@ def build_api_game(app):
 
         @apiSuccess {Object[]} vips List of the VIPs authorized in all games.
         @apiSuccess {Integer} vips.id Steam Id of the VIP.
-        @apiSuccess {String="GameVIPType.CASTER","GameVIPType.ADMIN"} vips.type Type of the VIP.
+        @apiSuccess {String=GameVIPType.CASTER,GameVIPType.ADMIN} vips.type Type of the VIP.
         @apiSuccess {String} vips.name Name of the VIP.
         """
         # Header checks
@@ -436,7 +436,7 @@ def build_api_game(app):
         @apiError (Errors){String} InvalidId id is invalid.
         @apiError (Errors){String} VIPWithIdAlreadyExists VIP with id is already in database.
 
-        @apiParam {String="CASTER","ADMIN"} type Type of the vip to add.
+        @apiParam {String=CASTER,ADMIN} type Type of the vip to add.
         @apiError (Errors){String} MissingType type is not specified.
         @apiError (Errors){String} InvalidType type is not valid.
 
@@ -578,26 +578,21 @@ def build_api_game(app):
                         'payload': {}
                         }), 200
 
-    @app.route('/api/dynamic/configuration/get', methods=['GET'])
-    def get_dynamic_configuration():
+    @app.route('/api/game/bot/pause/get', methods=['GET'])
+    def get_pause_bot():
         """
-        @api {get} /api/dynamic/configuration/get DynamicConfigurationGet
+        @api {get} /api/game/bot/pause/get BotPauseGet
         @apiVersion 1.0.3
-        @apiName DynamicConfigurationGet
+        @apiName BotPauseGet
         @apiGroup DotaBots
-        @apiDescription Get the value of a dynamic configuration.
+        @apiDescription Get the bot pause status
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
         @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
         @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        @apiError (Errors){String} BotPauseMissing Bot pause was never set, default value is 'False'.
 
-        @apiParam {String[1..]} key Key of the configuration to return.
-        @apiError (Errors){String} MissingKey key is not specified.
-        @apiError (Errors){String} InvalidKey key is invalid.
-        @apiError (Errors){String} NoSuchKey No dynamic configuration with this key.
-
-        @apiSuccess {String} key Key requested.
-        @apiSuccess {String} value Value of the key requested.
+        @apiSuccess {String=True,False} bot_pause Pause status of the bot.
         """
         # Header checks
         header_key = request.headers.get('API_KEY', None)
@@ -612,54 +607,35 @@ def build_api_game(app):
                             'payload': {}
                             }), 200
 
-        data = request.get_json(force=True)
-
-        # key checks
-        key = data.get('key', None)
-        if key is None:
+        bot_pause = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key=='bot_pause').one_or_none()
+        if bot_pause is None:
             return jsonify({'success': 'no',
-                            'error': 'MissingKey',
-                            'payload': {}
-                            }), 200
-        if not isinstance(key, str) or len(key)== 0:
-            return jsonify({'success': 'no',
-                            'error': 'InvalidKey',
-                            'payload': {}
-                            }), 200
-        dc = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key==key).one_or_none()
-        if dc is None:
-            return jsonify({'success': 'no',
-                            'error': 'NoSuchKey',
+                            'error': 'BotPauseMissing',
                             'payload': {}
                             }), 200
 
         return jsonify({'success': 'yes',
-                        'payload': {'key': dc.key, 'value': dc.value}
+                        'payload': {'bot_pause': bot_pause.value}
                         }), 200
 
-    @app.route('/api/dynamic/configuration/update', methods=['POST'])
-    def update_dynamic_configuration():
+    @app.route('/api/game/bot/pause/update', methods=['POST'])
+    def update_pause_bot():
         """
-        @api {post} /api/dynamic/configuration/update DynamicConfigurationUpdate
+        @api {post} /api/game/bot/pause/update BotPauseUpdate
         @apiVersion 1.0.3
-        @apiName DynamicConfigurationUpdate
+        @apiName BotPauseUpdate
         @apiGroup DotaBots
-        @apiDescription Update the value of a dynamic configuration.
+        @apiDescription Update the bot pause status.
 
         @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
         @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
         @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiParam {String[1..]} key Key of the configuration to return.
-        @apiError (Errors){String} MissingKey key is not specified.
-        @apiError (Errors){String} InvalidKey key is invalid.
+        @apiParam {String=True,False} bot_pause Pause status of the bot.
+        @apiError (Errors){String} MissingBotPause bot_pause is not specified.
+        @apiError (Errors){String} InvalidBotPause bot_pause is invalid.
 
-        @apiParam {String} value Value of the configuration to return.
-        @apiError (Errors){String} MissingValue value is not specified.
-        @apiError (Errors){String} InvalidValue value is invalid.
-
-        @apiSuccess {String} key Key added.
-        @apiSuccess {String} value Value of the key added.
+        @apiSuccess {String=True,False} bot_pause Pause status of the bot after update.
         """
         # Header checks
         header_key = request.headers.get('API_KEY', None)
@@ -676,34 +652,21 @@ def build_api_game(app):
 
         data = request.get_json(force=True)
 
-        # key checks
-        key = data.get('key', None)
-        if key is None:
+        # bot_pause checks
+        bot_pause = data.get('bot_pause', None)
+        if bot_pause is None:
             return jsonify({'success': 'no',
-                            'error': 'MissingKey',
+                            'error': 'MissingBotPause',
                             'payload': {}
                             }), 200
-        if not isinstance(key, str) or len(key)== 0:
+        if not isinstance(bot_pause, str) or bot_pause not in ['True', 'False']:
             return jsonify({'success': 'no',
-                            'error': 'InvalidKey',
-                            'payload': {}
-                            }), 200
-
-        # value checks
-        value = data.get('value', None)
-        if value is None:
-            return jsonify({'success': 'no',
-                            'error': 'MissingValue',
-                            'payload': {}
-                            }), 200
-        if not isinstance(value, str):
-            return jsonify({'success': 'no',
-                            'error': 'InvalidValue',
+                            'error': 'InvalidBotPause',
                             'payload': {}
                             }), 200
 
         # Update
-        dc = DynamicConfiguration.update(key, value)
+        dc = DynamicConfiguration.update('bot_pause', bot_pause)
         return jsonify({'success': 'yes',
-                        'payload': {'key': dc.key, 'value': dc.value}
+                        'payload': {'bot_pause': dc.value}
                         }), 200

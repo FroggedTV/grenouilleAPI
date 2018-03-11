@@ -120,12 +120,12 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/dynamic/configuration/get",
-    "title": "DynamicConfigurationGet",
+    "url": "/api/game/bot/pause/get",
+    "title": "BotPauseGet",
     "version": "1.0.3",
-    "name": "DynamicConfigurationGet",
+    "name": "BotPauseGet",
     "group": "DotaBots",
-    "description": "<p>Get the value of a dynamic configuration.</p>",
+    "description": "<p>Get the bot pause status</p>",
     "header": {
       "fields": {
         "Header": [
@@ -160,35 +160,8 @@ define({ "api": [
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingKey",
-            "description": "<p>key is not specified.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidKey",
-            "description": "<p>key is invalid.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "NoSuchKey",
-            "description": "<p>No dynamic configuration with this key.</p>"
-          }
-        ]
-      }
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String[1..]",
-            "optional": false,
-            "field": "key",
-            "description": "<p>Key of the configuration to return.</p>"
+            "field": "BotPauseMissing",
+            "description": "<p>Bot pause was never set, default value is 'False'.</p>"
           }
         ]
       }
@@ -199,16 +172,13 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
+            "allowedValues": [
+              "True",
+              "False"
+            ],
             "optional": false,
-            "field": "key",
-            "description": "<p>Key requested.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "value",
-            "description": "<p>Value of the key requested.</p>"
+            "field": "bot_pause",
+            "description": "<p>Pause status of the bot.</p>"
           }
         ]
       }
@@ -218,12 +188,12 @@ define({ "api": [
   },
   {
     "type": "post",
-    "url": "/api/dynamic/configuration/update",
-    "title": "DynamicConfigurationUpdate",
+    "url": "/api/game/bot/pause/update",
+    "title": "BotPauseUpdate",
     "version": "1.0.3",
-    "name": "DynamicConfigurationUpdate",
+    "name": "BotPauseUpdate",
     "group": "DotaBots",
-    "description": "<p>Update the value of a dynamic configuration.</p>",
+    "description": "<p>Update the bot pause status.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -258,29 +228,15 @@ define({ "api": [
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingKey",
-            "description": "<p>key is not specified.</p>"
+            "field": "MissingBotPause",
+            "description": "<p>bot_pause is not specified.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidKey",
-            "description": "<p>key is invalid.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingValue",
-            "description": "<p>value is not specified.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidValue",
-            "description": "<p>value is invalid.</p>"
+            "field": "InvalidBotPause",
+            "description": "<p>bot_pause is invalid.</p>"
           }
         ]
       }
@@ -290,17 +246,14 @@ define({ "api": [
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "String[1..]",
-            "optional": false,
-            "field": "key",
-            "description": "<p>Key of the configuration to return.</p>"
-          },
-          {
-            "group": "Parameter",
             "type": "String",
+            "allowedValues": [
+              "True",
+              "False"
+            ],
             "optional": false,
-            "field": "value",
-            "description": "<p>Value of the configuration to return.</p>"
+            "field": "bot_pause",
+            "description": "<p>Pause status of the bot.</p>"
           }
         ]
       }
@@ -311,16 +264,13 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "String",
+            "allowedValues": [
+              "True",
+              "False"
+            ],
             "optional": false,
-            "field": "key",
-            "description": "<p>Key added.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "value",
-            "description": "<p>Value of the key added.</p>"
+            "field": "bot_pause",
+            "description": "<p>Pause status of the bot after update.</p>"
           }
         ]
       }
@@ -673,12 +623,12 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"GameStatus.WAITING_FOR_BOT\"",
-              "\"GameStatus.CREATION_IN_PROGRESS\"",
-              "\"GameStatus.WAITING_FOR_PLAYERS\"",
-              "\"GameStatus.GAME_IN_PROGRESS\"",
-              "\"GameStatus.COMPLETED\"",
-              "\"GameStatus.CANCELLED\""
+              "GameStatus.WAITING_FOR_BOT",
+              "GameStatus.CREATION_IN_PROGRESS",
+              "GameStatus.WAITING_FOR_PLAYERS",
+              "GameStatus.GAME_IN_PROGRESS",
+              "GameStatus.COMPLETED",
+              "GameStatus.CANCELLED"
             ],
             "optional": false,
             "field": "status",
@@ -1060,12 +1010,12 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"GameStatus.WAITING_FOR_BOT\"",
-              "\"GameStatus.CREATION_IN_PROGRESS\"",
-              "\"GameStatus.WAITING_FOR_PLAYERS\"",
-              "\"GameStatus.GAME_IN_PROGRESS\"",
-              "\"GameStatus.COMPLETED\"",
-              "\"GameStatus.CANCELLED\""
+              "GameStatus.WAITING_FOR_BOT",
+              "GameStatus.CREATION_IN_PROGRESS",
+              "GameStatus.WAITING_FOR_PLAYERS",
+              "GameStatus.GAME_IN_PROGRESS",
+              "GameStatus.COMPLETED",
+              "GameStatus.CANCELLED"
             ],
             "optional": false,
             "field": "games.status",
@@ -1217,8 +1167,8 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "allowedValues": [
-              "\"CASTER\"",
-              "\"ADMIN\""
+              "CASTER",
+              "ADMIN"
             ],
             "optional": false,
             "field": "type",
@@ -1299,8 +1249,8 @@ define({ "api": [
             "group": "Success 200",
             "type": "String",
             "allowedValues": [
-              "\"GameVIPType.CASTER\"",
-              "\"GameVIPType.ADMIN\""
+              "GameVIPType.CASTER",
+              "GameVIPType.ADMIN"
             ],
             "optional": false,
             "field": "vips.type",

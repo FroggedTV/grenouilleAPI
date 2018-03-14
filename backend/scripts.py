@@ -52,7 +52,8 @@ def insert_all_vips():
         [76561198062806656, GameVIPType.CASTER, 'BoomEsport1'],
         [76561197979979281, GameVIPType.CASTER, 'BoomEsport2'],
         [76561198347635223, GameVIPType.CASTER, 'SoteyOS'],
-        [76561198094493830, GameVIPType.CASTER, 'Whyll']
+        [76561198094493830, GameVIPType.CASTER, 'Whyll'],
+        [76561198079970517, GameVIPType.CASTER, 'Yugnatt']
     ]
     for user in users:
         GameVIP.upsert(user[0], user[1], user[2])

@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_script import Manager
 
 from app import create_app
-from models import db, Game, GameVIP, GameVIPType
+from models import db, Game, GameStatus, GameVIP, GameVIPType
 
 app = create_app()
 manager = Manager(app)
@@ -62,6 +62,30 @@ def insert_all_vips():
 def clean_game_database():
     """Clean all matches from database. BE CAREFULL WITH DIS !!!"""
     db.session().query(Game).delete()
+    db.session().commit()
+
+@manager.option('--id', dest='id', default=None)
+@manager.option('--status', dest='status', default=None)
+@manager.option('--vid', dest='vid', default=None)
+@manager.option('--winner', dest='winner', default=None)
+def force_game_status(id, status, vid, winner):
+    """Force some game status options."""
+    game = db.session().query(Game).filter(Game.id==id).one_or_none()
+    if game is None:
+        print('No game with such id.')
+        return
+
+    if status == 'COMPLETED':
+        game.status = GameStatus.COMPLETED
+    elif status == 'CANCELLED':
+        game.status = GameStatus.CANCELLED
+
+    if game.status == GameStatus.COMPLETED:
+        if vid is not None and str.isdigit(vid):
+            game.valve_id = int(vid)
+        if winner is not None and winner in ['1', '2']:
+            game.winner = winner
+
     db.session().commit()
 
 #######################

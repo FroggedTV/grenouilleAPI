@@ -1435,8 +1435,8 @@ define({ "api": [
     "groupTitle": "DotaBots"
   },
   {
-    "type": "get",
-    "url": "/api/stream/obs/scenes/list",
+    "type": "post",
+    "url": "/api/obs/scene/update",
     "title": "OBSSceneChange",
     "version": "1.0.4",
     "name": "OBSSceneChange",
@@ -1507,7 +1507,7 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/stream/obs/scenes/list",
+    "url": "/api/obs/scene/list",
     "title": "OBSSceneList",
     "version": "1.0.4",
     "name": "OBSSceneList",

@@ -11,22 +11,18 @@ def build_api_user(app):
     @app.route('/api/user/details', methods=['GET'])
     def get_user_details():
         """
-        @api {get} /api/user/details GetUserDetails
-        @apiVersion 1.0.0
-        @apiName GetUserDetails
+        @api {get} /api/user/details UserGetDetails
+        @apiVersion 1.0.4
+        @apiName UserGetDetails
         @apiGroup User
         @apiDescription This method returns multiple information about a user that logged at least one time.
 
         @apiParam {String} id SteamID (64bits) of the user to request.
-
-        @apiSuccess {String} id SteamID (64bits).
-        @apiSuccess {String} nickname Username.
-        @apiSuccess {Boolean} nickname_verified True if user nickname is locked because verified.
-        @apiSuccess {String} avatar User avatar as a 64bits string.
-
         @apiError (Errors){String} MissingIdParameter Id is not present in the parameters.
         @apiError (Errors){String} InvalidIdParameter Invalid id value (not an int).
         @apiError (Errors){String} UserNotFound There is no user in the database with this id.
+
+        @apiSuccess {String} id SteamID (64bits).
         """
         steam_id = request.args.get('id', None)
         if steam_id is None:
@@ -51,9 +47,5 @@ def build_api_user(app):
         return jsonify({'success': 'yes',
                     'error': '',
                     'payload': {
-                        'id': str(user.id),
-                        'nickname': user.nickname,
-                        'nickname_verified': user.nickname_verified,
-                        'avatar': user.avatar,
-
+                        'id': str(user.id)
                     }}), 200

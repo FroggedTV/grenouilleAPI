@@ -2,12 +2,10 @@ import logging
 import re
 import jwt
 from datetime import datetime, timedelta
-from urllib.parse import urlencode
-from steam import SteamID, WebAPI
+from steam import SteamID
 
 from flask import jsonify, redirect, request
 
-from helpers import UrlImageToBase64
 from models import db, UserRefreshToken, User
 
 def build_api_auth(app, oid):
@@ -17,13 +15,13 @@ def build_api_auth(app, oid):
     @oid.loginhandler
     def login():
         """
-        @api {get} /api/auth/login 1.1 - Get a Refresh Token with Steam Login
-        @apiVersion 1.0.0
-        @apiName GetRefreshToken
+        @api {get} /api/auth/login RefreshTokenGet
+        @apiVersion 1.0.4
+        @apiName RefreshTokenGet
         @apiGroup Authentication
-        @apiDescription Calling this endpoint redirects to the steam login page.
+        @apiDescription First endpoint to call in the auth process. Calling it redirects to the steam login page.
         After login, the user is redirected to a callback url with the refresh token as a parameter.
-        The URL is defined in the backend config.
+        The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.
         """
         return oid.try_login('http://steamcommunity.com/openid')
 
@@ -33,7 +31,7 @@ def build_api_auth(app, oid):
     @oid.after_login
     def login_callback(resp):
         """Callback fired after steam login, log user in the application by generating a refresh token.
-        Also create a basic profil from steam information if this is the first login.
+        Also create a basic user entry from steam id if this is the first login.
 
         Args:
             resp: OpenID response.
@@ -54,13 +52,8 @@ def build_api_auth(app, oid):
         user = User.get(steam_id)
         if user is None:
             user = User(steam_id)
-
-            api = WebAPI(key=app.config['STEAM_KEY'])
-            resp = api.ISteamUser.GetPlayerSummaries_v2(steamids=steam_id)
-            user.nickname = resp['response']['players'][0]['personaname']
-            user.avatar = UrlImageToBase64(resp['response']['players'][0]['avatarfull'])
             db.session.add(user)
-            db.session.commit()
+        db.session.commit()
 
         url = '{0}?token={1}'.format(app.config['FRONTEND_LOGIN_REDIRECT'],
                                      token.decode('utf-8'))
@@ -69,9 +62,9 @@ def build_api_auth(app, oid):
     @app.route('/api/auth/token', methods=['GET'])
     def get_auth_token():
         """
-        @api {get} /api/auth/token 2 - Get a Auth Token from a Refresh Token
-        @apiVersion 1.0.0
-        @apiName GetAuthToken
+        @api {get} /api/auth/token AuthTokenGet
+        @apiVersion 1.0.4
+        @apiName AuthTokenGet
         @apiGroup Authentication
         @apiDescription Refresh tokens are long lived but auth tokens are short lived.
         Using a valid refresh token, this api delivers an auth token to access data endpoints.
@@ -139,17 +132,8 @@ def build_api_auth(app, oid):
 
     @app.route('/api/auth/token_test', methods=['GET'])
     def test_token_display():
-        """
-        @api {get} /api/auth/token_test 1.2 - Dummy display of a Refresh Token
-        @apiVersion 1.0.0
-        @apiName DisplayToken
-        @apiGroup Authentication
-        @apiDescription Test function used to display the token generated after the steam login.
+        """ Dummy display of a Refresh Token. Test function used to display the token generated after the steam login.
         This must not be used in production, but only as a token displayer in dev.
-
-        @apiParam {String} token The refresh token to display.
-
-        @apiSuccess {String} token The refresh token displayed.
         """
         token = request.args.get('token', '')
         return jsonify({'success': 'yes',

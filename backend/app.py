@@ -32,10 +32,14 @@ def access_docs(path):
 from routes.user import build_api_user
 from routes.auth import build_api_auth
 from routes.game import build_api_game
+from routes.community import build_api_community
+from routes.stream_system import build_api_stream_system
 
 build_api_auth(app, oid)
 build_api_user(app)
 build_api_game(app)
+build_api_community(app)
+build_api_stream_system(app)
 
 ########################
 # Default Error Routes #

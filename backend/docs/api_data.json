@@ -1,47 +1,10 @@
 [
   {
     "type": "get",
-    "url": "/api/auth/token_test",
-    "title": "1.2 - Dummy display of a Refresh Token",
-    "version": "1.0.0",
-    "name": "DisplayToken",
-    "group": "Authentication",
-    "description": "<p>Test function used to display the token generated after the steam login. This must not be used in production, but only as a token displayer in dev.</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>The refresh token to display.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>The refresh token displayed.</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/auth.py",
-    "groupTitle": "Authentication"
-  },
-  {
-    "type": "get",
     "url": "/api/auth/token",
-    "title": "2 - Get a Auth Token from a Refresh Token",
-    "version": "1.0.0",
-    "name": "GetAuthToken",
+    "title": "AuthTokenGet",
+    "version": "1.0.4",
+    "name": "AuthTokenGet",
     "group": "Authentication",
     "description": "<p>Refresh tokens are long lived but auth tokens are short lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
     "header": {
@@ -109,14 +72,138 @@
   },
   {
     "type": "get",
+    "url": "/api/auth/token",
+    "title": "2 - Get a Auth Token from a Refresh Token",
+    "version": "1.0.0",
+    "name": "AuthTokenGet",
+    "group": "Authentication",
+    "description": "<p>Refresh tokens are long lived but auth tokens are short lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;refresh_token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "auth_token",
+            "description": "<p>Authentication token short lived to access data.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidHeader",
+            "description": "<p>Authorization header not well formated.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "NoRefreshToken",
+            "description": "<p>There is no refresh token provided.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ExpiredRefreshToken",
+            "description": "<p>Refresh token has expired and user should log again.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidRefreshToken",
+            "description": "<p>Token is invalid (decode, rights, signature...).</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/_apidoc.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/login",
+    "title": "RefreshTokenGet",
+    "version": "1.0.4",
+    "name": "RefreshTokenGet",
+    "group": "Authentication",
+    "description": "<p>First endpoint to call in the auth process. Calling it redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.</p>",
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
     "url": "/api/auth/login",
     "title": "1.1 - Get a Refresh Token with Steam Login",
     "version": "1.0.0",
-    "name": "GetRefreshToken",
+    "name": "RefreshTokenGet",
     "group": "Authentication",
     "description": "<p>Calling this endpoint redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config.</p>",
-    "filename": "backend/routes/auth.py",
+    "filename": "backend/routes/_apidoc.py",
     "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/calendar/get",
+    "title": "CalendarGet",
+    "version": "1.0.4",
+    "name": "CalendarGet",
+    "group": "Community",
+    "description": "<p>This method returns the streaming calendar from the FroggedTV Google calendar. Calendar is updated every hour with a cron job, or forced by an API call.</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "calendar",
+            "description": "<p>events available into the calendar for the current week.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "calendar.title",
+            "description": "<p>Title of the event.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/community.py",
+    "groupTitle": "Community"
+  },
+  {
+    "type": "get",
+    "url": "/api/calendar/update",
+    "title": "CalendarUpdate",
+    "version": "1.0.4",
+    "name": "CalendarUpdate",
+    "group": "Community",
+    "description": "<p>Force internal calendar update from google doc.</p>",
+    "filename": "backend/routes/community.py",
+    "groupTitle": "Community"
   },
   {
     "type": "get",
@@ -495,9 +582,9 @@
   {
     "type": "get",
     "url": "/api/game/details",
-    "title": "GameDetails",
+    "title": "GameGetDetails",
     "version": "1.0.1",
-    "name": "GameDetails",
+    "name": "GameGetDetails",
     "group": "DotaBots",
     "description": "<p>Request game details.</p>",
     "header": {
@@ -679,9 +766,9 @@
   {
     "type": "get",
     "url": "/api/game/details",
-    "title": "GameDetails",
+    "title": "GameGetDetails",
     "version": "1.0.0",
-    "name": "GameDetails",
+    "name": "GameGetDetails",
     "group": "DotaBots",
     "description": "<p>Request game details.</p>",
     "header": {
@@ -850,7 +937,7 @@
         ]
       }
     },
-    "filename": "backend/routes/__init__.py",
+    "filename": "backend/routes/_apidoc.py",
     "groupTitle": "DotaBots"
   },
   {
@@ -1349,10 +1436,145 @@
   },
   {
     "type": "get",
+    "url": "/api/stream/obs/scenes/list",
+    "title": "OBSSceneChange",
+    "version": "1.0.4",
+    "name": "OBSSceneChange",
+    "group": "StreamSystem",
+    "description": "<p>Change the OBS current scene to a new one</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InternalOBSError",
+            "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingScene",
+            "description": "<p>The scene with the specified name doesn't exist.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "scene",
+            "description": "<p>Name of the scene to change to.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "get",
+    "url": "/api/stream/obs/scenes/list",
+    "title": "OBSSceneList",
+    "version": "1.0.4",
+    "name": "OBSSceneList",
+    "group": "StreamSystem",
+    "description": "<p>List the available scenes in OBS.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InternalOBSError",
+            "description": "<p>Error communicating to OBS.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "scenes",
+            "description": "<p>All available scenes with their name as Strings.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "get",
     "url": "/api/user/details",
-    "title": "GetUserDetails",
-    "version": "1.0.0",
-    "name": "GetUserDetails",
+    "title": "UserGetDetails",
+    "version": "1.0.4",
+    "name": "UserGetDetails",
     "group": "User",
     "description": "<p>This method returns multiple information about a user that logged at least one time.</p>",
     "parameter": {
@@ -1364,40 +1586,6 @@
             "optional": false,
             "field": "id",
             "description": "<p>SteamID (64bits) of the user to request.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "id",
-            "description": "<p>SteamID (64bits).</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "nickname",
-            "description": "<p>Username.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "nickname_verified",
-            "description": "<p>True if user nickname is locked because verified.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "avatar",
-            "description": "<p>User avatar as a 64bits string.</p>"
           }
         ]
       }
@@ -1425,6 +1613,19 @@
             "optional": false,
             "field": "UserNotFound",
             "description": "<p>There is no user in the database with this id.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>SteamID (64bits).</p>"
           }
         ]
       }

@@ -4,7 +4,7 @@ import collections
 from flask import request, jsonify
 
 from helpers import UrlImageToBase64
-from models import db, Game, GameVIP, DynamicConfiguration
+from models import db, Game, GameVIP, GameVIPType, DynamicConfiguration
 
 def build_api_game(app):
     """Factory to setup the routes for the Dota bots."""
@@ -196,9 +196,9 @@ def build_api_game(app):
     @app.route('/api/game/details', methods=['GET'])
     def get_game_details():
         """
-        @api {get} /api/game/details GameDetails
+        @api {get} /api/game/details GameGetDetails
         @apiVersion 1.0.1
-        @apiName GameDetails
+        @apiName GameGetDetails
         @apiGroup DotaBots
         @apiDescription Request game details.
 

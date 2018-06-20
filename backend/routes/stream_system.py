@@ -48,9 +48,9 @@ def build_api_stream_system(app):
     @app.route('/api/obs/scene/update', methods=['POST'])
     def update_obs_scene():
         """
-        @api {post} /api/obs/scene/update OBSSceneChange
+        @api {post} /api/obs/scene/update OBSSceneUpdate
         @apiVersion 1.0.4
-        @apiName OBSSceneChange
+        @apiName OBSSceneUpdate
         @apiGroup StreamSystem
         @apiDescription Change the OBS current scene to a new one
 

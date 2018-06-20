@@ -8,10 +8,10 @@ from models import User
 def build_api_stream_system(app):
     """Factory to setup the routes for the stream system api."""
 
-    @app.route('/api/obs/scenes/list', methods=['GET'])
+    @app.route('/api/obs/scene/list', methods=['GET'])
     def get_obs_scene_list():
         """
-        @api {get} /api/stream/obs/scenes/list OBSSceneList
+        @api {get} /api/obs/scene/list OBSSceneList
         @apiVersion 1.0.4
         @apiName OBSSceneList
         @apiGroup StreamSystem
@@ -45,10 +45,10 @@ def build_api_stream_system(app):
                         'scenes': []
                     }}), 200
 
-    @app.route('/api/obs/scenes/list', methods=['GET'])
+    @app.route('/api/obs/scene/update', methods=['POST'])
     def update_obs_scene():
         """
-        @api {get} /api/stream/obs/scenes/list OBSSceneChange
+        @api {post} /api/obs/scene/update OBSSceneChange
         @apiVersion 1.0.4
         @apiName OBSSceneChange
         @apiGroup StreamSystem

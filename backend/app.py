@@ -57,19 +57,19 @@ build_api_stream_system(app)
 def unauthorized(e):
     return jsonify({'success': 'no',
                     'error': 'AuthorizationError',
-                    'payload': {}}), 401
+                    'payload': {}}), 200
 
 @app.errorhandler(404)
 def unknown(e):
     return jsonify({'success': 'no',
                     'error': 'UnknownEndpoint',
-                    'payload': {}}), 404
+                    'payload': {}}), 200
 
 @app.errorhandler(429)
 def rate_limit_handler(e):
     return jsonify({'success': 'no',
                     'error': 'RequestRateLimit',
-                    'payload': {}}), 429
+                    'payload': {}}), 200
 
 ############################
 # Start Tornado Web Server #

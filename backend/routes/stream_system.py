@@ -39,10 +39,11 @@ def build_api_stream_system(app):
 
         # TODO connect to obs
 
-        return jsonify({'success': 'yes',
-                    'error': '',
+        logging.error('TODO: NOT IMPLEMENTED')
+        return jsonify({'success': 'no',
+                    'error': 'NotImplementedError',
                     'payload': {
-                        'scenes': []
+
                     }}), 200
 
     @app.route('/api/obs/scene/update', methods=['POST'])
@@ -78,6 +79,9 @@ def build_api_stream_system(app):
 
         # TODO connect to obs and do work
 
-        return jsonify({'success': 'yes',
-                    'error': '',
-                    'payload': {}}), 200
+        logging.error('TODO: NOT IMPLEMENTED')
+        return jsonify({'success': 'no',
+                    'error': 'NotImplementedError',
+                    'payload': {
+
+                    }}), 200

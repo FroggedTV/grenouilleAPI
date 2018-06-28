@@ -22,11 +22,11 @@ def build_api_community(app):
         @apiSuccess {String} calendar.title Title of the event.
         """
         # TODO
-
-        return jsonify({'success': 'yes',
-                    'error': '',
+        logging.error('TODO: NOT IMPLEMENTED')
+        return jsonify({'success': 'no',
+                    'error': 'NotImplementedError',
                     'payload': {
-                        'id': str(user.id)
+
                     }}), 200
 
 
@@ -40,9 +40,9 @@ def build_api_community(app):
         @apiDescription Force internal calendar update from google doc.
         """
         # TODO
-
-        return jsonify({'success': 'yes',
-                    'error': '',
+        logging.error('TODO: NOT IMPLEMENTED')
+        return jsonify({'success': 'no',
+                    'error': 'NotImplementedError',
                     'payload': {
-                        'id': str(user.id)
+
                     }}), 200

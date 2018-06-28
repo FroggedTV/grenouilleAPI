@@ -43,4 +43,5 @@ services:
       context: ..
       dockerfile: docker/grenouilleapi_rtmp/Dockerfile
     ports:
-      - 1935:1935
+      - "1935:1935"
+      - "9997:9997"

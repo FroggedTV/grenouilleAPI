@@ -10,7 +10,7 @@ First you can use an APIKey if the <API_KEY> header is present. Otherwise, if yo
 A typical curl command to access an endpoint is:
 
 ```
-curl -X <COMMAND> --header "API_KEY: <KEY>" -d "<JSON_PAYLOAD>" "https://grenouilleapi.the-cluster.org/api/<ENDPOINT>
+curl -X <COMMAND> --header "API_KEY: <KEY>" -d "<JSON_PAYLOAD>" https://grenouilleapi.the-cluster.org/api/<ENDPOINT>
 ```
 
 * `<COMMAND>` is `GET` or `POST`.

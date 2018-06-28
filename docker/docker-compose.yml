@@ -34,3 +34,13 @@ services:
     entrypoint: python3 /grenouille/backend/bot_app.py
     depends_on:
       - grenouilleapi_postgres
+
+  grenouilleapi_rtmp:
+    image: grenouilleapi_rtmp
+    container_name: grenouilleapi_rtmp
+    restart: always
+    build:
+      context: ..
+      dockerfile: docker/grenouilleapi_rtmp/Dockerfile
+    ports:
+      - 1935:1935

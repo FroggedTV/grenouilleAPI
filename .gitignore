@@ -8,6 +8,7 @@
 # Configs
 docker/grenouilleapi_postgres/conf.env
 backend/cfg/settings.cfg
+docker/grenouilleapi_rtmp/nginx.conf
 
 # Dev database
 backend/cfg/sqlite.db

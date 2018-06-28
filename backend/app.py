@@ -3,6 +3,8 @@
 #####################
 
 from flask import Flask, jsonify, send_from_directory
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_openid import OpenID
 from flask_migrate import Migrate
 
@@ -20,6 +22,12 @@ def create_app():
 app = create_app()
 oid = OpenID(app, store_factory=lambda: None)
 migrate = Migrate(app, db)
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per minute"]
+)
+
 
 ##########
 # Routes #
@@ -48,14 +56,20 @@ build_api_stream_system(app)
 @app.errorhandler(401)
 def unauthorized(e):
     return jsonify({'success': 'no',
-                    'error': 'Authorization error.',
+                    'error': 'AuthorizationError',
                     'payload': {}}), 401
 
 @app.errorhandler(404)
 def unknown(e):
     return jsonify({'success': 'no',
-                    'error': 'Unknown endpoint.',
+                    'error': 'UnknownEndpoint',
                     'payload': {}}), 404
+
+@app.errorhandler(429)
+def rate_limit_handler(e):
+    return jsonify({'success': 'no',
+                    'error': 'RequestRateLimit',
+                    'payload': {}}), 429
 
 ############################
 # Start Tornado Web Server #

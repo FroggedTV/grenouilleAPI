@@ -1,4 +1,6 @@
 import logging
+import json
+import websocket
 
 from flask import request, jsonify
 
@@ -37,9 +39,6 @@ def build_api_stream_system(app):
                             'payload': {}
                             }), 200
 
-        # TODO connect to obs
-
-        logging.error('TODO: NOT IMPLEMENTED')
         return jsonify({'success': 'no',
                     'error': 'NotImplementedError',
                     'payload': {
@@ -61,8 +60,8 @@ def build_api_stream_system(app):
 
         @apiParam {String} scene Name of the scene to change to.
         @apiError (Errors){String} InternalOBSError Error communicating to OBS.
-        @apiError (Errors){String} MissingScene The scene with the specified name doesn't exist.
-
+        @apiError (Errors){String} MissingSceneParameter Scene is not present in the parameters.
+        @apiError (Errors){String} InvalidSceneParameter Scene is not valid String.
         """
         # Header checks
         header_key = request.headers.get('API_KEY', None)
@@ -77,11 +76,38 @@ def build_api_stream_system(app):
                             'payload': {}
                             }), 200
 
-        # TODO connect to obs and do work
+        data = request.get_json(force=True)
 
-        logging.error('TODO: NOT IMPLEMENTED')
-        return jsonify({'success': 'no',
-                    'error': 'NotImplementedError',
-                    'payload': {
+        # scene checks
+        scene = data.get('scene', None)
+        if scene is None:
+            return jsonify({'success': 'no',
+                            'error': 'MissingSceneParameter',
+                            'payload': {}
+                            }), 200
+        if not isinstance(scene, str):
+            return jsonify({'success': 'no',
+                            'error': 'InvalidSceneParameter',
+                            'payload': {}
+                            }), 200
+        if len(scene) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidSceneParameter',
+                            'payload': {}
+                            }), 200
 
-                    }}), 200
+        # Send command to obs
+        try:
+            ws = websocket.WebSocket()
+            ws.connect("ws://{}:{}".format('127.0.0.1', '4444'))
+            ws.send(json.dumps({'message-id': 1, 'request-type': 'SetCurrentScene', 'scene-name': scene}))
+            result = json.loads(ws.recv())
+            ws.close()
+        except Exception as e:
+            return jsonify({'success': 'no',
+                            'error': 'InternalOBSError',
+                            'payload': {}}), 200
+
+        return jsonify({'success': 'yes',
+                    'error': '',
+                    'payload': {}}), 200

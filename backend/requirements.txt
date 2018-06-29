@@ -11,3 +11,4 @@ pyjwt==1.5.3
 steam==0.8.23
 dota2==0.2.11
 Flask-Limiter==1.0.1
+websocket-client

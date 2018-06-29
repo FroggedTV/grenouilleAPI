@@ -24,6 +24,7 @@ services:
     entrypoint: python3 /grenouille/backend/app.py
     depends_on:
       - grenouilleapi_postgres
+    network_mode: host
 
   grenouilleapi_bot:
     image: grenouilleapi

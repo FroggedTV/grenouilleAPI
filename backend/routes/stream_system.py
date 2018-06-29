@@ -104,6 +104,7 @@ def build_api_stream_system(app):
             result = json.loads(ws.recv())
             ws.close()
         except Exception as e:
+            logging.error(e)
             return jsonify({'success': 'no',
                             'error': 'InternalOBSError',
                             'payload': {}}), 200

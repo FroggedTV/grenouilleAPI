@@ -1,10 +1,8 @@
 import logging
-import json
-import websocket
 
 from flask import request, jsonify
 
-from helpers import UrlImageToBase64
+from helpers import send_command_to_obs, url_image_to_base64
 from models import User
 
 def build_api_stream_system(app):
@@ -98,11 +96,89 @@ def build_api_stream_system(app):
 
         # Send command to obs
         try:
-            ws = websocket.WebSocket()
-            ws.connect("ws://{}:{}".format('127.0.0.1', '4444'))
-            ws.send(json.dumps({'message-id': 1, 'request-type': 'SetCurrentScene', 'scene-name': scene}))
-            result = json.loads(ws.recv())
-            ws.close()
+            result = send_command_to_obs('SetCurrentScene', {'scene-name': scene})
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                            'error': 'InternalOBSError',
+                            'payload': {}}), 200
+
+        return jsonify({'success': 'yes',
+                    'error': '',
+                    'payload': {}}), 200
+
+    @app.route('/api/obs/record/start', methods=['POST'])
+    def get_obs_record_start():
+        """
+        @api {post} /api/obs/record/start OBSRecordStart
+        @apiVersion 1.0.5
+        @apiName OBSRecordStart
+        @apiGroup StreamSystem
+        @apiDescription Start the recording by OBS.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiError (Errors){String} InternalOBSError Error communicating to OBS.
+        """
+        # Header checks
+        header_key = request.headers.get('API_KEY', None)
+        if header_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyMissing',
+                            'payload': {}
+                            }), 200
+        if header_key != app.config['API_KEY']:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Send command to obs
+        try:
+            result = send_command_to_obs('StartRecording', {})
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                            'error': 'InternalOBSError',
+                            'payload': {}}), 200
+
+        return jsonify({'success': 'yes',
+                    'error': '',
+                    'payload': {}}), 200
+
+    @app.route('/api/obs/record/stop', methods=['POST'])
+    def get_obs_record_stop():
+        """
+        @api {post} /api/obs/record/stop OBSRecordStop
+        @apiVersion 1.0.5
+        @apiName OBSRecordStop
+        @apiGroup StreamSystem
+        @apiDescription Stop the recording by OBS.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiError (Errors){String} InternalOBSError Error communicating to OBS.
+        """
+        # Header checks
+        header_key = request.headers.get('API_KEY', None)
+        if header_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyMissing',
+                            'payload': {}
+                            }), 200
+        if header_key != app.config['API_KEY']:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Send command to obs
+        try:
+            result = send_command_to_obs('StopRecording', {})
         except Exception as e:
             logging.error(e)
             return jsonify({'success': 'no',

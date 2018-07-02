@@ -1,6 +1,6 @@
 {
   "name": "GrenouilleAPI",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "API used with multiple FroggedTV services.",
   "header": {
     "title": "Presentation",

@@ -2,8 +2,6 @@ import logging
 import collections
 
 from flask import request, jsonify
-
-from helpers import UrlImageToBase64
 from models import db, Game, GameVIP, GameVIPType, DynamicConfiguration
 
 def build_api_game(app):

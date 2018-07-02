@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from steam import SteamID
 
 from flask import jsonify, redirect, request
-
 from models import db, UserRefreshToken, User
 
 def build_api_auth(app, oid):

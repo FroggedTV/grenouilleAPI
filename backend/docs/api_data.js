@@ -1435,6 +1435,108 @@ define({ "api": [
     "groupTitle": "DotaBots"
   },
   {
+    "type": "post",
+    "url": "/api/obs/record/start",
+    "title": "OBSRecordStart",
+    "version": "1.0.5",
+    "name": "OBSRecordStart",
+    "group": "StreamSystem",
+    "description": "<p>Start the recording by OBS.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InternalOBSError",
+            "description": "<p>Error communicating to OBS.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "post",
+    "url": "/api/obs/record/stop",
+    "title": "OBSRecordStop",
+    "version": "1.0.5",
+    "name": "OBSRecordStop",
+    "group": "StreamSystem",
+    "description": "<p>Stop the recording by OBS.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InternalOBSError",
+            "description": "<p>Error communicating to OBS.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
     "type": "get",
     "url": "/api/obs/scene/list",
     "title": "OBSSceneList",
@@ -1547,8 +1649,15 @@ define({ "api": [
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingScene",
-            "description": "<p>The scene with the specified name doesn't exist.</p>"
+            "field": "MissingSceneParameter",
+            "description": "<p>Scene is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidSceneParameter",
+            "description": "<p>Scene is not valid String.</p>"
           }
         ]
       }

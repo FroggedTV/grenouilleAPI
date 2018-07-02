@@ -1,8 +1,6 @@
 import logging
 
 from flask import request, jsonify
-
-from helpers import UrlImageToBase64
 from models import User
 
 def build_api_community(app):

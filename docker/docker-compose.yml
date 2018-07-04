@@ -19,6 +19,8 @@ services:
     build:
       context: ..
       dockerfile: docker/grenouilleapi/Dockerfile
+    volumes:
+      - "/data:/data"
     ports:
       - "9999:9999"
     entrypoint: python3 /grenouille/backend/app.py

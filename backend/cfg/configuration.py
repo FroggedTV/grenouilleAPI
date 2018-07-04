@@ -17,12 +17,18 @@ class Config(object):
     SECRET_KEY = 'secret_key'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}/sqlite.db'.format(os.path.join(os.path.dirname(__file__)))
+
     HOST = '127.0.0.1'
     PORT = 9999
     SERVERNAME = 'http://127.0.0.1:9999'
+
     STEAM_KEY='XXX'
     FRONTEND_LOGIN_REDIRECT='http://127.0.0.1:9999/api/auth/token_test'
     API_KEY = 'abc'
+
+    VOD_UNSORTED_PATH='/tmp'
+    VOD_SORTED_PATH='/tmp'
+
     STEAM_BOTS = 'login1@pass1@login2@pass2'
     DOTA_LOBBY_CHEATS = False
     DOTA_LOBBY_TICKET = 0 # FTV 1 CUP is 4947 - FTV 2 LEAGUE is 9674

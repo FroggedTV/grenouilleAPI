@@ -7,7 +7,7 @@ from threading import Lock
 from app import create_app
 from dota_bot import DotaBot
 from models import db, DynamicConfiguration, Game, GameStatus, GameVIP
-from helpers import divide_vip_list_per_type
+from helpers.general import divide_vip_list_per_type
 
 # Log
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s', level=logging.INFO)

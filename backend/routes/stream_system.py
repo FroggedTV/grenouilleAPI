@@ -3,13 +3,15 @@ import os
 
 from flask import request, jsonify
 
-from helpers import send_command_to_obs, url_image_to_base64
+from helpers.endpoint import api_key_endpoint
+from helpers.obs import send_command_to_obs
 from models import User
 
 def build_api_stream_system(app):
     """Factory to setup the routes for the stream system api."""
 
     @app.route('/api/obs/scene/list', methods=['GET'])
+    @api_key_endpoint(app)
     def get_obs_scene_list():
         """
         @api {get} /api/obs/scene/list OBSSceneList
@@ -25,19 +27,7 @@ def build_api_stream_system(app):
         @apiError (Errors){String} InternalOBSError Error communicating to OBS.
         @apiSuccess {String[]} scenes All available scenes with their name as Strings.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
+        # TODO
         return jsonify({'success': 'no',
                     'error': 'NotImplementedError',
                     'payload': {
@@ -45,6 +35,7 @@ def build_api_stream_system(app):
                     }}), 200
 
     @app.route('/api/obs/scene/update', methods=['POST'])
+    @api_key_endpoint(app)
     def update_obs_scene():
         """
         @api {post} /api/obs/scene/update OBSSceneUpdate
@@ -62,19 +53,6 @@ def build_api_stream_system(app):
         @apiError (Errors){String} MissingSceneParameter Scene is not present in the parameters.
         @apiError (Errors){String} InvalidSceneParameter Scene is not valid String.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # scene checks
@@ -109,6 +87,7 @@ def build_api_stream_system(app):
                     'payload': {}}), 200
 
     @app.route('/api/obs/record/start', methods=['POST'])
+    @api_key_endpoint(app)
     def get_obs_record_start():
         """
         @api {post} /api/obs/record/start OBSRecordStart
@@ -123,19 +102,6 @@ def build_api_stream_system(app):
 
         @apiError (Errors){String} InternalOBSError Error communicating to OBS.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         # Send command to obs
         try:
             result = send_command_to_obs('StartRecording', {})
@@ -150,6 +116,7 @@ def build_api_stream_system(app):
                     'payload': {}}), 200
 
     @app.route('/api/obs/record/stop', methods=['POST'])
+    @api_key_endpoint(app)
     def get_obs_record_stop():
         """
         @api {post} /api/obs/record/stop OBSRecordStop
@@ -164,19 +131,6 @@ def build_api_stream_system(app):
 
         @apiError (Errors){String} InternalOBSError Error communicating to OBS.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         # Send command to obs
         try:
             result = send_command_to_obs('StopRecording', {})
@@ -191,6 +145,7 @@ def build_api_stream_system(app):
                     'payload': {}}), 200
 
     @app.route('/api/vod/unsorted/list', methods=['GET'])
+    @api_key_endpoint(app)
     def get_vod_unsorted_list():
         """
         @api {get} /api/vod/unsorted/list VODUnsortedList
@@ -210,19 +165,6 @@ def build_api_stream_system(app):
         @apiSuccess {String} vod.filename Filename of the unsorted VOD.
         @apiSuccess {Integer} vod.size Size of the VOD in octets.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         # Probe disk for files
         try:
             files = []
@@ -252,6 +194,7 @@ def build_api_stream_system(app):
 
 
     @app.route('/api/vod/unsorted/delete', methods=['POST'])
+    @api_key_endpoint(app)
     def get_vod_unsorted_delete():
         """
         @api {post} /api/vod/unsorted/delete VODUnsortedDelete
@@ -271,19 +214,6 @@ def build_api_stream_system(app):
 
         @apiError (Errors){String} VODErrorNoPath The path for unsorted VOD is not a directory.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # filename checks

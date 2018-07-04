@@ -3,11 +3,13 @@ import collections
 
 from flask import request, jsonify
 from models import db, Game, GameVIP, GameVIPType, DynamicConfiguration
+from helpers.endpoint import api_key_endpoint
 
 def build_api_game(app):
     """Factory to setup the routes for the Dota bots."""
 
     @app.route('/api/game/create', methods=['POST'])
+    @api_key_endpoint(app)
     def create_game():
         """
         @api {post} /api/game/create GameCreate
@@ -46,19 +48,6 @@ def build_api_game(app):
 
         @apiSuccess {Integer} id Id of the game that will be hosted by bots.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # team1 checks
@@ -192,6 +181,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/details', methods=['GET'])
+    @api_key_endpoint(app)
     def get_game_details():
         """
         @api {get} /api/game/details GameGetDetails
@@ -224,20 +214,6 @@ def build_api_game(app):
         @apiSuccess {Integer} valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
         @apiSuccess {Integer=1,2} winner Team winning the game (if status 'GameStatus.COMPLETED')
         """
-
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # id checks
@@ -282,6 +258,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/list', methods=['GET'])
+    @api_key_endpoint(app)
     def list_game():
         """
         @api {get} /api/game/list GameList
@@ -318,19 +295,6 @@ def build_api_game(app):
         @apiSuccess {Integer} games.valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
         @apiSuccess {Integer=1,2} games.winner Team winning the game (if status 'GameStatus.COMPLETED')
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # limit check
@@ -380,6 +344,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/vip/list', methods=['GET'])
+    @api_key_endpoint(app)
     def list_game_vips():
         """
         @api {get} /api/game/vip/list GameVIPList
@@ -397,19 +362,6 @@ def build_api_game(app):
         @apiSuccess {String=GameVIPType.CASTER,GameVIPType.ADMIN} vips.type Type of the VIP.
         @apiSuccess {String} vips.name Name of the VIP.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         # Return ids
         vips = GameVIP.get_all_vips()
         return jsonify({'success': 'yes',
@@ -417,6 +369,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/vip/add', methods=['POST'])
+    @api_key_endpoint(app)
     def add_game_vip():
         """
         @api {post} /api/game/vip/add GameVIPAdd
@@ -442,19 +395,6 @@ def build_api_game(app):
         @apiError (Errors){String} MissingName name is not specified.
         @apiError (Errors){String} InvalidName name is not valid.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # id checks
@@ -517,6 +457,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/vip/remove', methods=['POST'])
+    @api_key_endpoint(app)
     def remove_game_vip():
         """
         @api {post} /api/game/vip/remove GameVIPRemove
@@ -534,19 +475,6 @@ def build_api_game(app):
         @apiError (Errors){String} InvalidId id is invalid.
         @apiError (Errors){String} VIPDoesNotExist VIP with id does not exist in the database.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # id checks
@@ -577,6 +505,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/bot/pause/get', methods=['GET'])
+    @api_key_endpoint(app)
     def get_pause_bot():
         """
         @api {get} /api/game/bot/pause/get BotPauseGet
@@ -592,19 +521,6 @@ def build_api_game(app):
 
         @apiSuccess {String=True,False} bot_pause Pause status of the bot.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         bot_pause = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key=='bot_pause').one_or_none()
         if bot_pause is None:
             return jsonify({'success': 'no',
@@ -617,6 +533,7 @@ def build_api_game(app):
                         }), 200
 
     @app.route('/api/game/bot/pause/update', methods=['POST'])
+    @api_key_endpoint(app)
     def update_pause_bot():
         """
         @api {post} /api/game/bot/pause/update BotPauseUpdate
@@ -635,19 +552,6 @@ def build_api_game(app):
 
         @apiSuccess {String=True,False} bot_pause Pause status of the bot after update.
         """
-        # Header checks
-        header_key = request.headers.get('API_KEY', None)
-        if header_key is None:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyMissing',
-                            'payload': {}
-                            }), 200
-        if header_key != app.config['API_KEY']:
-            return jsonify({'success': 'no',
-                            'error': 'ApiKeyInvalid',
-                            'payload': {}
-                            }), 200
-
         data = request.get_json(force=True)
 
         # bot_pause checks

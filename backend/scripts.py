@@ -13,6 +13,10 @@ manager = Manager(app)
 # Scripts #
 ###########
 
+@manager.command
+def hello_world():
+    """Simple script example."""
+    print('Hello World')
 
 @manager.command
 def insert_all_vips():

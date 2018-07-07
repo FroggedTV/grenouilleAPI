@@ -15,7 +15,7 @@ dev-run:
 dev-botrun:
 	.venv/bin/python3 backend/bot_app.py
 
-SCRIPT?=insert_all_vips
+SCRIPT?=hello_world
 dev-script:
 	.venv/bin/python3 backend/scripts.py $(SCRIPT)
 
@@ -56,7 +56,7 @@ prod-start:
 prod-stop:
 	docker-compose -p grenouille -f docker/docker-compose.yml down
 
-SCRIPT?=insert_all_vips
+SCRIPT?=hello_world
 prod-script:
 	docker run --network grenouille_default -e FLASK_APP=grenouille/backend/app.py grenouilleapi python3 grenouille/backend/scripts.py $(SCRIPT)
 

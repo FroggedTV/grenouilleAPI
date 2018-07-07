@@ -4,39 +4,51 @@
 
 ### API
 
-Endpoints:
-- [X] Change documentation function names
-- [X] Fix versioning in documentation
+General:
+- [ ] Normalize documentations and move to version `1.1.0` with UserRights and Wrappers.
+- [ ] Add the ability to run specific CRON jobs inside the grenouilleAPI worker.
+
+User:
+- [ ] Add UserRights.
+
+Auth:
+- [ ] Create wrappers `@AccessWithAPI(<ScopeList>)` `@AccessWithUser(<UserRight>)` `@AccessWithUserOrAPI(<ScopeList>, <UserRight>)`
+- [ ] Add user rights in auth token
+- [ ] Secure endpoints with user rights.
+
+StreamSystem:
+- [ ] Update/Get rediff playlist with an endpoint.
+- [ ] List all vod available (records or saved).
+- [ ] Move a vod (with possible rename).
+- [ ] Create a vod category (basically a directory).
+- [ ] Remove a vod from disk.
+- [ ] Show server disk usage.
+
+Game:
 - [ ] Add a `ListGames(limit, offset)`, ordered by `id desc`
 - [ ] Add `limit` and `offset` to `ListGameVIPs(limit, offset)`
 
+Community:
+- [ ] Implement the calendar fetcher (Update and Get). Similar to GrenouilleIRC.
+- [ ] Create a CRON job to update calendar (every 1 hour).
+
+Stats:
+- [ ] Integrate stats scripts inside the grenouilleAPI to prepare for TI image generation (from deposit GameStatAnalyzer).
+
+Calendar:
+- [ ] Integrate the calendar image generation inside the website (from deposit CalendarImageGenerator).
+
 ### BOT
 
-Features:
-- [X] VIPs enter lobby, CASTER can enter casting slots, ADMIN stay spectator
-- [X] CASTERs can authorize a co-caster to enter the lobby, with !cocast <SteamID>
-- [X] ADMINs can authorize standins to enter the lobby, with !standin <SteanID> <Team>
-- [X] Add a !destroy command so ADMINs can hard cancel a lobby
-- [X] Test host inside S1 Ticket
-- [X] Add bot login to Game entry inside db
-- [X] Test if bots status is inside db
-
-- [ ] Retry if someone does not connect. 3 retries, 5min between each.
-- [ ] !ready to start game, and not when players are all in position
-- [ ] Test host inside S2 ticket
-- [ ] Bot leaves chats that are not lobby chat
-
-Code design:
-- [X] Bot secure cancel, destroy Greenlet and every sleeping events.
-- [ ] Refactor main loop (player waiting, side/order, waiting again, retry, game waiting, result)
-- [ ] Function documentations
 
 ## General Documentation
 
-The grenouilleAPI repository is composed of 3 main parts: the **Database**, the **Web API**, the **DotaBOT** section.
+The grenouilleAPI repository is composed of 4 main parts: the **Database**, the **Web API**, the **DotaBOT** section and the **RTMP Server**.
  
 The **Database** part is a generic storage for the API and also connected to the DotaBOT. 
 It can take different form: a sqlite file storage for development, or a shared mysql/postgres/maria/..., or the docker image prepared with a postgres database.
+
+The **RTMP Server** is a simple `nginx` with the RTMP plugin. It is used to receive streamer intake to feed to a `OBS-STUDIO` instance running on the host machine.
 
 ### Web API - `backend/app.py`
 
@@ -115,7 +127,7 @@ Generate a new migration file into `backend/migrations/versions` by comparing `b
 
 ### Production Environment
 
-Production run inside docker images. A postgres image hosts the database, and 2 debian images with tornado/python and dota lib hosts the API and the DotaBot.
+Production run inside docker images. A postgres image hosts the database, and 3 Debian images with tornado/python and dota lib hosts the API, the DotaBot and the RTMP server.
 
 Start everything with `make prod-start` and stop everything with `make prod-stop`.
 

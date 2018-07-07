@@ -36,7 +36,7 @@ def build_api_stream_system(app):
 
     @app.route('/api/obs/scene/update', methods=['POST'])
     @api_key_endpoint(app)
-    def update_obs_scene():
+    def post_obs_scene_update():
         """
         @api {post} /api/obs/scene/update OBSSceneUpdate
         @apiVersion 1.0.4
@@ -88,7 +88,7 @@ def build_api_stream_system(app):
 
     @app.route('/api/obs/record/start', methods=['POST'])
     @api_key_endpoint(app)
-    def get_obs_record_start():
+    def post_obs_record_start():
         """
         @api {post} /api/obs/record/start OBSRecordStart
         @apiVersion 1.0.5
@@ -117,7 +117,7 @@ def build_api_stream_system(app):
 
     @app.route('/api/obs/record/stop', methods=['POST'])
     @api_key_endpoint(app)
-    def get_obs_record_stop():
+    def post_obs_record_stop():
         """
         @api {post} /api/obs/record/stop OBSRecordStop
         @apiVersion 1.0.5
@@ -194,6 +194,73 @@ def build_api_stream_system(app):
 
 
     @app.route('/api/vod/unsorted/delete', methods=['POST'])
+    @api_key_endpoint(app)
+    def post_vod_unsorted_delete():
+        """
+        @api {post} /api/vod/unsorted/delete VODUnsortedDelete
+        @apiVersion 1.0.5
+        @apiName VODUnsortedDelete
+        @apiGroup StreamSystem
+        @apiDescription Delete on of the unsorted VOD file.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiParam {String} filename Name of the file to delete.
+        @apiError (Errors){String} MissingFilenameParameter Filename is not present in the parameters.
+        @apiError (Errors){String} InvalidFilenameParameter Filename is not valid String.
+        @apiError (Errors){String} NoSuchVODFile There is no unsorted VOD with the specified filename.
+
+        @apiError (Errors){String} VODErrorNoPath The path for unsorted VOD is not a directory.
+        """
+        data = request.get_json(force=True)
+
+        # filename checks
+        filename = data.get('filename', None)
+        if filename is None:
+            return jsonify({'success': 'no',
+                            'error': 'MissingFilenameParameter',
+                            'payload': {}
+                            }), 200
+        if not isinstance(filename, str):
+            return jsonify({'success': 'no',
+                            'error': 'InvalidFilenameParameter',
+                            'payload': {}
+                            }), 200
+        if len(filename) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'InvalidFilenameParameter',
+                            'payload': {}
+                            }), 200
+
+        try:
+            # Check if file is valid and delete
+            if not os.path.isdir(app.config['VOD_UNSORTED_PATH']):
+                return jsonify({'success': 'no',
+                                'error': 'VODErrorNoPath',
+                                'payload': {}
+                                }), 200
+
+            file_path = os.path.join(app.config['VOD_UNSORTED_PATH'], filename)
+            if not os.path.isfile(file_path):
+                return jsonify({'success': 'no',
+                                'error': 'NoSuchVODFile',
+                                'payload': {}
+                                }), 200
+            else:
+                os.remove(file_path)
+
+            return jsonify({'success': 'yes',
+                            'error': '',
+                            'payload': {}}), 200
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                        'error': 'FileSystemError',
+                        'payload': {}}), 200
+
+    @app.route('/api/obs/playlist/update', methods=['POST'])
     @api_key_endpoint(app)
     def get_vod_unsorted_delete():
         """

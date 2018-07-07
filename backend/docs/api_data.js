@@ -1764,6 +1764,91 @@ define({ "api": [
     "groupTitle": "StreamSystem"
   },
   {
+    "type": "post",
+    "url": "/api/vod/unsorted/delete",
+    "title": "VODUnsortedDelete",
+    "version": "1.0.5",
+    "name": "VODUnsortedDelete",
+    "group": "StreamSystem",
+    "description": "<p>Delete on of the unsorted VOD file.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "API_KEY",
+            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyMissing",
+            "description": "<p>Missing API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ApiKeyInvalid",
+            "description": "<p>Invalid API_KEY header.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "MissingFilenameParameter",
+            "description": "<p>Filename is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "InvalidFilenameParameter",
+            "description": "<p>Filename is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "NoSuchVODFile",
+            "description": "<p>There is no unsorted VOD with the specified filename.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "VODErrorNoPath",
+            "description": "<p>The path for unsorted VOD is not a directory.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "filename",
+            "description": "<p>Name of the file to delete.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
     "type": "get",
     "url": "/api/vod/unsorted/list",
     "title": "VODUnsortedList",

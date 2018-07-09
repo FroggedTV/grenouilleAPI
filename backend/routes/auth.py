@@ -14,9 +14,9 @@ def build_api_auth(app, oid):
     @oid.loginhandler
     def login():
         """
-        @api {get} /api/auth/login RefreshTokenGet
-        @apiVersion 1.0.4
-        @apiName RefreshTokenGet
+        @api {get} /api/auth/login/steam RefreshTokenGetSteam
+        @apiVersion 1.1.0
+        @apiName RefreshTokenGetWithSteam
         @apiGroup Authentication
         @apiDescription First endpoint to call in the auth process. Calling it redirects to the steam login page.
         After login, the user is redirected to a callback url with the refresh token as a parameter.
@@ -43,6 +43,7 @@ def build_api_auth(app, oid):
         token = {
             'steamid': str(steam_id.as_64),
             'aud': 'refresh',
+            'scopes': '',
             'exp': datetime.utcnow() + timedelta(days=60)
         }
         token = jwt.encode(token, app.config['SECRET_KEY'])

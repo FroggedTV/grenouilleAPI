@@ -1,6 +1,6 @@
 define({
   "name": "GrenouilleAPI",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "API used with multiple FroggedTV services.",
   "header": {
     "title": "Presentation",
@@ -11,7 +11,7 @@ define({
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2018-07-07T05:21:12.031Z",
+    "time": "2018-07-08T15:21:41.778Z",
     "url": "http://apidocjs.com",
     "version": "0.17.6"
   }

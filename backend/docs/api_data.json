@@ -146,22 +146,28 @@
     "url": "/api/auth/login",
     "title": "RefreshTokenGet",
     "version": "1.0.4",
-    "name": "RefreshTokenGet",
+    "deprecated": {
+      "content": "@apiName RefreshTokenGet"
+    },
     "group": "Authentication",
     "description": "<p>First endpoint to call in the auth process. Calling it redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.</p>",
     "filename": "backend/routes/auth.py",
-    "groupTitle": "Authentication"
+    "groupTitle": "Authentication",
+    "name": "GetApiAuthLogin"
   },
   {
     "type": "get",
     "url": "/api/auth/login",
     "title": "1.1 - Get a Refresh Token with Steam Login",
     "version": "1.0.0",
-    "name": "RefreshTokenGet",
+    "deprecated": {
+      "content": "@apiName RefreshTokenGet"
+    },
     "group": "Authentication",
     "description": "<p>Calling this endpoint redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config.</p>",
     "filename": "backend/routes/_apidoc.py",
-    "groupTitle": "Authentication"
+    "groupTitle": "Authentication",
+    "name": "GetApiAuthLogin"
   },
   {
     "type": "get",

@@ -1,24 +1,26 @@
 import logging
 import re
 import jwt
+import hashlib
+
 from datetime import datetime, timedelta
 from steam import SteamID
 
 from flask import jsonify, redirect, request
-from models import db, UserRefreshToken, User
+from models import db, UserRefreshToken, User, APIKey
 
 def build_api_auth(app, oid):
     """Factory to setup the routes for the auth api."""
 
-    @app.route('/api/auth/login', methods=['GET'])
+    @app.route('/api/auth/login/steam', methods=['GET'])
     @oid.loginhandler
-    def login():
+    def login_steam():
         """
         @api {get} /api/auth/login/steam RefreshTokenGetSteam
         @apiVersion 1.1.0
         @apiName RefreshTokenGetWithSteam
         @apiGroup Authentication
-        @apiDescription First endpoint to call in the auth process. Calling it redirects to the steam login page.
+        @apiDescription First endpoint to call in the auth process with user. Calling it redirects to the steam login page.
         After login, the user is redirected to a callback url with the refresh token as a parameter.
         The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.
         """
@@ -41,29 +43,78 @@ def build_api_auth(app, oid):
         steam_id = SteamID(match.group(1))
 
         token = {
-            'steamid': str(steam_id.as_64),
             'aud': 'refresh',
-            'scopes': '',
+            'client': {
+                'type': 'user',
+                'steamid': str(steam_id.as_64)
+            },
             'exp': datetime.utcnow() + timedelta(days=60)
         }
         token = jwt.encode(token, app.config['SECRET_KEY'])
 
-        UserRefreshToken.upsert(steam_id, token.decode('utf-8'))
         user = User.get(steam_id)
         if user is None:
             user = User(steam_id)
             db.session.add(user)
+        UserRefreshToken.upsert(steam_id, token.decode('utf-8'))
         db.session.commit()
 
         url = '{0}?token={1}'.format(app.config['FRONTEND_LOGIN_REDIRECT'],
                                      token.decode('utf-8'))
         return redirect(url)
 
+    @app.route('/api/auth/login/key', methods=['GET'])
+    def login_key():
+        """
+        @api {get} /api/auth/login/key RefreshTokenGetWithKey
+        @apiVersion 1.1.0
+        @apiName RefreshTokenGetWithKey
+        @apiGroup Authentication
+        @apiDescription Get a refresh token using a API Key.
+
+        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        @apiSuccess {String} token Refresh token long lived to request access data.
+        """
+        header_key = request.headers.get('API_KEY', None)
+        if header_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyMissing',
+                            'payload': {}
+                            }), 200
+
+        salt = app.config['API_KEY_SALT']
+        hash_object = hashlib.sha1(header_key + salt)
+        hash_key = hash_object.hexdigest()
+        key = APIKey.get(hash_key.decode('utf-8'))
+
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'ApiKeyInvalid',
+                            'payload': {}
+                            }), 200
+        else:
+            token = {
+                'aud': 'refresh',
+                'client': {
+                    'type': 'key',
+                    'keyid': str(key.key_hash)
+                },
+                'exp': datetime.utcnow() + timedelta(days=60)
+            }
+            token = jwt.encode(token, app.config['SECRET_KEY'])
+            return jsonify({'success': 'yes',
+                            'error': '',
+                            'payload': {'token': token.decode('utf-8')}
+                            }), 200
+
     @app.route('/api/auth/token', methods=['GET'])
     def get_auth_token():
         """
         @api {get} /api/auth/token AuthTokenGet
-        @apiVersion 1.0.4
+        @apiVersion 1.1.0
         @apiName AuthTokenGet
         @apiGroup Authentication
         @apiDescription Refresh tokens are long lived but auth tokens are short lived.
@@ -71,19 +122,19 @@ def build_api_auth(app, oid):
 
         @apiHeader {String} Authorization 'Bearer <refresh_token>'
 
-        @apiSuccess {String} auth_token Authentication token short lived to access data.
+        @apiSuccess {String} token Authentication token short lived to access data.
 
-        @apiError (Errors){String} InvalidHeader Authorization header not well formated.
-        @apiError (Errors){String} NoRefreshToken There is no refresh token provided.
-        @apiError (Errors){String} ExpiredRefreshToken Refresh token has expired and user should log again.
-        @apiError (Errors){String} InvalidRefreshToken Token is invalid (decode, rights, signature...).
+        @apiError (Errors){String} HeaderInvalid Authorization header not well formated.
+        @apiError (Errors){String} RefreshTokenMissing There is no refresh token provided.
+        @apiError (Errors){String} RefreshTokenExpired Refresh token has expired and client should get a new one.
+        @apiError (Errors){String} RefreshTokenInvalid Token is invalid (decode, rights, signature...).
         """
         header_token = request.headers.get('Authorization', None)
         if (header_token is None
             or len(header_token) < 8
             or header_token[0:7] != 'Bearer '):
             return jsonify({'success': 'no',
-                            'error': 'InvalidHeader',
+                            'error': 'HeaderInvalid',
                             'payload': {}
                             }), 200
         raw_token = header_token[7:]
@@ -93,38 +144,44 @@ def build_api_auth(app, oid):
                                audience='refresh')
         except jwt.InvalidAudienceError:
             return jsonify({'success': 'no',
-                            'error': 'NoRefreshToken',
+                            'error': 'RefreshTokenMissing',
                             'payload': {}
                             }), 200
         except jwt.ExpiredSignatureError:
             return jsonify({'success': 'no',
-                            'error': 'ExpiredRefreshToken',
+                            'error': 'RefreshTokenExpired',
                             'payload': {}
                             }), 200
         except Exception as e:
             return jsonify({'success': 'no',
-                            'error': 'InvalidRefreshToken',
-                            'payload': {}
-                            }), 200
-
-        steam_id = int(token['steamid'])
-
-        # Check if this is the only valid refresh token
-        user_refresh_token = UserRefreshToken.get(steam_id)
-        if (user_refresh_token is None
-            or user_refresh_token.refresh_token != raw_token):
-            return jsonify({'success': 'no',
-                            'error': 'ExpiredRefreshToken',
+                            'error': 'RefreshTokenInvalid',
                             'payload': {}
                             }), 200
 
         auth_token = {
-            'steamid': str(steam_id),
-            'aud': 'auth',
-            'exp': datetime.utcnow() + timedelta(hours=1)
-        }
-        auth_token = jwt.encode(auth_token, app.config['SECRET_KEY'])
+                'aud': 'auth',
+                'client': {
+                    'type': token['client']['type']
+                },
+                'exp': datetime.utcnow() + timedelta(hours=1)
+            }
 
+        if token['client']['type'] == 'user':
+            auth_token['client']['steamid'] = token['client']['steamid']
+
+            # Check if the refresh token is still valid
+            # TODO
+            # Add scopes
+            # TODO
+        elif token['client']['type'] == 'key':
+            auth_token['client']['keyid'] = token['client']['keyid']
+
+            # Check if the refresh token is still valid
+            # TODO
+            # Add scopes
+            # TODO
+
+        auth_token = jwt.encode(auth_token, app.config['SECRET_KEY'])
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {'token': auth_token.decode('utf-8')}

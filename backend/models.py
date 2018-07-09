@@ -88,6 +88,33 @@ class User(db.Model):
         """
         return User.query.filter_by(id=id).one_or_none()
 
+class APIKey(db.Model):
+    """An API Key used in the system
+
+    Attributes:
+        key_hash: sha1 of a valid API_KEY.
+        description: description of the API key usage.
+    """
+    __tablename__ = 'api_key'
+
+    key_hash = db.Column(db.String(), primary_key=True)
+    description = db.Column(db.String(), nullable=True)
+
+    def __init__(self, key_hash, description=None):
+        self.key_hash = key_hash
+        self.description = description
+
+    @staticmethod
+    def get(key_hash):
+        """Returns the APIKey data if found.
+
+        Args:
+            key_hash: sha1 hash of the key to find data about.
+        Returns:
+            APIKey object if it exists, none otherwise.
+        """
+        return APIKey.query.filter_by(key_hash=key_hash).one_or_none()
+
 class GameStatus(enum.Enum):
     WAITING_FOR_BOT = 'Waiting for a bot to start and pick the game.'
     CREATION_IN_PROGRESS = 'Bot is creating the game inside the client.'

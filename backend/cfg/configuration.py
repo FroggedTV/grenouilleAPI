@@ -26,8 +26,7 @@ class Config(object):
     FRONTEND_LOGIN_REDIRECT='http://127.0.0.1:9999/api/auth/token_test'
     API_KEY_SALT = 'XXX'
 
-    VOD_UNSORTED_PATH='/tmp'
-    VOD_SORTED_PATH='/tmp'
+    VOD_PATH='/tmp'
 
     STEAM_BOTS = 'login1@pass1@login2@pass2'
     DOTA_LOBBY_CHEATS = False

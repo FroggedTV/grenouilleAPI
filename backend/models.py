@@ -5,68 +5,21 @@ from sqlalchemy_utils import ScalarListType
 
 db = SQLAlchemy()
 
-class UserRefreshToken(db.Model):
-    """The only valid refresh token for this user..
-
-    Attributes:
-        id: Steam unique identifier 64bits.
-        token: String of the valid token
-    """
-    __tablename__ = 'user_refresh_token'
-
-    id = db.Column(db.BigInteger(), primary_key=True)
-    refresh_token = db.Column(db.String(), primary_key=True)
-
-    @staticmethod
-    def get(id):
-        """Returns the token of a specific user.
-
-        Args:
-            id: Steam unique identifier.
-        Returns:
-            UserRefreshToken of the target user or None if no refresh token existing.
-        """
-        return UserRefreshToken.query.filter_by(id=id).one_or_none()
-
-    @staticmethod
-    def upsert(id, token):
-        """Upsert the current refresh token valid for a user.
-
-        Args:
-            id: Steam unique identifier of the user.
-            token: Refresh JWT of the user.
-        Returns:
-            UserRefreshToken of the target user, with the token updated.
-        """
-        user_refresh_token = UserRefreshToken.get(id)
-        if user_refresh_token is None:
-            user_refresh_token = UserRefreshToken()
-            user_refresh_token.id = id
-            db.session.add(user_refresh_token)
-        user_refresh_token.refresh_token = token
-        db.session.commit()
-
-        return user_refresh_token
-
-    @staticmethod
-    def revoke(id):
-        """Revoke the token of a specified user when logout.
-
-        Args:
-            id: Steam unique identifier of the user.
-        """
-        UserRefreshToken.query.filter_by(id=id).delete()
-        db.session.commit()
+#########################
+# User, APIKeys, Scopes #
+#########################
 
 class User(db.Model):
     """A user representation in the database.
 
     Attributes:
         id: Steam unique identifier 64bits.
+        refresh_token: current refresh_token valid for this user
     """
     __tablename__ = 'user'
 
     id = db.Column(db.BigInteger(), primary_key=True)
+    refresh_token = db.Column(db.String(), nullable=True)
 
     def __init__(self, id):
         """Instantiate a new user with default values.
@@ -94,11 +47,13 @@ class APIKey(db.Model):
     Attributes:
         key_hash: sha1 of a valid API_KEY.
         description: description of the API key usage.
+        refresh_token: current refresh_token valid for this API_KEY
     """
     __tablename__ = 'api_key'
 
     key_hash = db.Column(db.String(), primary_key=True)
     description = db.Column(db.String(), nullable=True)
+    refresh_token = db.Column(db.String(), nullable=True)
 
     def __init__(self, key_hash, description=None):
         self.key_hash = key_hash
@@ -114,6 +69,148 @@ class APIKey(db.Model):
             APIKey object if it exists, none otherwise.
         """
         return APIKey.query.filter_by(key_hash=key_hash).one_or_none()
+
+class Scope(enum.Enum):
+    API_KEY_SCOPE = 'api_key_scope'         # Management of the API_KEYs
+    USER_SCOPE = 'user_scope'               # Management of the user rights
+    OBS_CONTROL = 'obs_control'             # Send commands to OBS
+    VOD_MANAGE = 'vod_manage'               # Manage VODs on disk
+
+class UserScope(db.Model):
+    """All scopes available for a user.
+
+    Args:
+        id: User id.
+        scope: scope.
+    """
+    __tablename__ = 'user_scope'
+
+    id = db.Column(db.BigInteger(), primary_key=True)
+    scope = db.Column(db.String(), primary_key=True)
+
+    def __init__(self, id, scope):
+        self.id = id
+        self.scope = scope
+
+    @staticmethod
+    def upsert(id, scope):
+        """Add a scope to a user.
+
+        Args:
+            id: user id.
+            scope: scope to add.
+        """
+
+        user_scope = db.session().query(UserScope).filter(UserScope.id==id, UserScope.scope==scope).one_or_none()
+        if user_scope is None:
+            user_scope = UserScope(id, scope)
+            db.session.add(user_scope)
+            db.session.commit()
+
+        return user_scope
+
+    @staticmethod
+    def remove(id, scope):
+        """Remove a scope for a user.
+
+        Args:
+            id: user id.
+            scope: scope to remove.
+        Returns:
+            True if the scope was removed, False otherwise.
+        """
+        user_scope = db.session().query(UserScope).filter(UserScope.id==id, UserScope.scope==scope).one_or_none()
+        if user_scope is None:
+            return False
+        else:
+            db.session.delete(user_scope)
+            db.session.commit()
+            return True
+
+    @staticmethod
+    def get_all(id):
+        """Get all scopes of a single user.
+
+        Args:
+            id: user id
+        Returns:
+            List of scopes
+        """
+        scopes = []
+        for scope in db.session().query(UserScope).filter(UserScope.id==id).all():
+            scopes.append(scope.scope)
+
+        return scopes
+
+class APIKeyScope(db.Model):
+    """All scopes available for an APIKey.
+
+    Args:
+        key_hash: User id.
+        scope: scope.
+    """
+    __tablename__ = 'api_key_scope'
+
+    key_hash = db.Column(db.String(), primary_key=True)
+    scope = db.Column(db.String(), primary_key=True)
+
+    def __init__(self, key_hash, scope):
+        self.key_hash = key_hash
+        self.scope = scope
+
+    @staticmethod
+    def upsert(key_hash, scope):
+        """Add a scope to a APIKey.
+
+        Args:
+            key_hash: APIKey hash.
+            scope: scope to add.
+        """
+
+        api_scope = db.session().query(APIKeyScope).filter(APIKeyScope.key_hash==key_hash, APIKeyScope.scope==scope).one_or_none()
+        if api_scope is None:
+            api_scope = APIKeyScope(key_hash, scope)
+            db.session.add(api_scope)
+            db.session.commit()
+
+        return api_scope
+
+    @staticmethod
+    def remove(key_hash, scope):
+        """Remove a scope for a APIKey.
+
+        Args:
+            key_hash: APIKey hash.
+            scope: scope to remove.
+        Returns:
+            True if the scope was removed, False otherwise.
+        """
+        api_scope = db.session().query(APIKeyScope).filter(APIKeyScope.key_hash==key_hash, APIKeyScope.scope==scope).one_or_none()
+        if api_scope is None:
+            return False
+        else:
+            db.session.delete(api_scope)
+            db.session.commit()
+            return True
+
+    @staticmethod
+    def get_all(key_hash):
+        """Get all scopes of a single APIKey.
+
+        Args:
+            key_hash: APIKey hash.
+        Returns:
+            List of scopes
+        """
+        scopes = []
+        for scope in db.session().query(APIKeyScope).filter(APIKeyScope.key_hash==key_hash).all():
+            scopes.append(scope.scope)
+
+        return scopes
+
+###################
+# Games, GameVIPs #
+###################
 
 class GameStatus(enum.Enum):
     WAITING_FOR_BOT = 'Waiting for a bot to start and pick the game.'
@@ -193,6 +290,10 @@ class GameVIP(db.Model):
             vip.type = type
             vip.name = name
         db.session.commit()
+
+###########
+# Various #
+###########
 
 class DynamicConfiguration(db.Model):
     """Dynamic configuration used by multiple elements, modified using the API."""

@@ -1,9 +1,10 @@
 from datetime import datetime
+import hashlib
 
 from flask_script import Manager
 
 from app import create_app
-from models import db, Game, GameStatus, GameVIP, GameVIPType
+from models import db, APIKey, APIKeyScope, Game, GameStatus, GameVIP, GameVIPType
 
 app = create_app()
 manager = Manager(app)
@@ -17,6 +18,62 @@ manager = Manager(app)
 def hello_world():
     """Simple script example."""
     print('Hello World')
+
+@manager.option('--key', dest='key', default=None)
+@manager.option('--description', dest='description', default=None)
+def add_api_key(key, description):
+    """Add a new API Key to the system.
+
+    Args:
+        key: key value string to add.
+        description: key description as a reminder.
+    """
+    if key is None:
+        print('No API key specified')
+        return
+    if description is None:
+        print('No description specified')
+        return
+
+    salt = app.config['API_KEY_SALT']
+    hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+    hash_key = hash_object.hexdigest()
+    api_key = db.session().query(APIKey).filter(APIKey.key_hash == hash_key).one_or_none()
+
+    if api_key is not None:
+        print('Key already in the system')
+    else:
+        key = APIKey(hash_key, description)
+        db.session().add(key)
+        db.session().commit()
+        print('Key added')
+
+@manager.option('--key', dest='key', default=None)
+@manager.option('--scope', dest='scope', default=None)
+def add_scope_api_key(key, scope):
+    """Add a scope to target APIKey
+
+    Args:
+        key: key value.
+        scope: scope to add.
+    """
+    if key is None:
+        print('No API key specified')
+        return
+    if scope is None:
+        print('No scope specified')
+        return
+
+    salt = app.config['API_KEY_SALT']
+    hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+    hash_key = hash_object.hexdigest()
+    api_key = db.session().query(APIKey).filter(APIKey.key_hash == hash_key).one_or_none()
+
+    if api_key is None:
+        print('Key not present!')
+    else:
+        APIKeyScope.upsert(api_key.key_hash, scope)
+        print('Scope added')
 
 @manager.command
 def insert_all_vips():

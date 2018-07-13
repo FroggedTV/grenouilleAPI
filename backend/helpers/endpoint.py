@@ -1,101 +1,65 @@
 from functools import wraps
+import jwt
+import logging
 
 from flask import request, jsonify
 
-def api_key_endpoint(app):
-    """Decorator to turn a endpoint into a secure endpoint where a API_KEY is necessary.
+def secure(app, type, scopes):
+    """Decorator to turn a endpoint into a secure endpoint where a AuthToken is necessary, and scopes too.
+
+    May raise AuthorizationHeaderInvalid, AuthTokenExpired, AuthTokenInvalid, ClientAccessImpossible,
+    or ClientAccessRefused instead of calling the decorated function.
+    Decorated function will be called with the auth token as a first argument.
 
     Args:
         app: Flask app to access config where the API_KEY is stored.
+        type: List of type of Auth token accepted.
+        scopes: list of scopes necessary to call the endpoint.
     Returns:
         Decorated function.
     """
-    def api_key_routed(f):
+    def secured(f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            header_key = request.headers.get('API_KEY', None)
-            if header_key is None:
-                return jsonify({'success': 'no',
-                                'error': 'ApiKeyMissing',
-                                'payload': {}
-                                }), 200
-            if header_key != app.config['API_KEY']:
-                return jsonify({'success': 'no',
-                                'error': 'ApiKeyInvalid',
-                                'payload': {}
-                                }), 200
 
-            return f(*args, **kwargs)
-
-        return wrap
-
-    return api_key_routed
-
-def user_endpoint(app, necessary_rights=None):
-    """Decorator to turn a endpoint into a secure endpoint where a user Authorization is necessary.
-
-    Args:
-        app: Flask app to access config where the API_KEY is stored.
-        necessary_rights: List of necessary user rights to use the endpoint. None is no right.
-    Returns:
-        Decorated function.
-    """
-    def user_routed(f):
-        @wraps(f)
-        def wrap(*args, **kwargs):
             header_token = request.headers.get('Authorization', None)
             if (header_token is None
                     or len(header_token) < 8
                     or header_token[0:7] != 'Bearer '):
                 return jsonify({'success': 'no',
-                                'error': 'InvalidAuthorizationHeader',
+                                'error': 'AuthorizationHeaderInvalid',
                                 'payload': {}
                                 }), 200
             raw_token = header_token[7:]
             try:
-                token = jwt.decode(raw_token,
-                                   app.config['SECRET_KEY'],
-                                   audience='refresh')
-                if not(necessary_rights is None or 'all' in token['rights']):
-                    # TODO test rights against arguments
-                    pass
-
+                auth_token = jwt.decode(raw_token,
+                                        app.config['SECRET_KEY'],
+                                        audience='auth')
+            except jwt.ExpiredSignatureError:
+                return jsonify({'success': 'no',
+                                'error': 'AuthTokenExpired',
+                                'payload': {}
+                                }), 200
             except Exception as e:
+                logging.error(e)
                 return jsonify({'success': 'no',
-                                'error': 'InvalidRefreshToken',
+                                'error': 'AuthTokenInvalid',
                                 'payload': {}
                                 }), 200
-            return f(*args, **kwargs)
+            if auth_token['client']['type'] not in type:
+                return jsonify({'success': 'no',
+                                'error': 'ClientAccessImpossible',
+                                'payload': {}
+                                }), 200
+            for scope in scopes:
+                if scope not in auth_token['client']['scopes']:
+                    return jsonify({'success': 'no',
+                                    'error': 'ClientAccessRefused',
+                                    'payload': {}
+                                    }), 200
+
+            return f(auth_token, *args, **kwargs)
 
         return wrap
 
-    return user_routed
-
-def user_or_api_key_endpoint(app):
-    """Decorator to turn a endpoint into a secure endpoint where a API_KEY or a user Authorization is necessary.
-
-    Args:
-        app: Flask app to access config where the API_KEY is stored.
-    Returns:
-        Decorated function.
-    """
-    def user_or_api_key_routed(f):
-        @wraps(f)
-        def wrap(*args, **kwargs):
-            header_key = request.headers.get('API_KEY', None)
-            if header_key is None:
-                return jsonify({'success': 'no',
-                                'error': 'ApiKeyMissing',
-                                'payload': {}
-                                }), 200
-            if header_key != app.config['API_KEY']:
-                return jsonify({'success': 'no',
-                                'error': 'ApiKeyInvalid',
-                                'payload': {}
-                                }), 200
-
-            return f(*args, **kwargs)
-
-        return wrap
-
-    return user_or_api_key_routed
+    return secured

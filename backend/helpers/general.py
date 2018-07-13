@@ -1,7 +1,7 @@
 import requests
 import base64
 
-from backend.models import GameVIPType
+from models import GameVIPType
 
 def url_image_to_base64(url):
     response = requests.get(url)

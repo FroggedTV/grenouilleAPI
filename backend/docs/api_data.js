@@ -1296,6 +1296,197 @@ define({ "api": [
     "groupTitle": "Authentication"
   },
   {
+    "type": "get",
+    "url": "/api/obs/playlist/get",
+    "title": "OBSPlaylistGet",
+    "version": "1.1.0",
+    "name": "OBSPlaylistGet",
+    "group": "StreamSystem",
+    "description": "<p>Get OBS playlist content for replay.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "files",
+            "description": "<p>List of file paths inside the playlist.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "post",
+    "url": "/api/obs/playlist/update",
+    "title": "OBSPlaylistUpdate",
+    "version": "1.1.0",
+    "name": "OBSPlaylistUpdate",
+    "group": "StreamSystem",
+    "description": "<p>Set OBS playlist content for replay.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilesParameterMissing",
+            "description": "<p>files is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilesParameterInvalid",
+            "description": "<p>files is not list of valid file paths.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AtLeastOneFileDoesntExist",
+            "description": "<p>files is not list of valid file paths.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "files",
+            "description": "<p>List of file paths to build the playlist from.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
     "type": "post",
     "url": "/api/obs/record/start",
     "title": "OBSRecordStart",

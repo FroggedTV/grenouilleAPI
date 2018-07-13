@@ -592,8 +592,114 @@ def build_api_stream_system(app):
                         'error': 'FileSystemError',
                         'payload': {}}), 200
 
-    def get_vlc_playlist(auth_token):
-        pass
+    @app.route('/api/obs/playlist/get', methods=['GET'])
+    @secure(app, ['key', 'user'], ['obs_control'])
+    def get_playlist(auth_token):
+        """
+        @api {get} /api/obs/playlist/get OBSPlaylistGet
+        @apiVersion 1.1.0
+        @apiName OBSPlaylistGet
+        @apiGroup StreamSystem
+        @apiDescription Get OBS playlist content for replay.
 
-    def post_vlc_playlist(auth_token):
-        pass
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiError (Errors){String} OBSInternalError Error communicating to OBS.
+
+        @apiSuccess {String[]} files List of file paths inside the playlist.
+        """
+        try:
+            files = []
+            result = send_command_to_obs('GetSourceSettings', {'sourceName': 'RediffPlaylist'})
+            if result['status'] == 'error' or 'playlist' not in result['sourceSettings']:
+                logging.error(result)
+                return jsonify({'success': 'no',
+                                'error': 'InternalOBSError',
+                                'payload': {}}), 200
+            for file in result['sourceSettings']['playlist']:
+                files.append(file['value'])
+            return jsonify({'success': 'yes',
+                            'error': '',
+                            'payload': {
+                                'files': files
+                            }}), 200
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                            'error': 'InternalOBSError',
+                            'payload': {}}), 200
+
+    @app.route('/api/obs/playlist/update', methods=['POST'])
+    @secure(app, ['key', 'user'], ['obs_control'])
+    def post_playlist_update(auth_token):
+        """
+        @api {post} /api/obs/playlist/update OBSPlaylistUpdate
+        @apiVersion 1.1.0
+        @apiName OBSPlaylistUpdate
+        @apiGroup StreamSystem
+        @apiDescription Set OBS playlist content for replay.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiError (Errors){String} OBSInternalError Error communicating to OBS.
+
+        @apiParam {String[]} files List of file paths to build the playlist from.
+        @apiError (Errors){String} FilesParameterMissing files is not present in the parameters.
+        @apiError (Errors){String} FilesParameterInvalid files is not list of valid file paths.
+        @apiError (Errors){String} AtLeastOneFileDoesntExist files is not list of valid file paths.
+        """
+        data = request.get_json(force=True)
+
+        # files checks
+        files = data.get('files', None)
+        if files is None:
+            return jsonify({'success': 'no',
+                            'error': 'FilesParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(files, list):
+            return jsonify({'success': 'no',
+                            'error': 'FilesParameterInvalid',
+                            'payload': {}
+                            }), 200
+        for file in files:
+            path = os.path.join(app.config['VOD_PATH'], file)
+            if not os.path.isfile(path):
+                return jsonify({'success': 'no',
+                                'error': 'AtLeastOneFileDoesntExist',
+                                'payload': {
+                                    'file': file
+                                }
+                                }), 200
+        path_files = [{ 'value': os.path.join(app.config['VOD_PATH'], x)} for x in files]
+
+        try:
+            result = send_command_to_obs('SetSourceSettings', {'sourceName': 'RediffPlaylist',
+                                                               'sourceSettings': {
+                                                                   'playlist': path_files
+                                                               }})
+            if result['status'] == 'error':
+                logging.error(result)
+                return jsonify({'success': 'no',
+                                'error': 'InternalOBSError',
+                                'payload': {}}), 200
+            return jsonify({'success': 'yes',
+                            'error': '',
+                            'payload': {
+
+                            }}), 200
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                            'error': 'InternalOBSError',
+                            'payload': {}}), 200

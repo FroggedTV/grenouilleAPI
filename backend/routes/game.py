@@ -8,6 +8,8 @@ from helpers.endpoint import secure
 def build_api_game(app):
     """Factory to setup the routes for the Dota bots."""
 
+    # TODO REBUILD THESE ROUTES
+
     #@app.route('/api/game/create', methods=['POST'])
     def create_game():
         """

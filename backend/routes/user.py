@@ -6,6 +6,8 @@ from models import User
 def build_api_user(app):
     """Factory to setup the routes for the user api."""
 
+    # TODO REBUILD THESE ROUTES
+
     #@app.route('/api/user/details', methods=['GET'])
     def get_user_details():
         """

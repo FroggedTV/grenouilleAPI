@@ -1,12 +1,12 @@
 [
   {
-    "type": "get",
-    "url": "/api/auth/token",
-    "title": "AuthTokenGet",
-    "version": "1.0.4",
-    "name": "AuthTokenGet",
+    "type": "post",
+    "url": "/api/auth/key/add",
+    "title": "APIKeyAdd",
+    "version": "1.1.0",
+    "name": "APIKeyAdd",
     "group": "Authentication",
-    "description": "<p>Refresh tokens are long lived but auth tokens are short lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
+    "description": "<p>Add a new APIKey into the system.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -15,20 +15,7 @@
             "type": "String",
             "optional": false,
             "field": "Authorization",
-            "description": "<p>'Bearer &lt;refresh_token&gt;'</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "auth_token",
-            "description": "<p>Authentication token short lived to access data.</p>"
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -40,29 +27,211 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidHeader",
-            "description": "<p>Authorization header not well formated.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "NoRefreshToken",
-            "description": "<p>There is no refresh token provided.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ExpiredRefreshToken",
-            "description": "<p>Refresh token has expired and user should log again.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidRefreshToken",
-            "description": "<p>Token is invalid (decode, rights, signature...).</p>"
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyAlreadyExists",
+            "description": "<p>Key is already in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterMissing",
+            "description": "<p>Description is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterInvalid",
+            "description": "<p>Description is not valid String.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to add to the system.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Key description for information.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/description/update",
+    "title": "APIKeyDescriptionUpdate",
+    "version": "1.1.0",
+    "name": "APIKeyDescriptionUpdate",
+    "group": "Authentication",
+    "description": "<p>Update the description of an APIKey.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterMissing",
+            "description": "<p>Description is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterInvalid",
+            "description": "<p>Description is not valid String.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to update the description.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Key description for information.</p>"
           }
         ]
       }
@@ -72,12 +241,12 @@
   },
   {
     "type": "get",
-    "url": "/api/auth/token",
-    "title": "2 - Get a Auth Token from a Refresh Token",
-    "version": "1.0.0",
-    "name": "AuthTokenGet",
+    "url": "/api/auth/key/list",
+    "title": "APIKeyList",
+    "version": "1.1.0",
+    "name": "APIKeyList",
     "group": "Authentication",
-    "description": "<p>Refresh tokens are long lived but auth tokens are short lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
+    "description": "<p>List all APIKeys.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -86,20 +255,7 @@
             "type": "String",
             "optional": false,
             "field": "Authorization",
-            "description": "<p>'Bearer &lt;refresh_token&gt;'</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "auth_token",
-            "description": "<p>Authentication token short lived to access data.</p>"
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -111,893 +267,50 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidHeader",
-            "description": "<p>Authorization header not well formated.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "NoRefreshToken",
-            "description": "<p>There is no refresh token provided.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ExpiredRefreshToken",
-            "description": "<p>Refresh token has expired and user should log again.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidRefreshToken",
-            "description": "<p>Token is invalid (decode, rights, signature...).</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/_apidoc.py",
-    "groupTitle": "Authentication"
-  },
-  {
-    "type": "get",
-    "url": "/api/auth/login",
-    "title": "RefreshTokenGet",
-    "version": "1.0.4",
-    "name": "RefreshTokenGet",
-    "group": "Authentication",
-    "description": "<p>First endpoint to call in the auth process. Calling it redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.</p>",
-    "filename": "backend/routes/auth.py",
-    "groupTitle": "Authentication"
-  },
-  {
-    "type": "get",
-    "url": "/api/auth/login",
-    "title": "1.1 - Get a Refresh Token with Steam Login",
-    "version": "1.0.0",
-    "name": "RefreshTokenGet",
-    "group": "Authentication",
-    "description": "<p>Calling this endpoint redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config.</p>",
-    "filename": "backend/routes/_apidoc.py",
-    "groupTitle": "Authentication"
-  },
-  {
-    "type": "get",
-    "url": "/api/calendar/get",
-    "title": "CalendarGet",
-    "version": "1.0.4",
-    "name": "CalendarGet",
-    "group": "Community",
-    "description": "<p>This method returns the streaming calendar from the FroggedTV Google calendar. Calendar is updated every hour with a cron job, or forced by an API call.</p>",
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Object[]",
-            "optional": false,
-            "field": "calendar",
-            "description": "<p>events available into the calendar for the current week.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "calendar.title",
-            "description": "<p>Title of the event.</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/community.py",
-    "groupTitle": "Community"
-  },
-  {
-    "type": "get",
-    "url": "/api/calendar/update",
-    "title": "CalendarUpdate",
-    "version": "1.0.4",
-    "name": "CalendarUpdate",
-    "group": "Community",
-    "description": "<p>Force internal calendar update from google doc.</p>",
-    "filename": "backend/routes/community.py",
-    "groupTitle": "Community"
-  },
-  {
-    "type": "get",
-    "url": "/api/game/bot/pause/get",
-    "title": "BotPauseGet",
-    "version": "1.0.3",
-    "name": "BotPauseGet",
-    "group": "DotaBots",
-    "description": "<p>Get the bot pause status</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Errors": [
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "BotPauseMissing",
-            "description": "<p>Bot pause was never set, default value is 'False'.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "True",
-              "False"
-            ],
-            "optional": false,
-            "field": "bot_pause",
-            "description": "<p>Pause status of the bot.</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
-  },
-  {
-    "type": "post",
-    "url": "/api/game/bot/pause/update",
-    "title": "BotPauseUpdate",
-    "version": "1.0.3",
-    "name": "BotPauseUpdate",
-    "group": "DotaBots",
-    "description": "<p>Update the bot pause status.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Errors": [
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingBotPause",
-            "description": "<p>bot_pause is not specified.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidBotPause",
-            "description": "<p>bot_pause is invalid.</p>"
-          }
-        ]
-      }
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "allowedValues": [
-              "True",
-              "False"
-            ],
-            "optional": false,
-            "field": "bot_pause",
-            "description": "<p>Pause status of the bot.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "True",
-              "False"
-            ],
-            "optional": false,
-            "field": "bot_pause",
-            "description": "<p>Pause status of the bot after update.</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
-  },
-  {
-    "type": "post",
-    "url": "/api/game/create",
-    "title": "GameCreate",
-    "version": "1.0.0",
-    "name": "GameCreate",
-    "group": "DotaBots",
-    "description": "<p>Queue a game to be host by bots.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Errors": [
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingTeam1",
-            "description": "<p>team1 is not present.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidTeam1",
-            "description": "<p>team1 is invalid.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingTeam1Ids",
-            "description": "<p>team1Ids is not present.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidTeam1Ids",
-            "description": "<p>team1Ids is not an array of integers. Must be of len &gt; 0.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingTeam2",
-            "description": "<p>team2 is not present.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidTeam2",
-            "description": "<p>team2 is invalid.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingTeam2Ids",
-            "description": "<p>team2Ids is not present.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidTeam2Ids",
-            "description": "<p>team2Ids is not an array of integers. Must be of len &gt; 0.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingName",
-            "description": "<p>name is not specified.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidName",
-            "description": "<p>name is not valid.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingPassword",
-            "description": "<p>password is not specified.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidPassword",
-            "description": "<p>password is not valid.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingTeamChoosingFirst",
-            "description": "<p>teamChoosingFirst is not specified.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidTeamChoosingFirst",
-            "description": "<p>teamChoosingFirst is not valid.</p>"
-          }
-        ]
-      }
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "team1",
-            "description": "<p>Id of the first team</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "team1Ids",
-            "description": "<p>SteamID (64bits) of first team players</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "team2",
-            "description": "<p>Id of the second team</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String[1..]",
-            "optional": false,
-            "field": "name",
-            "description": "<p>Name of the game lobby.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String[1..]",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Password for the lobby.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "teamChoosingFirst",
-            "description": "<p>Team choosing 'side'/'pick order' first.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Id of the game that will be hosted by bots.</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
-  },
-  {
-    "type": "get",
-    "url": "/api/game/details",
-    "title": "GameGetDetails",
-    "version": "1.0.1",
-    "name": "GameGetDetails",
-    "group": "DotaBots",
-    "description": "<p>Request game details.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Errors": [
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingId",
-            "description": "<p>Id is not present.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidId",
-            "description": "<p>Id is not an integer.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "NoGameWithId",
-            "description": "<p>Id is not present in database.</p>"
-          }
-        ]
-      }
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>Name of the game lobby.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Password for the lobby.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "team1",
-            "description": "<p>Id of the first team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "team1Ids",
-            "description": "<p>SteamID (64bits) of first team players</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "team2",
-            "description": "<p>Id of the second team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "GameStatus.WAITING_FOR_BOT",
-              "GameStatus.CREATION_IN_PROGRESS",
-              "GameStatus.WAITING_FOR_PLAYERS",
-              "GameStatus.GAME_IN_PROGRESS",
-              "GameStatus.COMPLETED",
-              "GameStatus.CANCELLED"
-            ],
-            "optional": false,
-            "field": "status",
-            "description": "<p>Game status.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "teamChoosingFirst",
-            "description": "<p>Team choosing 'side'/'pick order' first</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "bot",
-            "description": "<p>Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "valveId",
-            "description": "<p>Game Id in Valve database (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "winner",
-            "description": "<p>Team winning the game (if status 'GameStatus.COMPLETED')</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
-  },
-  {
-    "type": "get",
-    "url": "/api/game/details",
-    "title": "GameGetDetails",
-    "version": "1.0.0",
-    "name": "GameGetDetails",
-    "group": "DotaBots",
-    "description": "<p>Request game details.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Errors": [
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "MissingId",
-            "description": "<p>Id is not present.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidId",
-            "description": "<p>Id is not an integer.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "NoGameWithId",
-            "description": "<p>Id is not present in database.</p>"
-          }
-        ]
-      }
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "team1",
-            "description": "<p>Id of the first team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>Name of the game lobby.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Password for the lobby.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "team1Ids",
-            "description": "<p>SteamID (64bits) of first team players</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "team2",
-            "description": "<p>Id of the second team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "\"GameStatus.WAITING_FOR_BOT\"",
-              "\"GameStatus.CREATION_IN_PROGRESS\"",
-              "\"GameStatus.WAITING_FOR_PLAYERS\"",
-              "\"GameStatus.GAME_IN_PROGRESS\"",
-              "\"GameStatus.COMPLETED\"",
-              "\"GameStatus.CANCELLED\""
-            ],
-            "optional": false,
-            "field": "status",
-            "description": "<p>Game status.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "teamChoosingFirst",
-            "description": "<p>Team choosing 'side'/'pick order' first</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "valveId",
-            "description": "<p>Game Id in Valve database (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "winner",
-            "description": "<p>Team winning the game (if status 'GameStatus.COMPLETED')</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/_apidoc.py",
-    "groupTitle": "DotaBots"
-  },
-  {
-    "type": "get",
-    "url": "/api/game/list",
-    "title": "GameList",
-    "version": "1.0.2",
-    "name": "GameList",
-    "group": "DotaBots",
-    "description": "<p>Get the list of multiple hosted games.</p>",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
-          }
-        ]
-      }
-    },
-    "error": {
-      "fields": {
-        "Errors": [
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidLimit",
+            "field": "LimitInvalid",
             "description": "<p>Limit is not a positive integer in waited range.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidOffset",
+            "field": "OffsetInvalid",
             "description": "<p>Offset is not a positive integer in waited range.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "InvalidFields",
-            "description": "<p>Fields is not an array.</p>"
           }
         ]
       }
@@ -1022,142 +335,274 @@
             "field": "offset",
             "defaultValue": "0",
             "description": "<p>Optional offset for database fetch.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "keys",
+            "description": "<p>All available scopes.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "keys.hash",
+            "description": "<p>Hash of the API_KEY.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "keys.description",
+            "description": "<p>API Key description.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "keys.scopes",
+            "description": "<p>List of scopes this KEY has access to.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/remove",
+    "title": "APIKeyRemove",
+    "version": "1.1.0",
+    "name": "APIKeyRemove",
+    "group": "Authentication",
+    "description": "<p>Remove an APIKey from the system.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to add to the system.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/scope/add",
+    "title": "APIKeyScopeAdd",
+    "version": "1.1.0",
+    "name": "APIKeyScopeAdd",
+    "group": "Authentication",
+    "description": "<p>Add scope access to the APIKey.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to add scopes to.</p>"
           },
           {
             "group": "Parameter",
             "type": "String[]",
-            "optional": true,
-            "field": "fields",
-            "defaultValue": "['name', 'password', 'team1', 'team1Ids', 'team2', 'team2Ids', 'status',\n         'teamChoosingFirst', 'bot', 'valveId', 'winner']",
-            "description": "<p>Optional fields to return.</p>"
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to add to the key.</p>"
           }
         ]
       }
     },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Object[]",
-            "optional": false,
-            "field": "games",
-            "description": "<p>List of the Games ordered by decreasing id, with filters applied.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "games.id",
-            "description": "<p>Id of the game hosted by bots.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "games.name",
-            "description": "<p>Name of the game lobby.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "games.password",
-            "description": "<p>Password for the lobby.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "games.team1",
-            "description": "<p>Id of the first team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "games.team1Ids",
-            "description": "<p>SteamID (64bits) of first team players</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "games.team2",
-            "description": "<p>Id of the second team</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer[]",
-            "optional": false,
-            "field": "games.team2Ids",
-            "description": "<p>SteamID (64bits) of second team  players</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "GameStatus.WAITING_FOR_BOT",
-              "GameStatus.CREATION_IN_PROGRESS",
-              "GameStatus.WAITING_FOR_PLAYERS",
-              "GameStatus.GAME_IN_PROGRESS",
-              "GameStatus.COMPLETED",
-              "GameStatus.CANCELLED"
-            ],
-            "optional": false,
-            "field": "games.status",
-            "description": "<p>Game status.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "games.teamChoosingFirst",
-            "description": "<p>Team choosing 'side'/'pick order' first</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "games.bot",
-            "description": "<p>Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "games.valveId",
-            "description": "<p>Game Id in Valve database (if status 'GameStatus.COMPLETED')</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "allowedValues": [
-              "1",
-              "2"
-            ],
-            "optional": false,
-            "field": "games.winner",
-            "description": "<p>Team winning the game (if status 'GameStatus.COMPLETED')</p>"
-          }
-        ]
-      }
-    },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
   },
   {
     "type": "post",
-    "url": "/api/game/vip/add",
-    "title": "GameVIPAdd",
-    "version": "1.0.0",
-    "name": "GameVIPAdd",
-    "group": "DotaBots",
-    "description": "<p>Add a new game VIP.</p>",
+    "url": "/api/auth/key/scope/remove",
+    "title": "APIKeyScopeRemove",
+    "version": "1.1.0",
+    "name": "APIKeyScopeRemove",
+    "group": "Authentication",
+    "description": "<p>Remove scope access to the APIKey.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1165,8 +610,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1178,64 +623,71 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingId",
-            "description": "<p>id is not specified.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidId",
-            "description": "<p>id is invalid.</p>"
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "VIPWithIdAlreadyExists",
-            "description": "<p>VIP with id is already in database.</p>"
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingType",
-            "description": "<p>type is not specified.</p>"
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidType",
-            "description": "<p>type is not valid.</p>"
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingName",
-            "description": "<p>name is not specified.</p>"
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidName",
-            "description": "<p>name is not valid.</p>"
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
           }
         ]
       }
@@ -1245,43 +697,103 @@
         "Parameter": [
           {
             "group": "Parameter",
-            "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>SteamId (64bits) of the vip to add.</p>"
-          },
-          {
-            "group": "Parameter",
             "type": "String",
-            "allowedValues": [
-              "CASTER",
-              "ADMIN"
-            ],
             "optional": false,
-            "field": "type",
-            "description": "<p>Type of the vip to add.</p>"
+            "field": "key",
+            "description": "<p>APIKey to remove scopes from.</p>"
           },
           {
             "group": "Parameter",
-            "type": "String[1..]",
+            "type": "String[]",
             "optional": false,
-            "field": "name",
-            "description": "<p>Name of the vip to add.</p>"
+            "field": "scopes",
+            "description": "<p>Scopes to remove from the key.</p>"
           }
         ]
       }
     },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
   },
   {
     "type": "get",
-    "url": "/api/game/vip/list",
-    "title": "GameVIPList",
-    "version": "1.0.0",
-    "name": "GameVIPList",
-    "group": "DotaBots",
-    "description": "<p>Get the list of all VIPs</p>",
+    "url": "/api/auth/token",
+    "title": "AuthTokenGet",
+    "version": "1.1.0",
+    "name": "AuthTokenGet",
+    "group": "Authentication",
+    "description": "<p>Refresh tokens are long lived but auth tokens are short lived. Using a valid refresh token, this api delivers an auth token to access data endpoints.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;refresh_token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Authentication token short lived to access data.</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization header not well formated.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "RefreshTokenExpired",
+            "description": "<p>Refresh token has expired and client should get a new one.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "RefreshTokenRevoked",
+            "description": "<p>Refresh token has has been revoked and client should get a new one.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "RefreshTokenInvalid",
+            "description": "<p>Token is invalid (decode, rights, signature...).</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/login/key",
+    "title": "RefreshTokenGetWithKey",
+    "version": "1.1.0",
+    "name": "RefreshTokenGetWithKey",
+    "group": "Authentication",
+    "description": "<p>Get a refresh token using a API Key.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1290,7 +802,7 @@
             "type": "String",
             "optional": false,
             "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "description": "<p>API_KEY necessary to call the endpoint.</p>"
           }
         ]
       }
@@ -1320,50 +832,36 @@
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "Object[]",
-            "optional": false,
-            "field": "vips",
-            "description": "<p>List of the VIPs authorized in all games.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "vips.id",
-            "description": "<p>Steam Id of the VIP.</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "GameVIPType.CASTER",
-              "GameVIPType.ADMIN"
-            ],
-            "optional": false,
-            "field": "vips.type",
-            "description": "<p>Type of the VIP.</p>"
-          },
-          {
-            "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "vips.name",
-            "description": "<p>Name of the VIP.</p>"
+            "field": "token",
+            "description": "<p>Refresh token long lived to request access data.</p>"
           }
         ]
       }
     },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
   },
   {
-    "type": "post",
-    "url": "/api/game/vip/remove",
-    "title": "GameVIPRemove",
-    "version": "1.0.0",
-    "name": "GameVIPRemove",
-    "group": "DotaBots",
-    "description": "<p>Remove a game VIP.</p>",
+    "type": "get",
+    "url": "/api/auth/login/steam",
+    "title": "RefreshTokenGetSteam",
+    "version": "1.1.0",
+    "name": "RefreshTokenGetWithSteam",
+    "group": "Authentication",
+    "description": "<p>First endpoint to call in the auth process with user. Calling it redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.</p>",
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/scope/list",
+    "title": "ScopeList",
+    "version": "1.1.0",
+    "name": "ScopeList",
+    "group": "Authentication",
+    "description": "<p>List all available scopes for APIKey and users.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1371,8 +869,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1384,36 +882,241 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingId",
-            "description": "<p>id is not specified.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidId",
-            "description": "<p>id is invalid.</p>"
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>All available scopes.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/user/scope/add",
+    "title": "UserScopeAdd",
+    "version": "1.1.0",
+    "name": "UserScopeAdd",
+    "group": "Authentication",
+    "description": "<p>Add scope access to a user.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "VIPDoesNotExist",
-            "description": "<p>VIP with id does not exist in the database.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterMissing",
+            "description": "<p>id is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterInvalid",
+            "description": "<p>id is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "UserWithIdDoesntExists",
+            "description": "<p>There is no user with such id in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>User id to add scopes to.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to add to the user.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/user/scope/list",
+    "title": "UserScopeList",
+    "version": "1.1.0",
+    "name": "UserScopeList",
+    "group": "Authentication",
+    "description": "<p>List all users with their scopes.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "LimitInvalid",
+            "description": "<p>Limit is not a positive integer in waited range.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OffsetInvalid",
+            "description": "<p>Offset is not a positive integer in waited range.</p>"
           }
         ]
       }
@@ -1424,21 +1127,370 @@
           {
             "group": "Parameter",
             "type": "Integer",
-            "optional": false,
-            "field": "id",
-            "description": "<p>SteamId of the vip to remove.</p>"
+            "size": "1-100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>Optional number of entries to return.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "0-..",
+            "optional": true,
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>Optional offset for database fetch.</p>"
           }
         ]
       }
     },
-    "filename": "backend/routes/game.py",
-    "groupTitle": "DotaBots"
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "users",
+            "description": "<p>All available users.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.id",
+            "description": "<p>Id of the user.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "users.scopes",
+            "description": "<p>List of scopes this user has access to.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/user/scope/remove",
+    "title": "UserScopeRemove",
+    "version": "1.1.0",
+    "name": "UserScopeRemove",
+    "group": "Authentication",
+    "description": "<p>Remove scope access from a user.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterMissing",
+            "description": "<p>id is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterInvalid",
+            "description": "<p>id is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "UserWithIdDoesntExists",
+            "description": "<p>There is no user with such id in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>User id to remove scopes from.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to remove from the user.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/obs/playlist/get",
+    "title": "OBSPlaylistGet",
+    "version": "1.1.0",
+    "name": "OBSPlaylistGet",
+    "group": "StreamSystem",
+    "description": "<p>Get OBS playlist content for replay.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "files",
+            "description": "<p>List of file paths inside the playlist.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "post",
+    "url": "/api/obs/playlist/update",
+    "title": "OBSPlaylistUpdate",
+    "version": "1.1.0",
+    "name": "OBSPlaylistUpdate",
+    "group": "StreamSystem",
+    "description": "<p>Set OBS playlist content for replay.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilesParameterMissing",
+            "description": "<p>files is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilesParameterInvalid",
+            "description": "<p>files is not list of valid file paths.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AtLeastOneFileDoesntExist",
+            "description": "<p>files is not list of valid file paths.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "files",
+            "description": "<p>List of file paths to build the playlist from.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
   },
   {
     "type": "post",
     "url": "/api/obs/record/start",
     "title": "OBSRecordStart",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "name": "OBSRecordStart",
     "group": "StreamSystem",
     "description": "<p>Start the recording by OBS.</p>",
@@ -1449,8 +1501,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1462,22 +1514,50 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InternalOBSError",
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
             "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSAlreadyRecording",
+            "description": "<p>OBS is already recording.</p>"
           }
         ]
       }
@@ -1489,7 +1569,7 @@
     "type": "post",
     "url": "/api/obs/record/stop",
     "title": "OBSRecordStop",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "name": "OBSRecordStop",
     "group": "StreamSystem",
     "description": "<p>Stop the recording by OBS.</p>",
@@ -1500,8 +1580,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1513,22 +1593,50 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InternalOBSError",
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
             "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSNotRecording",
+            "description": "<p>OBS is not currently recording.</p>"
           }
         ]
       }
@@ -1540,7 +1648,7 @@
     "type": "get",
     "url": "/api/obs/scene/list",
     "title": "OBSSceneList",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "name": "OBSSceneList",
     "group": "StreamSystem",
     "description": "<p>List the available scenes in OBS.</p>",
@@ -1551,8 +1659,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1564,21 +1672,42 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InternalOBSError",
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
             "description": "<p>Error communicating to OBS.</p>"
           }
         ]
@@ -1593,6 +1722,13 @@
             "optional": false,
             "field": "scenes",
             "description": "<p>All available scenes with their name as Strings.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "active_scene",
+            "description": "<p>Active scene.</p>"
           }
         ]
       }
@@ -1604,10 +1740,10 @@
     "type": "post",
     "url": "/api/obs/scene/update",
     "title": "OBSSceneUpdate",
-    "version": "1.0.4",
+    "version": "1.1.0",
     "name": "OBSSceneUpdate",
     "group": "StreamSystem",
-    "description": "<p>Change the OBS current scene to a new one</p>",
+    "description": "<p>Change the OBS active scene to a new one.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1615,8 +1751,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1628,36 +1764,64 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InternalOBSError",
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
             "description": "<p>Error communicating to OBS.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingSceneParameter",
+            "field": "SceneParameterMissing",
             "description": "<p>Scene is not present in the parameters.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidSceneParameter",
+            "field": "SceneParameterInvalid",
             "description": "<p>Scene is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "SceneDoesNotExist",
+            "description": "<p>Specified scene does not exist in OBS.</p>"
           }
         ]
       }
@@ -1679,13 +1843,13 @@
     "groupTitle": "StreamSystem"
   },
   {
-    "type": "post",
-    "url": "/api/vod/unsorted/delete",
-    "title": "VODUnsortedDelete",
-    "version": "1.0.5",
-    "name": "VODUnsortedDelete",
+    "type": "get",
+    "url": "/api/obs/status",
+    "title": "OBSStatus",
+    "version": "1.1.0",
+    "name": "OBSStatus",
     "group": "StreamSystem",
-    "description": "<p>Delete on of the unsorted VOD file.</p>",
+    "description": "<p>Get OBS streaming and recording status.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1693,8 +1857,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1706,56 +1870,63 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingFilenameParameter",
-            "description": "<p>Filename is not present in the parameters.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidFilenameParameter",
-            "description": "<p>Filename is not valid String.</p>"
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "NoSuchVODFile",
-            "description": "<p>There is no unsorted VOD with the specified filename.</p>"
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "VODErrorNoPath",
-            "description": "<p>The path for unsorted VOD is not a directory.</p>"
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
           }
         ]
       }
     },
-    "parameter": {
+    "success": {
       "fields": {
-        "Parameter": [
+        "Success 200": [
           {
-            "group": "Parameter",
-            "type": "String",
+            "group": "Success 200",
+            "type": "Boolean",
             "optional": false,
-            "field": "filename",
-            "description": "<p>Name of the file to delete.</p>"
+            "field": "recording",
+            "description": "<p>Status of the OBS record.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "streaming",
+            "description": "<p>Status of the OBS stream.</p>"
           }
         ]
       }
@@ -1765,12 +1936,12 @@
   },
   {
     "type": "post",
-    "url": "/api/vod/unsorted/delete",
-    "title": "VODUnsortedDelete",
-    "version": "1.0.5",
-    "name": "VODUnsortedDelete",
+    "url": "/api/obs/stream/start",
+    "title": "OBSStreamStart",
+    "version": "1.1.0",
+    "name": "OBSStreamStart",
     "group": "StreamSystem",
-    "description": "<p>Delete on of the unsorted VOD file.</p>",
+    "description": "<p>Start the streaming by OBS.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1778,8 +1949,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1791,43 +1962,222 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingFilenameParameter",
-            "description": "<p>Filename is not present in the parameters.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidFilenameParameter",
-            "description": "<p>Filename is not valid String.</p>"
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "NoSuchVODFile",
-            "description": "<p>There is no unsorted VOD with the specified filename.</p>"
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "VODErrorNoPath",
-            "description": "<p>The path for unsorted VOD is not a directory.</p>"
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSAlreadyStreaming",
+            "description": "<p>OBS already streaming to endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "post",
+    "url": "/api/obs/stream/stop",
+    "title": "OBSStreamStop",
+    "version": "1.1.0",
+    "name": "OBSStreamStop",
+    "group": "StreamSystem",
+    "description": "<p>Stop the streaming by OBS.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSInternalError",
+            "description": "<p>Error communicating to OBS.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OBSNotStreaming",
+            "description": "<p>OBS is not currently streaming.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "post",
+    "url": "/api/vod/dir/create",
+    "title": "VODDirCreate",
+    "version": "1.1.0",
+    "name": "VODDirCreate",
+    "group": "StreamSystem",
+    "description": "<p>Create a directory for VOD.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FileSystemError",
+            "description": "<p>Internal error manipulating the filesystem.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DirParameterMissing",
+            "description": "<p>dir is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DirParameterInvalid",
+            "description": "<p>dir is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DirAlreadyExists",
+            "description": "<p>There is no VOD file or directory with the specified filename.</p>"
           }
         ]
       }
@@ -1839,8 +2189,8 @@
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "filename",
-            "description": "<p>Name of the file to delete.</p>"
+            "field": "dir",
+            "description": "<p>Path of the dir to create, without any &quot;.&quot; character. &quot;/&quot; are accepted for sub directories.</p>"
           }
         ]
       }
@@ -1850,12 +2200,12 @@
   },
   {
     "type": "get",
-    "url": "/api/vod/unsorted/list",
-    "title": "VODUnsortedList",
-    "version": "1.0.5",
-    "name": "VODUnsortedList",
+    "url": "/api/vod/disk_usage",
+    "title": "VODDiskUsage",
+    "version": "1.1.0",
+    "name": "VODDiskUsage",
     "group": "StreamSystem",
-    "description": "<p>List all unsorted VOD.</p>",
+    "description": "<p>Get the disk usage of all the VOD directory.</p>",
     "header": {
       "fields": {
         "Header": [
@@ -1863,8 +2213,8 @@
             "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "API_KEY",
-            "description": "<p>Restricted API_KEY necessary to call the endpoint.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1876,22 +2226,234 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyMissing",
-            "description": "<p>Missing API_KEY header.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "ApiKeyInvalid",
-            "description": "<p>Invalid API_KEY header.</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "VODErrorNoPath",
-            "description": "<p>The path for unsorted VOD is not a directory.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FileSystemError",
+            "description": "<p>Internal error manipulating the filesystem.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "size",
+            "description": "<p>Size of the root directory in octets.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "post",
+    "url": "/api/vod/file/delete",
+    "title": "VODFileDelete",
+    "version": "1.1.0",
+    "name": "VODFileDelete",
+    "group": "StreamSystem",
+    "description": "<p>Delete a VOD file or directory.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FileSystemError",
+            "description": "<p>Internal error manipulating the filesystem.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilenameParameterMissing",
+            "description": "<p>Filename is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilenameParameterInvalid",
+            "description": "<p>Filename is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "VODFileDoesntExist",
+            "description": "<p>There is no VOD file or directory with the specified filename.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "VODDirectoryNotEmpty",
+            "description": "<p>Impossible to remove a directory not empty.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "filename",
+            "description": "<p>Path of the file to delete (equal to what vod_file_list returns).</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "get",
+    "url": "/api/vod/file/list",
+    "title": "VODFileList",
+    "version": "1.1.0",
+    "name": "VODFileList",
+    "group": "StreamSystem",
+    "description": "<p>List all VOD files, omitting VOD_PATH root.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
           },
           {
             "group": "Errors",
@@ -1910,22 +2472,33 @@
             "group": "Success 200",
             "type": "Object[]",
             "optional": false,
-            "field": "vod",
-            "description": "<p>List of all unsorted VOD.</p>"
+            "field": "entry",
+            "description": "<p>List of all VOD directories and files.</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "vod.filename",
-            "description": "<p>Filename of the unsorted VOD.</p>"
+            "field": "entry.name",
+            "description": "<p>Name of the entry.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "dir",
+              "file"
+            ],
+            "optional": false,
+            "field": "entry.type",
+            "description": "<p>Type of the entry.</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "vod.size",
-            "description": "<p>Size of the VOD in octets.</p>"
+            "field": "entry.size",
+            "description": "<p>Size of the entry if type is 'file', in octets.</p>"
           }
         ]
       }
@@ -1934,22 +2507,22 @@
     "groupTitle": "StreamSystem"
   },
   {
-    "type": "get",
-    "url": "/api/user/details",
-    "title": "UserGetDetails",
-    "version": "1.0.4",
-    "name": "UserGetDetails",
-    "group": "User",
-    "description": "<p>This method returns multiple information about a user that logged at least one time.</p>",
-    "parameter": {
+    "type": "post",
+    "url": "/api/vod/file/move",
+    "title": "VODFileMove",
+    "version": "1.1.0",
+    "name": "VODFileMove",
+    "group": "StreamSystem",
+    "description": "<p>Move a VOD file.</p>",
+    "header": {
       "fields": {
-        "Parameter": [
+        "Header": [
           {
-            "group": "Parameter",
+            "group": "Header",
             "type": "String",
             "optional": false,
-            "field": "id",
-            "description": "<p>SteamID (64bits) of the user to request.</p>"
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
           }
         ]
       }
@@ -1961,40 +2534,117 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "MissingIdParameter",
-            "description": "<p>Id is not present in the parameters.</p>"
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "InvalidIdParameter",
-            "description": "<p>Invalid id value (not an int).</p>"
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
           },
           {
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "UserNotFound",
-            "description": "<p>There is no user in the database with this id.</p>"
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FileSystemError",
+            "description": "<p>Internal error manipulating the filesystem.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "SourceParameterMissing",
+            "description": "<p>Source is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "SourceParameterInvalid",
+            "description": "<p>Source is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "SourceFileDoesntExist",
+            "description": "<p>There is no VOD file with the specified source path.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DestinationParameterMissing",
+            "description": "<p>Destination is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DestinationParameterInvalid",
+            "description": "<p>Destination is not a valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DestinationFileAlreadyExist",
+            "description": "<p>There is already a file with such path.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DestinationRootDirectoryMissing",
+            "description": "<p>Destination path has no root directory created yet.</p>"
           }
         ]
       }
     },
-    "success": {
+    "parameter": {
       "fields": {
-        "Success 200": [
+        "Parameter": [
           {
-            "group": "Success 200",
+            "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "id",
-            "description": "<p>SteamID (64bits).</p>"
+            "field": "source",
+            "description": "<p>Path of the file to move (equal to what vod_file_list returns).</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "destination",
+            "description": "<p>Path where to move the file.</p>"
           }
         ]
       }
     },
-    "filename": "backend/routes/user.py",
-    "groupTitle": "User"
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
   }
 ]

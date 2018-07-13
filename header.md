@@ -1,10 +1,12 @@
-# Global
+***
 
 ### Endpoints access
 
-Endpoints are protected in 2 possible ways, specified in endpoint headers. API calls are limited to 200 per minutes per ip.
-* If the `API_KEY` header is present, you can use the endpoint with such a key. Keys will (TODO) be secured using a `scope`.
-* If the `Authorization` header is present, you can use the endpoint as a logged user. You need to follow the authorization process to get a `Refresh` token then a `Auth` token. Endpoints are restricted using `UserRights`.      
+Some endpoints are free to use but most of them are protected in 2 possible ways, either with a user login or an API-key. Such endpoints require a full auth process to be accessed. All API calls are limited to 200 per minutes per ip.
+* If the application is a web based application where the user needs to login, this application will use the `RefreshTokenGetWithSteam` endpoint to get a `JWT`.
+* In other cases, the application with use an application key to get a `JWT`, using `RefreshTokenGetWithKey` endpoint.
+
+Refresh tokens are long lived (60 days) and must be saved in a secured place. They give access to `AuthTokenGet` endpoint, generating a Auth token. This token is short lived (1 hour) and contains user scopes (endpoint restrictions).
 
 ### Parameter format
 
@@ -15,7 +17,7 @@ curl -X <COMMAND> --header "<HEADER>" -d "<JSON_PAYLOAD>" https://grenouilleapi.
 ```
 
 * `<COMMAND>` is `GET` or `POST`.
-* `<HEADER>` is either `API_KEY: <KEY>` with a valid key or `Authorization: Bearer <TOKEN>` for a user accessed endpoint.
+* `<HEADER>` use the format `Authorization: Bearer <TOKEN>` with a valid `JWT` token.
 * `<ENDPOINT>` is a valid endpoint path.
 * `<JSON_PAYLOAD>` is the JSON payload in both `GET` and `POST` cases.
 
@@ -37,10 +39,9 @@ where `success` contains either
 
 ***
 
-# Modules
-
 ## Authentication
-User authentication module. User logs with Steam, and is redirected to the website with a refresh token valid for 60 days (as a parameter in the URL). The `Refresh` token is then used to get a `Auth` token, valid for 1 hour.
+
+Authentication module, either with Steam for a user, or with an api key for other applications.
 
 ## DotaBots
 

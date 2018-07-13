@@ -65,6 +65,12 @@ def unknown(e):
                     'error': 'UnknownEndpoint',
                     'payload': {}}), 200
 
+@app.errorhandler(405)
+def unknown(e):
+    return jsonify({'success': 'no',
+                    'error': 'WrongMethodOnEndpoint',
+                    'payload': {}}), 200
+
 @app.errorhandler(429)
 def rate_limit_handler(e):
     return jsonify({'success': 'no',

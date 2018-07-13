@@ -3,50 +3,53 @@ import collections
 
 from flask import request, jsonify
 from models import db, Game, GameVIP, GameVIPType, DynamicConfiguration
-from helpers.endpoint import api_key_endpoint
+from helpers.endpoint import secure
 
 def build_api_game(app):
     """Factory to setup the routes for the Dota bots."""
 
-    @app.route('/api/game/create', methods=['POST'])
-    @api_key_endpoint(app)
+    # TODO REBUILD THESE ROUTES
+
+    #@app.route('/api/game/create', methods=['POST'])
     def create_game():
         """
-        @api {post} /api/game/create GameCreate
-        @apiVersion 1.0.0
-        @apiName GameCreate
-        @apiGroup DotaBots
-        @apiDescription Queue a game to be host by bots.
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {post} /api/game/create GameCreate
+        apiVersion 1.0.0
+        apiName GameCreate
+        apiGroup DotaBots
+        apiDescription Queue a game to be host by bots.
 
-        @apiParam {Integer} team1 Id of the first team
-        @apiParam {Integer[]} team1Ids SteamID (64bits) of first team players
-        @apiParam {Integer} team2 Id of the second team
-        @apiParam {Integer[]} team2Ids SteamID (64bits) of second team  players
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiError (Errors){String} MissingTeam1 team1 is not present.
-        @apiError (Errors){String} InvalidTeam1 team1 is invalid.
-        @apiError (Errors){String} MissingTeam1Ids team1Ids is not present.
-        @apiError (Errors){String} InvalidTeam1Ids team1Ids is not an array of integers. Must be of len > 0.
-        @apiError (Errors){String} MissingTeam2 team2 is not present.
-        @apiError (Errors){String} InvalidTeam2 team2 is invalid.
-        @apiError (Errors){String} MissingTeam2Ids team2Ids is not present.
-        @apiError (Errors){String} InvalidTeam2Ids team2Ids is not an array of integers. Must be of len > 0.
+        apiParam {Integer} team1 Id of the first team
+        apiParam {Integer[]} team1Ids SteamID (64bits) of first team players
+        apiParam {Integer} team2 Id of the second team
+        apiParam {Integer[]} team2Ids SteamID (64bits) of second team  players
 
-        @apiParam {String[1..]} name Name of the game lobby.
-        @apiError (Errors){String} MissingName name is not specified.
-        @apiError (Errors){String} InvalidName name is not valid.
-        @apiParam {String[1..]} password Password for the lobby.
-        @apiError (Errors){String} MissingPassword password is not specified.
-        @apiError (Errors){String} InvalidPassword password is not valid.
-        @apiParam {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first.
-        @apiError (Errors){String} MissingTeamChoosingFirst teamChoosingFirst is not specified.
-        @apiError (Errors){String} InvalidTeamChoosingFirst teamChoosingFirst is not valid.
+        apiError (Errors){String} MissingTeam1 team1 is not present.
+        apiError (Errors){String} InvalidTeam1 team1 is invalid.
+        apiError (Errors){String} MissingTeam1Ids team1Ids is not present.
+        apiError (Errors){String} InvalidTeam1Ids team1Ids is not an array of integers. Must be of len > 0.
+        apiError (Errors){String} MissingTeam2 team2 is not present.
+        apiError (Errors){String} InvalidTeam2 team2 is invalid.
+        apiError (Errors){String} MissingTeam2Ids team2Ids is not present.
+        apiError (Errors){String} InvalidTeam2Ids team2Ids is not an array of integers. Must be of len > 0.
 
-        @apiSuccess {Integer} id Id of the game that will be hosted by bots.
+        apiParam {String[1..]} name Name of the game lobby.
+        apiError (Errors){String} MissingName name is not specified.
+        apiError (Errors){String} InvalidName name is not valid.
+        apiParam {String[1..]} password Password for the lobby.
+        apiError (Errors){String} MissingPassword password is not specified.
+        apiError (Errors){String} InvalidPassword password is not valid.
+        apiParam {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first.
+        apiError (Errors){String} MissingTeamChoosingFirst teamChoosingFirst is not specified.
+        apiError (Errors){String} InvalidTeamChoosingFirst teamChoosingFirst is not valid.
+
+        apiSuccess {Integer} id Id of the game that will be hosted by bots.
         """
         data = request.get_json(force=True)
 
@@ -180,39 +183,40 @@ def build_api_game(app):
                         }
                         }), 200
 
-    @app.route('/api/game/details', methods=['GET'])
-    @api_key_endpoint(app)
+    #@app.route('/api/game/details', methods=['GET'])
     def get_game_details():
         """
-        @api {get} /api/game/details GameGetDetails
-        @apiVersion 1.0.1
-        @apiName GameGetDetails
-        @apiGroup DotaBots
-        @apiDescription Request game details.
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {get} /api/game/details GameGetDetails
+        apiVersion 1.0.1
+        apiName GameGetDetails
+        apiGroup DotaBots
+        apiDescription Request game details.
 
-        @apiParam {Integer} id Id of the game hosted by bots.
-        @apiError (Errors){String} MissingId Id is not present.
-        @apiError (Errors){String} InvalidId Id is not an integer.
-        @apiError (Errors){String} NoGameWithId Id is not present in database.
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiSuccess {Integer} id Id of the game hosted by bots.
-        @apiSuccess {String} name Name of the game lobby.
-        @apiSuccess {String} password Password for the lobby.
-        @apiSuccess {Integer} team1 Id of the first team
-        @apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
-        @apiSuccess {Integer} team2 Id of the second team
-        @apiSuccess {Integer[]} team2Ids SteamID (64bits) of second team  players
-        @apiSuccess {String=GameStatus.WAITING_FOR_BOT, GameStatus.CREATION_IN_PROGRESS,
+        apiParam {Integer} id Id of the game hosted by bots.
+        apiError (Errors){String} MissingId Id is not present.
+        apiError (Errors){String} InvalidId Id is not an integer.
+        apiError (Errors){String} NoGameWithId Id is not present in database.
+
+        apiSuccess {Integer} id Id of the game hosted by bots.
+        apiSuccess {String} name Name of the game lobby.
+        apiSuccess {String} password Password for the lobby.
+        apiSuccess {Integer} team1 Id of the first team
+        apiSuccess {Integer[]} team1Ids SteamID (64bits) of first team players
+        apiSuccess {Integer} team2 Id of the second team
+        apiSuccess {Integer[]} team2Ids SteamID (64bits) of second team  players
+        apiSuccess {String=GameStatus.WAITING_FOR_BOT, GameStatus.CREATION_IN_PROGRESS,
          GameStatus.WAITING_FOR_PLAYERS, GameStatus.GAME_IN_PROGRESS, GameStatus.COMPLETED,
          GameStatus.CANCELLED} status Game status.
-        @apiSuccess {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first
-        @apiSuccess {String} bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
-        @apiSuccess {Integer} valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
-        @apiSuccess {Integer=1,2} winner Team winning the game (if status 'GameStatus.COMPLETED')
+        apiSuccess {Integer=1,2} teamChoosingFirst Team choosing 'side'/'pick order' first
+        apiSuccess {String} bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
+        apiSuccess {Integer} valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
+        apiSuccess {Integer=1,2} winner Team winning the game (if status 'GameStatus.COMPLETED')
         """
         data = request.get_json(force=True)
 
@@ -257,43 +261,44 @@ def build_api_game(app):
                         'payload': payload
                         }), 200
 
-    @app.route('/api/game/list', methods=['GET'])
-    @api_key_endpoint(app)
+    #@app.route('/api/game/list', methods=['GET'])
     def list_game():
         """
-        @api {get} /api/game/list GameList
-        @apiVersion 1.0.2
-        @apiName GameList
-        @apiGroup DotaBots
-        @apiDescription Get the list of multiple hosted games.
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {get} /api/game/list GameList
+        apiVersion 1.0.2
+        apiName GameList
+        apiGroup DotaBots
+        apiDescription Get the list of multiple hosted games.
 
-        @apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
-        @apiError (Errors){String} InvalidLimit Limit is not a positive integer in waited range.
-        @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
-        @apiError (Errors){String} InvalidOffset Offset is not a positive integer in waited range.
-        @apiParam {String[]} [fields="['name', 'password', 'team1', 'team1Ids', 'team2', 'team2Ids', 'status',
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
+        apiError (Errors){String} InvalidLimit Limit is not a positive integer in waited range.
+        apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
+        apiError (Errors){String} InvalidOffset Offset is not a positive integer in waited range.
+        apiParam {String[]} [fields="['name', 'password', 'team1', 'team1Ids', 'team2', 'team2Ids', 'status',
          'teamChoosingFirst', 'bot', 'valveId', 'winner']"] Optional fields to return.
-        @apiError (Errors){String} InvalidFields Fields is not an array.
+        apiError (Errors){String} InvalidFields Fields is not an array.
 
-        @apiSuccess {Object[]} games List of the Games ordered by decreasing id, with filters applied.
-        @apiSuccess {Integer} games.id Id of the game hosted by bots.
-        @apiSuccess {String} games.name Name of the game lobby.
-        @apiSuccess {String} games.password Password for the lobby.
-        @apiSuccess {Integer} games.team1 Id of the first team
-        @apiSuccess {Integer[]} games.team1Ids SteamID (64bits) of first team players
-        @apiSuccess {Integer} games.team2 Id of the second team
-        @apiSuccess {Integer[]} games.team2Ids SteamID (64bits) of second team  players
-        @apiSuccess {String=GameStatus.WAITING_FOR_BOT, GameStatus.CREATION_IN_PROGRESS,
+        apiSuccess {Object[]} games List of the Games ordered by decreasing id, with filters applied.
+        apiSuccess {Integer} games.id Id of the game hosted by bots.
+        apiSuccess {String} games.name Name of the game lobby.
+        apiSuccess {String} games.password Password for the lobby.
+        apiSuccess {Integer} games.team1 Id of the first team
+        apiSuccess {Integer[]} games.team1Ids SteamID (64bits) of first team players
+        apiSuccess {Integer} games.team2 Id of the second team
+        apiSuccess {Integer[]} games.team2Ids SteamID (64bits) of second team  players
+        apiSuccess {String=GameStatus.WAITING_FOR_BOT, GameStatus.CREATION_IN_PROGRESS,
          GameStatus.WAITING_FOR_PLAYERS, GameStatus.GAME_IN_PROGRESS, GameStatus.COMPLETED,
          GameStatus.CANCELLED} games.status Game status.
-        @apiSuccess {Integer=1,2} games.teamChoosingFirst Team choosing 'side'/'pick order' first
-        @apiSuccess {String} games.bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
-        @apiSuccess {Integer} games.valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
-        @apiSuccess {Integer=1,2} games.winner Team winning the game (if status 'GameStatus.COMPLETED')
+        apiSuccess {Integer=1,2} games.teamChoosingFirst Team choosing 'side'/'pick order' first
+        apiSuccess {String} games.bot Steam Bot managing the game (if status not 'GameStatus.WAITING_FOR_BOT')
+        apiSuccess {Integer} games.valveId Game Id in Valve database (if status 'GameStatus.COMPLETED')
+        apiSuccess {Integer=1,2} games.winner Team winning the game (if status 'GameStatus.COMPLETED')
         """
         data = request.get_json(force=True)
 
@@ -343,24 +348,25 @@ def build_api_game(app):
                         'payload': payload
                         }), 200
 
-    @app.route('/api/game/vip/list', methods=['GET'])
-    @api_key_endpoint(app)
+    #app.route('/api/game/vip/list', methods=['GET'])
     def list_game_vips():
         """
-        @api {get} /api/game/vip/list GameVIPList
-        @apiVersion 1.0.0
-        @apiName GameVIPList
-        @apiGroup DotaBots
-        @apiDescription Get the list of all VIPs
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {get} /api/game/vip/list GameVIPList
+        apiVersion 1.0.0
+        apiName GameVIPList
+        apiGroup DotaBots
+        apiDescription Get the list of all VIPs
 
-        @apiSuccess {Object[]} vips List of the VIPs authorized in all games.
-        @apiSuccess {Integer} vips.id Steam Id of the VIP.
-        @apiSuccess {String=GameVIPType.CASTER,GameVIPType.ADMIN} vips.type Type of the VIP.
-        @apiSuccess {String} vips.name Name of the VIP.
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        apiSuccess {Object[]} vips List of the VIPs authorized in all games.
+        apiSuccess {Integer} vips.id Steam Id of the VIP.
+        apiSuccess {String=GameVIPType.CASTER,GameVIPType.ADMIN} vips.type Type of the VIP.
+        apiSuccess {String} vips.name Name of the VIP.
         """
         # Return ids
         vips = GameVIP.get_all_vips()
@@ -368,32 +374,33 @@ def build_api_game(app):
                         'payload': {'vips': vips}
                         }), 200
 
-    @app.route('/api/game/vip/add', methods=['POST'])
-    @api_key_endpoint(app)
+    #@app.route('/api/game/vip/add', methods=['POST'])
     def add_game_vip():
         """
-        @api {post} /api/game/vip/add GameVIPAdd
-        @apiVersion 1.0.0
-        @apiName GameVIPAdd
-        @apiGroup DotaBots
-        @apiDescription Add a new game VIP.
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {post} /api/game/vip/add GameVIPAdd
+        apiVersion 1.0.0
+        apiName GameVIPAdd
+        apiGroup DotaBots
+        apiDescription Add a new game VIP.
 
-        @apiParam {Integer} id SteamId (64bits) of the vip to add.
-        @apiError (Errors){String} MissingId id is not specified.
-        @apiError (Errors){String} InvalidId id is invalid.
-        @apiError (Errors){String} VIPWithIdAlreadyExists VIP with id is already in database.
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiParam {String=CASTER,ADMIN} type Type of the vip to add.
-        @apiError (Errors){String} MissingType type is not specified.
-        @apiError (Errors){String} InvalidType type is not valid.
+        apiParam {Integer} id SteamId (64bits) of the vip to add.
+        apiError (Errors){String} MissingId id is not specified.
+        apiError (Errors){String} InvalidId id is invalid.
+        apiError (Errors){String} VIPWithIdAlreadyExists VIP with id is already in database.
 
-        @apiParam {String[1..]} name Name of the vip to add.
-        @apiError (Errors){String} MissingName name is not specified.
-        @apiError (Errors){String} InvalidName name is not valid.
+        apiParam {String=CASTER,ADMIN} type Type of the vip to add.
+        apiError (Errors){String} MissingType type is not specified.
+        apiError (Errors){String} InvalidType type is not valid.
+
+        apiParam {String[1..]} name Name of the vip to add.
+        apiError (Errors){String} MissingName name is not specified.
+        apiError (Errors){String} InvalidName name is not valid.
         """
         data = request.get_json(force=True)
 
@@ -456,24 +463,25 @@ def build_api_game(app):
                         'payload': {}
                         }), 200
 
-    @app.route('/api/game/vip/remove', methods=['POST'])
-    @api_key_endpoint(app)
+    #@app.route('/api/game/vip/remove', methods=['POST'])
     def remove_game_vip():
         """
-        @api {post} /api/game/vip/remove GameVIPRemove
-        @apiVersion 1.0.0
-        @apiName GameVIPRemove
-        @apiGroup DotaBots
-        @apiDescription Remove a game VIP.
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {post} /api/game/vip/remove GameVIPRemove
+        apiVersion 1.0.0
+        apiName GameVIPRemove
+        apiGroup DotaBots
+        apiDescription Remove a game VIP.
 
-        @apiParam {Integer} id SteamId of the vip to remove.
-        @apiError (Errors){String} MissingId id is not specified.
-        @apiError (Errors){String} InvalidId id is invalid.
-        @apiError (Errors){String} VIPDoesNotExist VIP with id does not exist in the database.
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+
+        apiParam {Integer} id SteamId of the vip to remove.
+        apiError (Errors){String} MissingId id is not specified.
+        apiError (Errors){String} InvalidId id is invalid.
+        apiError (Errors){String} VIPDoesNotExist VIP with id does not exist in the database.
         """
         data = request.get_json(force=True)
 
@@ -504,22 +512,23 @@ def build_api_game(app):
                         'payload': {}
                         }), 200
 
-    @app.route('/api/game/bot/pause/get', methods=['GET'])
-    @api_key_endpoint(app)
+    #@app.route('/api/game/bot/pause/get', methods=['GET'])
     def get_pause_bot():
         """
-        @api {get} /api/game/bot/pause/get BotPauseGet
-        @apiVersion 1.0.3
-        @apiName BotPauseGet
-        @apiGroup DotaBots
-        @apiDescription Get the bot pause status
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
-        @apiError (Errors){String} BotPauseMissing Bot pause was never set, default value is 'False'.
+        api {get} /api/game/bot/pause/get BotPauseGet
+        apiVersion 1.0.3
+        apiName BotPauseGet
+        apiGroup DotaBots
+        apiDescription Get the bot pause status
 
-        @apiSuccess {String=True,False} bot_pause Pause status of the bot.
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        apiError (Errors){String} BotPauseMissing Bot pause was never set, default value is 'False'.
+
+        apiSuccess {String=True,False} bot_pause Pause status of the bot.
         """
         bot_pause = db.session().query(DynamicConfiguration).filter(DynamicConfiguration.key=='bot_pause').one_or_none()
         if bot_pause is None:
@@ -532,25 +541,26 @@ def build_api_game(app):
                         'payload': {'bot_pause': bot_pause.value}
                         }), 200
 
-    @app.route('/api/game/bot/pause/update', methods=['POST'])
-    @api_key_endpoint(app)
+    #@app.route('/api/game/bot/pause/update', methods=['POST'])
     def update_pause_bot():
         """
-        @api {post} /api/game/bot/pause/update BotPauseUpdate
-        @apiVersion 1.0.3
-        @apiName BotPauseUpdate
-        @apiGroup DotaBots
-        @apiDescription Update the bot pause status.
+        DEPRECATED
 
-        @apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
-        @apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
-        @apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
+        api {post} /api/game/bot/pause/update BotPauseUpdate
+        apiVersion 1.0.3
+        apiName BotPauseUpdate
+        apiGroup DotaBots
+        apiDescription Update the bot pause status.
 
-        @apiParam {String=True,False} bot_pause Pause status of the bot.
-        @apiError (Errors){String} MissingBotPause bot_pause is not specified.
-        @apiError (Errors){String} InvalidBotPause bot_pause is invalid.
+        apiHeader {String} API_KEY Restricted API_KEY necessary to call the endpoint.
+        apiError (Errors){String} ApiKeyMissing Missing API_KEY header.
+        apiError (Errors){String} ApiKeyInvalid Invalid API_KEY header.
 
-        @apiSuccess {String=True,False} bot_pause Pause status of the bot after update.
+        apiParam {String=True,False} bot_pause Pause status of the bot.
+        apiError (Errors){String} MissingBotPause bot_pause is not specified.
+        apiError (Errors){String} InvalidBotPause bot_pause is invalid.
+
+        apiSuccess {String=True,False} bot_pause Pause status of the bot after update.
         """
         data = request.get_json(force=True)
 

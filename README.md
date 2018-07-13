@@ -5,26 +5,10 @@
 ### API
 
 General:
-- [ ] Normalize documentations and move to version `1.1.0` with UserRights and Wrappers.
 - [ ] Add the ability to run specific CRON jobs inside the grenouilleAPI worker.
 
-User:
-- [ ] Add UserRights.
-
-Auth:
-- [ ] Create wrappers `@AccessWithAPI(<ScopeList>)` `@AccessWithUser(<UserRight>)` `@AccessWithUserOrAPI(<ScopeList>, <UserRight>)`
-- [ ] Add user rights in auth token
-- [ ] Secure endpoints with user rights.
-
-StreamSystem:
-- [ ] Update/Get rediff playlist with an endpoint.
-- [ ] List all vod available (records or saved).
-- [ ] Move a vod (with possible rename).
-- [ ] Create a vod category (basically a directory).
-- [ ] Remove a vod from disk.
-- [ ] Show server disk usage.
-
 Game:
+- [ ] Revamp endpoints
 - [ ] Add a `ListGames(limit, offset)`, ordered by `id desc`
 - [ ] Add `limit` and `offset` to `ListGameVIPs(limit, offset)`
 

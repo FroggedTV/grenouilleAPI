@@ -6,7 +6,7 @@ ENV NGINX_RTMP_MODULE_VERSION 1.2.1
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y ca-certificates openssl libssl-dev curl && \
+    apt-get install -y python3 ca-certificates openssl libssl-dev curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and decompress Nginx
@@ -49,6 +49,9 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
 
 # Set up config file
 COPY docker/grenouilleapi_rtmp/nginx.conf /etc/nginx/nginx.conf
+
+# Script file
+COPY backend/scripts/rtmp.py /grenouille/rtmp.py
 
 EXPOSE 1935
 CMD ["nginx", "-g", "daemon off;"]

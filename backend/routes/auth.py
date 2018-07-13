@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 from steam import SteamID
 
 from flask import jsonify, redirect, request
-from models import db, User, APIKey, UserScope, APIKeyScope
+from helpers.endpoint import secure
+from models import db, User, APIKey, UserScope, APIKeyScope, Scope
 
 def build_api_auth(app, oid):
     """Factory to setup the routes for the auth api."""
@@ -206,4 +207,670 @@ def build_api_auth(app, oid):
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {'token': token}
+                        }), 200
+
+    @app.route('/api/auth/scope/list', methods=['GET'])
+    @secure(app, ['key', 'user'], [])
+    def get_scope_list(auth_token):
+        """
+        @api {get} /api/auth/scope/list ScopeList
+        @apiVersion 1.1.0
+        @apiName ScopeList
+        @apiGroup Authentication
+        @apiDescription List all available scopes for APIKey and users.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+
+        @apiSuccess {String[]} scopes All available scopes.
+        """
+        scopes = []
+        for scope in list(Scope):
+            scopes.append(scope.value)
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {'scopes': scopes}
+                        }), 200
+
+    @app.route('/api/auth/key/list', methods=['GET'])
+    @secure(app, ['key', 'user'], ['api_key_scope'])
+    def get_api_key_list(auth_token):
+        """
+        @api {get} /api/auth/key/list APIKeyList
+        @apiVersion 1.1.0
+        @apiName APIKeyList
+        @apiGroup Authentication
+        @apiDescription List all APIKeys.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
+        @apiError (Errors){String} LimitInvalid Limit is not a positive integer in waited range.
+        @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
+        @apiError (Errors){String} OffsetInvalid Offset is not a positive integer in waited range.
+
+        @apiSuccess {Object[]} keys All available scopes.
+        @apiSuccess {String} keys.hash Hash of the API_KEY.
+        @apiSuccess {String} keys.description API Key description.
+        @apiSuccess {String[]} keys.scopes List of scopes this KEY has access to.
+        """
+        data = request.get_json(force=True)
+
+        # limit check
+        limit = data.get('limit', 10)
+        if not isinstance(limit, int) or limit <= 0 or limit > 100:
+            return jsonify({'success': 'no',
+                            'error': 'LimitInvalid',
+                            'payload': {}
+                            }), 200
+
+        # offset check
+        offset = data.get('offset', 0)
+        if not isinstance(offset, int) or offset < 0 :
+            return jsonify({'success': 'no',
+                            'error': 'OffsetInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Return results
+        keys = []
+        for api_key in db.session().query(APIKey)\
+                                   .order_by(APIKey.key_hash.desc())\
+                                   .limit(limit)\
+                                   .offset(offset)\
+                                   .all():
+            scopes = []
+            for scope in db.session().query(APIKeyScope).filter(APIKeyScope.key_hash==api_key.key_hash).all():
+                scopes.append(scope.scope)
+            keys.append({ 'hash': api_key.key_hash, 'description': api_key.description, 'scopes': scopes })
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {
+                            'keys': keys
+                        }
+                        }), 200
+
+    @app.route('/api/auth/key/add', methods=['POST'])
+    @secure(app, ['key', 'user'], ['api_key_scope'])
+    def post_api_key_add(auth_token):
+        """
+        @api {post} /api/auth/key/add APIKeyAdd
+        @apiVersion 1.1.0
+        @apiName APIKeyAdd
+        @apiGroup Authentication
+        @apiDescription Add a new APIKey into the system.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} key APIKey to add to the system.
+        @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
+        @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
+        @apiError (Errors){String} KeyAlreadyExists Key is already in the system.
+        @apiParam {String} description Key description for information.
+        @apiError (Errors){String} DescriptionParameterMissing Description is not present in the parameters.
+        @apiError (Errors){String} DescriptionParameterInvalid Description is not valid String.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # description checks
+        description = data.get('description', None)
+        if description is None:
+            return jsonify({'success': 'no',
+                            'error': 'DescriptionParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(description, str) or len(description) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'DescriptionParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Hash
+        salt = app.config['API_KEY_SALT']
+        hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+        hash_key = hash_object.hexdigest()
+        db_key = APIKey.get(hash_key)
+
+        if db_key is not None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyAlreadyExists',
+                            'payload': {}
+                            }), 200
+        db_key = APIKey(hash_key, description)
+        db.session().add(db_key)
+        db.session().commit()
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200
+
+    @app.route('/api/auth/key/remove', methods=['POST'])
+    @secure(app, ['key', 'user'], ['api_key_scope'])
+    def post_api_key_remove(auth_token):
+        """
+        @api {post} /api/auth/key/remove APIKeyRemove
+        @apiVersion 1.1.0
+        @apiName APIKeyRemove
+        @apiGroup Authentication
+        @apiDescription Remove an APIKey from the system.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} key APIKey to add to the system.
+        @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
+        @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
+        @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Hash
+        salt = app.config['API_KEY_SALT']
+        hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+        hash_key = hash_object.hexdigest()
+        db_key = APIKey.get(hash_key)
+
+        if db_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyDoesntExists',
+                            'payload': {}
+                            }), 200
+        db.session().delete(db_key)
+        db.session().commit()
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200
+
+    @app.route('/api/auth/key/description/update', methods=['POST'])
+    @secure(app, ['key', 'user'], ['api_key_scope'])
+    def post_api_key_description_update(auth_token):
+        """
+        @api {post} /api/auth/key/description/update APIKeyDescriptionUpdate
+        @apiVersion 1.1.0
+        @apiName APIKeyDescriptionUpdate
+        @apiGroup Authentication
+        @apiDescription Update the description of an APIKey.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} key APIKey to update the description.
+        @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
+        @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
+        @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
+        @apiParam {String} description Key description for information.
+        @apiError (Errors){String} DescriptionParameterMissing Description is not present in the parameters.
+        @apiError (Errors){String} DescriptionParameterInvalid Description is not valid String.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # description checks
+        description = data.get('description', None)
+        if description is None:
+            return jsonify({'success': 'no',
+                            'error': 'DescriptionParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(description, str) or len(description) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'DescriptionParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Hash
+        salt = app.config['API_KEY_SALT']
+        hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+        hash_key = hash_object.hexdigest()
+        db_key = APIKey.get(hash_key)
+
+        if db_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyDoesntExists',
+                            'payload': {}
+                            }), 200
+        db_key.description = description
+        db.session().commit()
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200
+
+    @app.route('/api/auth/key/scope/add', methods=['POST'])
+    @secure(app, ['key', 'user'], ['api_key_scope'])
+    def post_api_key_scope_add(auth_token):
+        """
+        @api {post} /api/auth/key/scope/add APIKeyScopeAdd
+        @apiVersion 1.1.0
+        @apiName APIKeyScopeAdd
+        @apiGroup Authentication
+        @apiDescription Add scope access to the APIKey.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} key APIKey to add scopes to.
+        @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
+        @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
+        @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
+        @apiParam {String[]} scopes Scopes to add to the key.
+        @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
+        @apiError (Errors){String} ScopesParameterInvalid Scope is not list of valid scope Strings.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # scopes checks
+        scopes = data.get('scopes', None)
+        if scopes is None:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(scopes, list) or len(scopes) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterInvalid',
+                            'payload': {}
+                            }), 200
+        all_scopes = [x.value for x in list(Scope)]
+        for scope in scopes:
+            if scope not in all_scopes:
+                return jsonify({'success': 'no',
+                                'error': 'ScopesParameterInvalid',
+                                'payload': {}
+                                }), 200
+        # Hash
+        salt = app.config['API_KEY_SALT']
+        hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+        hash_key = hash_object.hexdigest()
+        db_key = APIKey.get(hash_key)
+
+        if db_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyDoesntExists',
+                            'payload': {}
+                            }), 200
+
+        # add scopes
+        for scope in scopes:
+            APIKeyScope.upsert(hash_key, scope)
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200
+
+    @app.route('/api/auth/key/scope/remove', methods=['POST'])
+    @secure(app, ['key', 'user'], ['api_key_scope'])
+    def post_api_key_scope_remove(auth_token):
+        """
+        @api {post} /api/auth/key/scope/remove APIKeyScopeRemove
+        @apiVersion 1.1.0
+        @apiName APIKeyScopeRemove
+        @apiGroup Authentication
+        @apiDescription Remove scope access to the APIKey.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} key APIKey to remove scopes from.
+        @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
+        @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
+        @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
+        @apiParam {String[]} scopes Scopes to remove from the key.
+        @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
+        @apiError (Errors){String} ScopesParameterInvalid Scope is not list of valid scope Strings.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        key = data.get('key', None)
+        if key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(key, str) or len(key) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # scopes checks
+        scopes = data.get('scopes', None)
+        if scopes is None:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(scopes, list) or len(scopes) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterInvalid',
+                            'payload': {}
+                            }), 200
+        all_scopes = [x.value for x in list(Scope)]
+        for scope in scopes:
+            if scope not in all_scopes:
+                return jsonify({'success': 'no',
+                                'error': 'ScopesParameterInvalid',
+                                'payload': {}
+                                }), 200
+        # Hash
+        salt = app.config['API_KEY_SALT']
+        hash_object = hashlib.sha1((key + salt).encode('utf-8'))
+        hash_key = hash_object.hexdigest()
+        db_key = APIKey.get(hash_key)
+
+        if db_key is None:
+            return jsonify({'success': 'no',
+                            'error': 'KeyDoesntExists',
+                            'payload': {}
+                            }), 200
+
+        # remove scopes
+        for scope in scopes:
+            api_scope = db.session.query(APIKeyScope).filter(APIKeyScope.key_hash==hash_key, APIKeyScope.scope==scope).one_or_none()
+            if api_scope is not None:
+                db.session.delete(api_scope)
+        db.session.commit()
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200
+
+    @app.route('/api/auth/user/scope/list', methods=['GET'])
+    @secure(app, ['key', 'user'], ['user_scope'])
+    def get_user_scope_list(auth_token):
+        """
+        @api {get} /api/auth/user/scope/list UserScopeList
+        @apiVersion 1.1.0
+        @apiName UserScopeList
+        @apiGroup Authentication
+        @apiDescription List all users with their scopes.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
+        @apiError (Errors){String} LimitInvalid Limit is not a positive integer in waited range.
+        @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
+        @apiError (Errors){String} OffsetInvalid Offset is not a positive integer in waited range.
+
+        @apiSuccess {Object[]} users All available users.
+        @apiSuccess {String} users.id Id of the user.
+        @apiSuccess {String[]} users.scopes List of scopes this user has access to.
+        """
+        data = request.get_json(force=True)
+
+        # limit check
+        limit = data.get('limit', 10)
+        if not isinstance(limit, int) or limit <= 0 or limit > 100:
+            return jsonify({'success': 'no',
+                            'error': 'LimitInvalid',
+                            'payload': {}
+                            }), 200
+
+        # offset check
+        offset = data.get('offset', 0)
+        if not isinstance(offset, int) or offset < 0 :
+            return jsonify({'success': 'no',
+                            'error': 'OffsetInvalid',
+                            'payload': {}
+                            }), 200
+
+        # Return results
+        users = []
+        for user in db.session().query(User)\
+                                   .order_by(User.id.desc())\
+                                   .limit(limit)\
+                                   .offset(offset)\
+                                   .all():
+            scopes = []
+            for scope in db.session().query(UserScope).filter(UserScope.id==user.id).all():
+                scopes.append(scope.scope)
+            users.append({ 'id': user.id, 'scopes': scopes })
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {
+                            'users': users
+                        }
+                        }), 200
+
+    @app.route('/api/auth/user/scope/add', methods=['POST'])
+    @secure(app, ['key', 'user'], ['user_scope'])
+    def post_user_scope_add(auth_token):
+        """
+        @api {post} /api/auth/user/scope/add UserScopeAdd
+        @apiVersion 1.1.0
+        @apiName UserScopeAdd
+        @apiGroup Authentication
+        @apiDescription Add scope access to a user.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} id User id to add scopes to.
+        @apiError (Errors){String} IdParameterMissing id is not present in the parameters.
+        @apiError (Errors){String} IdParameterInvalid id is not valid String.
+        @apiError (Errors){String} UserWithIdDoesntExists There is no user with such id in the system.
+        @apiParam {String[]} scopes Scopes to add to the user.
+        @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
+        @apiError (Errors){String} ScopesParameterInvalid Scope is not list of valid scope Strings.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        id = data.get('id', None)
+        if id is None:
+            return jsonify({'success': 'no',
+                            'error': 'IdParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(id, int) or id <=0:
+            return jsonify({'success': 'no',
+                            'error': 'IdParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # scopes checks
+        scopes = data.get('scopes', None)
+        if scopes is None:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(scopes, list) or len(scopes) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterInvalid',
+                            'payload': {}
+                            }), 200
+        all_scopes = [x.value for x in list(Scope)]
+        for scope in scopes:
+            if scope not in all_scopes:
+                return jsonify({'success': 'no',
+                                'error': 'ScopesParameterInvalid',
+                                'payload': {}
+                                }), 200
+
+        # Hash
+        user = User.get(id)
+
+        if user is None:
+            return jsonify({'success': 'no',
+                            'error': 'UserWithIdDoesntExists',
+                            'payload': {}
+                            }), 200
+
+        # add scopes
+        for scope in scopes:
+            UserScope.upsert(id, scope)
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200
+
+    @app.route('/api/auth/user/scope/remove', methods=['POST'])
+    @secure(app, ['key', 'user'], ['user_scope'])
+    def post_user_scope_remove(auth_token):
+        """
+        @api {post} /api/auth/user/scope/remove UserScopeRemove
+        @apiVersion 1.1.0
+        @apiName UserScopeRemove
+        @apiGroup Authentication
+        @apiDescription Remove scope access from a user.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} id User id to remove scopes from.
+        @apiError (Errors){String} IdParameterMissing id is not present in the parameters.
+        @apiError (Errors){String} IdParameterInvalid id is not valid String.
+        @apiError (Errors){String} UserWithIdDoesntExists There is no user with such id in the system.
+        @apiParam {String[]} scopes Scopes to remove from the user.
+        @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
+        @apiError (Errors){String} ScopesParameterInvalid Scope is not list of valid scope Strings.
+        """
+        data = request.get_json(force=True)
+
+        # key checks
+        id = data.get('id', None)
+        if id is None:
+            return jsonify({'success': 'no',
+                            'error': 'IdParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(id, int) or id <=0:
+            return jsonify({'success': 'no',
+                            'error': 'IdParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        # scopes checks
+        scopes = data.get('scopes', None)
+        if scopes is None:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(scopes, list) or len(scopes) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ScopesParameterInvalid',
+                            'payload': {}
+                            }), 200
+        all_scopes = [x.value for x in list(Scope)]
+        for scope in scopes:
+            if scope not in all_scopes:
+                return jsonify({'success': 'no',
+                                'error': 'ScopesParameterInvalid',
+                                'payload': {}
+                                }), 200
+
+        # Hash
+        user = User.get(id)
+        if user is None:
+            return jsonify({'success': 'no',
+                            'error': 'UserWithIdDoesntExists',
+                            'payload': {}
+                            }), 200
+
+        # add scopes
+        for scope in scopes:
+            user_scope = db.session.query(UserScope).filter(UserScope.id==user.id, UserScope.scope==scope).one_or_none()
+            if user_scope is not None:
+                db.session.delete(user_scope)
+        db.session.commit()
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
                         }), 200

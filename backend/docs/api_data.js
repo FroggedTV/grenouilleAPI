@@ -1,5 +1,721 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "/api/auth/key/add",
+    "title": "APIKeyAdd",
+    "version": "1.1.0",
+    "name": "APIKeyAdd",
+    "group": "Authentication",
+    "description": "<p>Add a new APIKey into the system.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyAlreadyExists",
+            "description": "<p>Key is already in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterMissing",
+            "description": "<p>Description is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterInvalid",
+            "description": "<p>Description is not valid String.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to add to the system.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Key description for information.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/description/update",
+    "title": "APIKeyDescriptionUpdate",
+    "version": "1.1.0",
+    "name": "APIKeyDescriptionUpdate",
+    "group": "Authentication",
+    "description": "<p>Update the description of an APIKey.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterMissing",
+            "description": "<p>Description is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DescriptionParameterInvalid",
+            "description": "<p>Description is not valid String.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to update the description.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "description",
+            "description": "<p>Key description for information.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/key/list",
+    "title": "APIKeyList",
+    "version": "1.1.0",
+    "name": "APIKeyList",
+    "group": "Authentication",
+    "description": "<p>List all APIKeys.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "LimitInvalid",
+            "description": "<p>Limit is not a positive integer in waited range.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OffsetInvalid",
+            "description": "<p>Offset is not a positive integer in waited range.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "1-100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>Optional number of entries to return.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "0-..",
+            "optional": true,
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>Optional offset for database fetch.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "keys",
+            "description": "<p>All available scopes.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "keys.hash",
+            "description": "<p>Hash of the API_KEY.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "keys.description",
+            "description": "<p>API Key description.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "keys.scopes",
+            "description": "<p>List of scopes this KEY has access to.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/remove",
+    "title": "APIKeyRemove",
+    "version": "1.1.0",
+    "name": "APIKeyRemove",
+    "group": "Authentication",
+    "description": "<p>Remove an APIKey from the system.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to add to the system.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/scope/add",
+    "title": "APIKeyScopeAdd",
+    "version": "1.1.0",
+    "name": "APIKeyScopeAdd",
+    "group": "Authentication",
+    "description": "<p>Add scope access to the APIKey.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to add scopes to.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to add to the key.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/key/scope/remove",
+    "title": "APIKeyScopeRemove",
+    "version": "1.1.0",
+    "name": "APIKeyScopeRemove",
+    "group": "Authentication",
+    "description": "<p>Remove scope access to the APIKey.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterMissing",
+            "description": "<p>Key is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyParameterInvalid",
+            "description": "<p>Key is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDoesntExists",
+            "description": "<p>There is no such key in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>APIKey to remove scopes from.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to remove from the key.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
     "type": "get",
     "url": "/api/auth/token",
     "title": "AuthTokenGet",
@@ -135,6 +851,447 @@ define({ "api": [
     "name": "RefreshTokenGetWithSteam",
     "group": "Authentication",
     "description": "<p>First endpoint to call in the auth process with user. Calling it redirects to the steam login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.</p>",
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/scope/list",
+    "title": "ScopeList",
+    "version": "1.1.0",
+    "name": "ScopeList",
+    "group": "Authentication",
+    "description": "<p>List all available scopes for APIKey and users.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>All available scopes.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/user/scope/add",
+    "title": "UserScopeAdd",
+    "version": "1.1.0",
+    "name": "UserScopeAdd",
+    "group": "Authentication",
+    "description": "<p>Add scope access to a user.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterMissing",
+            "description": "<p>id is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterInvalid",
+            "description": "<p>id is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "UserWithIdDoesntExists",
+            "description": "<p>There is no user with such id in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>User id to add scopes to.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to add to the user.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
+    "url": "/api/auth/user/scope/list",
+    "title": "UserScopeList",
+    "version": "1.1.0",
+    "name": "UserScopeList",
+    "group": "Authentication",
+    "description": "<p>List all users with their scopes.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "LimitInvalid",
+            "description": "<p>Limit is not a positive integer in waited range.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "OffsetInvalid",
+            "description": "<p>Offset is not a positive integer in waited range.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "1-100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "10",
+            "description": "<p>Optional number of entries to return.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Integer",
+            "size": "0-..",
+            "optional": true,
+            "field": "offset",
+            "defaultValue": "0",
+            "description": "<p>Optional offset for database fetch.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "users",
+            "description": "<p>All available users.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "users.id",
+            "description": "<p>Id of the user.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "users.scopes",
+            "description": "<p>List of scopes this user has access to.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "/api/auth/user/scope/remove",
+    "title": "UserScopeRemove",
+    "version": "1.1.0",
+    "name": "UserScopeRemove",
+    "group": "Authentication",
+    "description": "<p>Remove scope access from a user.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterMissing",
+            "description": "<p>id is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "IdParameterInvalid",
+            "description": "<p>id is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "UserWithIdDoesntExists",
+            "description": "<p>There is no user with such id in the system.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterMissing",
+            "description": "<p>Scope is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ScopesParameterInvalid",
+            "description": "<p>Scope is not list of valid scope Strings.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>User id to remove scopes from.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>Scopes to remove from the user.</p>"
+          }
+        ]
+      }
+    },
     "filename": "backend/routes/auth.py",
     "groupTitle": "Authentication"
   },

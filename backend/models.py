@@ -85,7 +85,7 @@ class UserScope(db.Model):
     """
     __tablename__ = 'user_scope'
 
-    id = db.Column(db.BigInteger(), primary_key=True)
+    id = db.Column(db.BigInteger(), db.ForeignKey('user.id'), primary_key=True)
     scope = db.Column(db.String(), primary_key=True)
 
     def __init__(self, id, scope):
@@ -151,7 +151,7 @@ class APIKeyScope(db.Model):
     """
     __tablename__ = 'api_key_scope'
 
-    key_hash = db.Column(db.String(), primary_key=True)
+    key_hash = db.Column(db.String(), db.ForeignKey('api_key.key_hash'), primary_key=True)
     scope = db.Column(db.String(), primary_key=True)
 
     def __init__(self, key_hash, scope):

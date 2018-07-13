@@ -591,3 +591,9 @@ def build_api_stream_system(app):
             return jsonify({'success': 'no',
                         'error': 'FileSystemError',
                         'payload': {}}), 200
+
+    def get_vlc_playlist(auth_token):
+        pass
+
+    def post_vlc_playlist(auth_token):
+        pass

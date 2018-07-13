@@ -12,6 +12,7 @@ services:
       - './grenouilleapi_postgres/conf.env'
     ports:
       - '9998:5432'
+    network_mode: host
 
   grenouilleapi:
     image: grenouilleapi
@@ -37,6 +38,7 @@ services:
     entrypoint: python3 /grenouille/backend/bot_app.py
     depends_on:
       - grenouilleapi_postgres
+    network_mode: host
 
   grenouilleapi_rtmp:
     image: grenouilleapi_rtmp

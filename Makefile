@@ -31,10 +31,10 @@ db-docker-stop:
 	docker-compose -p grenouille -f docker/docker-compose.yml down
 
 db-docker-upgrade:
-    docker run --network grenouille_default -e PYTHONPATH=$PYTHONPATH:/grenouille/backend/ -e FLASK_APP=grenouille/backend/app.py grenouilleapi flask db upgrade --directory grenouille/backend/migrations
+	docker run -e PYTHONPATH=$PYTHONPATH:/grenouille/backend/ -e FLASK_APP=grenouille/backend/app.py --network host grenouilleapi flask db upgrade --directory grenouille/backend/migrations
 
 db-docker-downgrade:
-    docker run --network grenouille_default -e PYTHONPATH=$PYTHONPATH:/grenouille/backend/ -e FLASK_APP=grenouille/backend/app.py grenouilleapi flask db downgrade --directory grenouille/backend/migrations
+	docker run -e PYTHONPATH=$PYTHONPATH:/grenouille/backend/ -e FLASK_APP=grenouille/backend/app.py --network host grenouilleapi flask db downgrade --directory grenouille/backend/migrations
 
 db-upgrade:
 	FLASK_APP=backend/app.py .venv/bin/flask db upgrade --directory backend/migrations
@@ -58,7 +58,7 @@ prod-stop:
 
 SCRIPT?=hello_world
 prod-script:
-	docker run --network grenouille_default -e FLASK_APP=grenouille/backend/app.py grenouilleapi python3 grenouille/backend/scripts.py $(SCRIPT)
+	docker run --network host -e FLASK_APP=grenouille/backend/app.py grenouilleapi python3 grenouille/backend/scripts.py $(SCRIPT)
 
 # DOCS
 refresh-docs:

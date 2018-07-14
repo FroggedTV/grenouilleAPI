@@ -52,7 +52,7 @@ COPY docker/grenouilleapi_rtmp/nginx.conf /etc/nginx/nginx.conf
 
 # Script file
 COPY backend/scripts/rtmp.py /grenouille/rtmp.py
-RUN pip3 install GrenouilleAPIClient==1.1.1
+RUN pip3 install GrenouilleAPIClient==1.1.1 requests
 
 EXPOSE 1935
 CMD ["nginx", "-g", "daemon off;"]

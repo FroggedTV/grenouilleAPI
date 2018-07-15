@@ -3,6 +3,7 @@
 #####################
 
 from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_openid import OpenID
@@ -20,6 +21,7 @@ def create_app():
     return app
 
 app = create_app()
+CORS(app)
 oid = OpenID(app, store_factory=lambda: None)
 migrate = Migrate(app, db)
 limiter = Limiter(

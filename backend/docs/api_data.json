@@ -2646,5 +2646,83 @@
     },
     "filename": "backend/routes/stream_system.py",
     "groupTitle": "StreamSystem"
+  },
+  {
+    "type": "get",
+    "url": "/api/user/me/details",
+    "title": "UserMeDetails",
+    "version": "1.1.1",
+    "name": "UserMeDetails",
+    "group": "User",
+    "description": "<p>Get detailed information of myself, scopes, id...</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "steam_id",
+            "description": "<p>Steam ID of the user.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes",
+            "description": "<p>List of scopes this user has access to.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/user.py",
+    "groupTitle": "User"
   }
 ]

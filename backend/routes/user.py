@@ -3,43 +3,33 @@ import logging
 from flask import request, jsonify
 from models import User
 
+from helpers.endpoint import secure
+
 def build_api_user(app):
     """Factory to setup the routes for the user api."""
 
-    # TODO REBUILD THESE ROUTES
-
-    #@app.route('/api/user/details', methods=['GET'])
-    def get_user_details():
+    @app.route('/api/user/me/details', methods=['GET'])
+    @secure(app, ['user'], [])
+    def get_user_me_details(auth_token):
         """
-        DEPRECATED
+        @api {get} /api/user/me/details UserMeDetails
+        @apiVersion 1.1.1
+        @apiName UserMeDetails
+        @apiGroup User
+        @apiDescription Get detailed information of myself, scopes, id...
 
-        api {get} /api/user/details UserGetDetails
-        apiVersion 1.0.4
-        apiName UserGetDetails
-        apiGroup User
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+
+        @apiSuccess {Integer} steam_id Steam ID of the user.
+        @apiSuccess {String[]} scopes List of scopes this user has access to.
         """
-        steam_id = request.args.get('id', None)
-        if steam_id is None:
-            return jsonify({'success': 'no',
-                            'error': 'MissingIdParameter',
-                            'payload': {}
-                            }), 200
-        try:
-            steam_id = int(steam_id)
-        except ValueError:
-            return jsonify({'success': 'no',
-                            'error': 'InvalidIdParameter',
-                            'payload': {}
-                            }), 200
-        user = User.get(steam_id)
-        if user is None:
-            return jsonify({'success': 'no',
-                            'error': 'UserNotFound',
-                            'payload': {}
-                            }), 200
-
         return jsonify({'success': 'yes',
                     'error': '',
                     'payload': {
-                        'id': str(user.id)
+                        'steam_id': auth_token['client']['steamid'],
+                        'scopes': auth_token['client']['scopes']
                     }}), 200

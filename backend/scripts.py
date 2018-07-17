@@ -4,7 +4,7 @@ import hashlib
 from flask_script import Manager
 
 from app import create_app
-from models import db, APIKey, APIKeyScope, User, UserScope, Game, GameStatus, GameVIP, GameVIPType
+from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType
 
 app = create_app()
 manager = Manager(app)
@@ -63,6 +63,9 @@ def add_scope_api_key(key, scope):
     if scope is None:
         print('No scope specified')
         return
+    if scope not in [x.value for x in list(Scope)]:
+        print('Invalid scope')
+        return
 
     salt = app.config['API_KEY_SALT']
     hash_object = hashlib.sha1((key + salt).encode('utf-8'))
@@ -90,6 +93,9 @@ def add_scope_user(id, scope):
     if scope is None:
         print('No scope specified')
         return
+    if scope not in [x.value for x in list(Scope)]:
+        print('Invalid scope')
+        return
     user = db.session().query(User).filter(User.id == id).one_or_none()
 
     if user is None:
@@ -97,6 +103,30 @@ def add_scope_user(id, scope):
     else:
         UserScope.upsert(user.id, scope)
         print('Scope added')
+
+@manager.option('--id', dest='id', default=None)
+@manager.option('--scope', dest='scope', default=None)
+def remove_scope_user(id, scope):
+    """Remove a scope to from steam ID.
+
+    Args:
+        id: user steam ID value.
+        scope: scope to remove.
+    """
+    if id is None:
+        print('No user steamId')
+        return
+    if scope is None:
+        print('No scope specified')
+        return
+    user_scope = db.session().query(UserScope).filter(UserScope.id==id, UserScope.scope==scope).one_or_none()
+
+    if user_scope is None:
+        print('UserScope not present!')
+    else:
+        db.session.delete(user_scope)
+        db.session.commit()
+        print('Scope removed')
 
 @manager.command
 def insert_all_vips():

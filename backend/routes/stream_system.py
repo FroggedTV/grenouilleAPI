@@ -240,7 +240,6 @@ def build_api_stream_system(app):
         """
         try:
             result = send_command_to_obs('StopStreaming', {})
-            logging.error(result)
             if ('status' in result
                     and result['status'] == 'error'
                     and result['error'] == 'streaming not active'):

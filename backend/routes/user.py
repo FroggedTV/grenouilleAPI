@@ -13,7 +13,7 @@ def build_api_user(app):
     def get_user_me_details(auth_token):
         """
         @api {get} /api/user/me/details UserMeDetails
-        @apiVersion 1.1.1
+        @apiVersion 1.1.0
         @apiName UserMeDetails
         @apiGroup User
         @apiDescription Get detailed information of myself, scopes, id...

@@ -679,6 +679,7 @@ def build_api_auth(app, oid):
         @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
         @apiError (Errors){String} OffsetInvalid Offset is not a positive integer in waited range.
 
+        @apiSuccess {Number} total Total number of users.
         @apiSuccess {Object[]} users All available users.
         @apiSuccess {String} users.id Id of the user.
         @apiSuccess {String[]} users.scopes List of scopes this user has access to.
@@ -702,6 +703,7 @@ def build_api_auth(app, oid):
                             }), 200
 
         # Return results
+        total = db.session().query(User).count()
         users = []
         for user in db.session().query(User)\
                                    .order_by(User.id.desc())\
@@ -715,6 +717,7 @@ def build_api_auth(app, oid):
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {
+                            'total': total,
                             'users': users
                         }
                         }), 200

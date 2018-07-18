@@ -1150,6 +1150,13 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users.</p>"
+          },
+          {
+            "group": "Success 200",
             "type": "Object[]",
             "optional": false,
             "field": "users",

@@ -758,11 +758,12 @@ def build_api_auth(app, oid):
                             'error': 'IdParameterMissing',
                             'payload': {}
                             }), 200
-        if not isinstance(id, int) or id <=0:
+        if not id.isdigit():
             return jsonify({'success': 'no',
                             'error': 'IdParameterInvalid',
                             'payload': {}
                             }), 200
+        id = int(id)
 
         # scopes checks
         scopes = data.get('scopes', None)
@@ -835,11 +836,12 @@ def build_api_auth(app, oid):
                             'error': 'IdParameterMissing',
                             'payload': {}
                             }), 200
-        if not isinstance(id, int) or id <=0:
+        if not id.isdigit():
             return jsonify({'success': 'no',
                             'error': 'IdParameterInvalid',
                             'payload': {}
                             }), 200
+        id = int(id)
 
         # scopes checks
         scopes = data.get('scopes', None)

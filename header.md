@@ -10,16 +10,26 @@ Refresh tokens are long lived (60 days) and must be saved in a secured place. Th
 
 ### Parameter format
 
-A typical curl command to access an endpoint is:
+A typical GET curl command to access an endpoint is:
 
 ```
-curl -X <COMMAND> --header "<HEADER>" -d "<JSON_PAYLOAD>" https://grenouilleapi.the-cluster.org/api/<ENDPOINT>
+curl -X GET --header "<HEADER>" https://grenouilleapi.the-cluster.org/api/<ENDPOINT>?data=<DATA>
 ```
 
-* `<COMMAND>` is `GET` or `POST`.
 * `<HEADER>` use the format `Authorization: Bearer <TOKEN>` with a valid `JWT` token.
 * `<ENDPOINT>` is a valid endpoint path.
-* `<JSON_PAYLOAD>` is the JSON payload in both `GET` and `POST` cases.
+* `<DATA>` is a JSON object representing parameters as a urlencoded string.
+
+
+A typical POST curl command to access an endpoint is:
+
+```
+curl -X POST --header "<HEADER>" -d "<JSON_PAYLOAD>" https://grenouilleapi.the-cluster.org/api/<ENDPOINT>
+```
+
+* `<HEADER>` use the format `Authorization: Bearer <TOKEN>` with a valid `JWT` token.
+* `<ENDPOINT>` is a valid endpoint path.
+* `<JSON_PAYLOAD>` is the JSON payload of data posted.
 
 ### Return format
 

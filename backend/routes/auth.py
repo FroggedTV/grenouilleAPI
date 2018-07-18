@@ -1,5 +1,6 @@
 import logging
 import re
+import json
 import jwt
 import hashlib
 
@@ -7,6 +8,7 @@ from datetime import datetime, timedelta
 from steam import SteamID
 
 from flask import jsonify, redirect, request
+from helpers.general import safe_json_loads
 from helpers.endpoint import secure
 from models import db, User, APIKey, UserScope, APIKeyScope, Scope
 
@@ -262,7 +264,7 @@ def build_api_auth(app, oid):
         @apiSuccess {String} keys.description API Key description.
         @apiSuccess {String[]} keys.scopes List of scopes this KEY has access to.
         """
-        data = request.get_json(force=True)
+        data = safe_json_loads(request.args.get('data', '{}'))
 
         # limit check
         limit = data.get('limit', 10)
@@ -684,7 +686,7 @@ def build_api_auth(app, oid):
         @apiSuccess {String} users.id Id of the user.
         @apiSuccess {String[]} users.scopes List of scopes this user has access to.
         """
-        data = request.get_json(force=True)
+        data = safe_json_loads(request.args.get('data', '{}'))
 
         # limit check
         limit = data.get('limit', 10)

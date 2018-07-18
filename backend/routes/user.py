@@ -3,6 +3,7 @@ import logging
 from flask import request, jsonify
 from models import User
 
+from helpers.general import safe_json_loads
 from helpers.endpoint import secure
 
 def build_api_user(app):

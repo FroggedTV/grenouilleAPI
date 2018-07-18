@@ -1,7 +1,16 @@
 import requests
 import base64
+import json
 
 from models import GameVIPType
+
+def safe_json_loads(string):
+    """Loads a JSON or return empty JSON."""
+    try:
+        data = json.loads(request.args.get('data', '{}'))
+        return data
+    except Exception:
+        return {}
 
 def url_image_to_base64(url):
     response = requests.get(url)

@@ -2,6 +2,8 @@
 # Application Setup #
 #####################
 
+import logging
+
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
@@ -55,28 +57,35 @@ build_api_stream_system(app)
 # Default Error Routes #
 ########################
 
+@app.errorhandler(400)
+def unauthorized(e):
+    return jsonify({'success': 'no',
+                    'error': 'HTTP400-InvalidRequest',
+                    'payload': {}}), 200
+
+
 @app.errorhandler(401)
 def unauthorized(e):
     return jsonify({'success': 'no',
-                    'error': 'AuthorizationError',
+                    'error': 'HTTP401-AuthorizationError',
                     'payload': {}}), 200
 
 @app.errorhandler(404)
 def unknown(e):
     return jsonify({'success': 'no',
-                    'error': 'UnknownEndpoint',
+                    'error': 'HTTP404-UnknownEndpoint',
                     'payload': {}}), 200
 
 @app.errorhandler(405)
 def unknown(e):
     return jsonify({'success': 'no',
-                    'error': 'WrongMethodOnEndpoint',
+                    'error': 'HTTP405-WrongMethodOnEndpoint',
                     'payload': {}}), 200
 
 @app.errorhandler(429)
 def rate_limit_handler(e):
     return jsonify({'success': 'no',
-                    'error': 'RequestRateLimit',
+                    'error': 'HTTP429-RequestRateLimit',
                     'payload': {}}), 200
 
 ############################

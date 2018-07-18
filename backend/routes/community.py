@@ -3,6 +3,8 @@ import logging
 from flask import request, jsonify
 from models import User
 
+from helpers.general import safe_json_loads
+
 def build_api_community(app):
     """Factory to setup the routes for the community api."""
 

@@ -31,6 +31,6 @@ def build_api_user(app):
         return jsonify({'success': 'yes',
                     'error': '',
                     'payload': {
-                        'steam_id': auth_token['client']['steamid'],
+                        'steam_id': str(auth_token['client']['steamid']),
                         'scopes': auth_token['client']['scopes']
                     }}), 200

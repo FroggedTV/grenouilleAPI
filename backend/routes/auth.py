@@ -715,7 +715,7 @@ def build_api_auth(app, oid):
             scopes = []
             for scope in db.session().query(UserScope).filter(UserScope.id==user.id).all():
                 scopes.append(scope.scope)
-            users.append({ 'id': user.id, 'scopes': scopes })
+            users.append({ 'id': str(user.id), 'scopes': scopes })
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {

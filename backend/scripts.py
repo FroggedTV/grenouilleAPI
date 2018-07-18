@@ -80,12 +80,14 @@ def add_scope_api_key(key, scope):
 
 @manager.option('--id', dest='id', default=None)
 @manager.option('--scope', dest='scope', default=None)
-def add_scope_user(id, scope):
+@manager.option('--force', dest='force', default=False)
+def add_scope_user(id, scope, force):
     """Add a scope to a steam ID.
 
     Args:
         id: user steam ID value.
         scope: scope to add.
+        force: force adding user to database.
     """
     if id is None:
         print('No user steamId')
@@ -99,10 +101,16 @@ def add_scope_user(id, scope):
     user = db.session().query(User).filter(User.id == id).one_or_none()
 
     if user is None:
-        print('User not present!')
-    else:
-        UserScope.upsert(user.id, scope)
-        print('Scope added')
+        if force is False:
+            print('User not present!')
+            return
+        else:
+            user = User(id)
+            db.session.add(user)
+            db.session.commit()
+
+    UserScope.upsert(user.id, scope)
+    print('Scope added')
 
 @manager.option('--id', dest='id', default=None)
 @manager.option('--scope', dest='scope', default=None)

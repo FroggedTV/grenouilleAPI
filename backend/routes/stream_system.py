@@ -353,13 +353,14 @@ def build_api_stream_system(app):
         """
         try:
             vod_files = []
-            for root, dirs, files in os.walk(app.config['VOD_PATH']):
+            for root, dirs, files in os.walk(app.config['VOD_PATH'], ):
+                dirs.sort()
                 for dir in dirs:
                     vod_files.append({
                         'filename': os.path.join(root, dir)[len(app.config['VOD_PATH'])+1:],
                         'type': 'dir'
                     })
-                for file in files:
+                for file in sorted(files):
                     vod_files.append({
                         'filename': os.path.join(root, file)[len(app.config['VOD_PATH'])+1:],
                         'type': 'file',

@@ -168,7 +168,7 @@ def build_api_auth(app, oid):
             'client': {
                 'type': refresh_token['client']['type']
             },
-            'exp': datetime.utcnow() + timedelta(hours=1)
+            'exp': datetime.utcnow() + timedelta(minutes=15)
         }
 
         if refresh_token['client']['type'] == 'user':

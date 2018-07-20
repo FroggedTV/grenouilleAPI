@@ -6,7 +6,7 @@ Some endpoints are free to use but most of them are protected in 2 possible ways
 * If the application is a web based application where the user needs to login, this application will use the `RefreshTokenGetWithSteam` endpoint to get a `JWT`.
 * In other cases, the application with use an application key to get a `JWT`, using `RefreshTokenGetWithKey` endpoint.
 
-Refresh tokens are long lived (60 days) and must be saved in a secured place. They give access to `AuthTokenGet` endpoint, generating a Auth token. This token is short lived (1 hour) and contains user scopes (endpoint restrictions).
+Refresh tokens are long lived (60 days) and must be saved in a secured place. They give access to `AuthTokenGet` endpoint, generating a Auth token. This token is short lived (15 min) and contains user scopes (endpoint restrictions).
 
 ### Parameter format
 

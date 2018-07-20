@@ -621,8 +621,9 @@ def build_api_stream_system(app):
                 return jsonify({'success': 'no',
                                 'error': 'InternalOBSError',
                                 'payload': {}}), 200
+            len_path = len(app.config['OBS_PLAYLIST_PATH']) + 1
             for file in result['sourceSettings']['playlist']:
-                files.append(file['value'])
+                files.append(file['value'][len_path:])
             return jsonify({'success': 'yes',
                             'error': '',
                             'payload': {
@@ -681,7 +682,7 @@ def build_api_stream_system(app):
                                     'file': file
                                 }
                                 }), 200
-        path_files = [{ 'value': os.path.join(app.config['VOD_PATH'], x)} for x in files]
+        path_files = [{ 'value': os.path.join(app.config['OBS_PLAYLIST_PATH'], x)} for x in files]
 
         try:
             result = send_command_to_obs('SetSourceSettings', {'sourceName': 'RediffPlaylist',

@@ -380,7 +380,7 @@ def build_api_stream_system(app):
 
 
     @app.route('/api/vod/file/delete', methods=['POST'])
-    @secure(app, ['key', 'user'], ['vod_manage'])
+    @secure(app, ['key', 'user'], ['vod_delete'])
     def post_vod_file_delete(auth_token):
         """
         @api {post} /api/vod/file/delete VODFileDelete
@@ -448,7 +448,7 @@ def build_api_stream_system(app):
                         'payload': {}}), 200
 
     @app.route('/api/vod/dir/create', methods=['POST'])
-    @secure(app, ['key', 'user'], ['vod_manage'])
+    @secure(app, ['key', 'user'], ['vod_delete'])
     def post_vod_dir_create(auth_token):
         """
         @api {post} /api/vod/dir/create VODDirCreate

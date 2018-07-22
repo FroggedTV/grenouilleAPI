@@ -112,6 +112,18 @@ def add_scope_user(id, scope, force):
     UserScope.upsert(user.id, scope)
     print('Scope added')
 
+@manager.command
+def clean_rogue_scopes():
+    """Clean rogue scopes from database."""
+    all_scopes = [x.value for x in list(Scope)]
+    for user_scope in db.session.query(UserScope).all():
+        if user_scope.scope not in all_scopes:
+            db.session.delete(user_scope)
+    for key_scope in db.session.query(APIKeyScope).all():
+        if key_scope.scope not in all_scopes:
+            db.session.delete(key_scope)
+    db.session.commit()
+
 @manager.option('--id', dest='id', default=None)
 @manager.option('--scope', dest='scope', default=None)
 def remove_scope_user(id, scope):

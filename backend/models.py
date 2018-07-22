@@ -71,10 +71,13 @@ class APIKey(db.Model):
         return APIKey.query.filter_by(key_hash=key_hash).one_or_none()
 
 class Scope(enum.Enum):
-    API_KEY_SCOPE = 'api_key_scope'         # Management of the API_KEYs
-    USER_SCOPE = 'user_scope'               # Management of the user rights
-    OBS_CONTROL = 'obs_control'             # Send commands to OBS
-    VOD_MANAGE = 'vod_manage'               # Manage VODs on disk
+    API_KEY_SCOPE = 'api_key_scope'           # Management of the API_KEYs
+    USER_SCOPE = 'user_scope'                 # Management of the user rights
+    OBS_CONTROL = 'obs_control'               # Send commands to OBS
+    VOD_MANAGE = 'vod_manage'                 # Manage VODs on disk
+    VOD_DELETE = 'vod_delete'                 # Delete VODs on disk
+    STATS_MANAGE = 'stats_manage'             # Work on stats
+    STATS_MANAGE_SCENE = 'stats_manage_scene' # Modify the stat displayed on scene
 
 class UserScope(db.Model):
     """All scopes available for a user.

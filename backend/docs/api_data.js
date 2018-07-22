@@ -1652,6 +1652,78 @@ define({ "api": [
     "groupTitle": "StreamSystem"
   },
   {
+    "type": "post",
+    "url": "/api/obs/rtmp/restart",
+    "title": "OBSRestartRTMP",
+    "version": "1.1.0",
+    "name": "OBSRestartRTMP",
+    "group": "StreamSystem",
+    "description": "<p>Force the restart of the RTMP docker image.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "DockerClientError",
+            "description": "<p>Impossible to manipulate docker with client.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
     "type": "get",
     "url": "/api/obs/scene/list",
     "title": "OBSSceneList",

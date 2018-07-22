@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import docker
 
 from flask import request, jsonify
 
@@ -704,3 +705,34 @@ def build_api_stream_system(app):
             return jsonify({'success': 'no',
                             'error': 'InternalOBSError',
                             'payload': {}}), 200
+
+    @app.route('/api/obs/rtmp/restart', methods=['POST'])
+    @secure(app, ['key', 'user'], ['obs_control'])
+    def post_restart_rtmp(auth_token):
+        """
+        @api {post} /api/obs/rtmp/restart OBSRestartRTMP
+        @apiVersion 1.1.0
+        @apiName OBSRestartRTMP
+        @apiGroup StreamSystem
+        @apiDescription Force the restart of the RTMP docker image.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiError (Errors){String} DockerClientError Impossible to manipulate docker with client.
+        """
+        client = docker.DockerClient("unix://var/run/docker.sock")
+        try:
+            client.containers.get('grenouilleapi_rtmp').restart(timeout=2)
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                            'error': 'DockerClientError',
+                            'payload': {}}), 200
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}}), 200

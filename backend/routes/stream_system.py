@@ -577,7 +577,6 @@ def build_api_stream_system(app):
                                 }), 200
 
             path_root = os.path.abspath(os.path.join(app.config['VOD_PATH'], destination, os.pardir))
-            logging.error(path_root)
             if not os.path.isdir(path_root):
                 return jsonify({'success': 'no',
                                 'error': 'DestinationRootDirectoryMissing',

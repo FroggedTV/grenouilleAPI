@@ -46,12 +46,14 @@ from routes.auth import build_api_auth
 from routes.game import build_api_game
 from routes.community import build_api_community
 from routes.stream_system import build_api_stream_system
+from routes.stats import build_api_stats
 
 build_api_auth(app, oid)
 build_api_user(app)
 build_api_game(app)
 build_api_community(app)
 build_api_stream_system(app)
+build_api_stats(app)
 
 ########################
 # Default Error Routes #

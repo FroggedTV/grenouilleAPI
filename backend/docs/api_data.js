@@ -1304,6 +1304,210 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/stats/csv/get",
+    "title": "StatsCSVGet",
+    "version": "1.1.0",
+    "name": "StatsCSVGet",
+    "group": "Stats",
+    "description": "<p>Get CSV saved for stats.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyInvalid",
+            "description": "<p>key is not a valid string.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDataDoesntExist",
+            "description": "<p>key has no data associated.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>CSV key to get.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "csv",
+            "description": "<p>CSVData associated to the key.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
+    "url": "/api/stats/csv/update",
+    "title": "StatsCSVUpdate",
+    "version": "1.1.0",
+    "name": "StatsCSVUpdate",
+    "group": "Stats",
+    "description": "<p>Update CSV saved for stats.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyInvalid",
+            "description": "<p>key is not a valid string.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ValueInvalid",
+            "description": "<p>value is not a valid string.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>CSV key to get.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "value",
+            "description": "<p>CSV data.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
     "url": "/api/obs/playlist/get",
     "title": "OBSPlaylistGet",
     "version": "1.1.0",

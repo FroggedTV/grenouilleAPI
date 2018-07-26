@@ -334,3 +334,22 @@ class DynamicConfiguration(db.Model):
         dc.value = value
         db.session().commit()
         return dc
+
+class CSVData(db.Model):
+    """CSV Holders"""
+    __tablename__= 'csv_data'
+
+    key = db.Column(db.String(), primary_key=True)
+    value = db.Column(db.Text(), nullable=False)
+
+    def __init__(self, key):
+        self.key = key
+
+    @staticmethod
+    def upsert(key, value):
+        data = db.session.query(CSVData).filter(CSVData.key==key).one_or_none()
+        if data is None:
+            data = CSVData(key)
+            db.session.add(data)
+        data.value = value
+        db.session.commit()

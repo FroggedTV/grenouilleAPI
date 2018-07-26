@@ -15,3 +15,4 @@ Flask-Limiter==1.0.1
 websocket-client
 grenouilleAPIClient==1.1.1
 docker==3.4.1
+Pillow==5.2.0

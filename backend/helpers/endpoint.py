@@ -39,13 +39,13 @@ def secure(app, type, scopes):
                 return jsonify({'success': 'no',
                                 'error': 'AuthTokenExpired',
                                 'payload': {}
-                                }), 200
+                                }), 401
             except Exception as e:
                 logging.error(e)
                 return jsonify({'success': 'no',
                                 'error': 'AuthTokenInvalid',
                                 'payload': {}
-                                }), 200
+                                }), 401
             if auth_token['client']['type'] not in type:
                 return jsonify({'success': 'no',
                                 'error': 'ClientAccessImpossible',

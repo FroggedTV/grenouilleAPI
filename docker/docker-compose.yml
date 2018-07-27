@@ -15,6 +15,20 @@ services:
       - '9998:5432'
     network_mode: host
 
+  grenouilleapiti_postgres:
+    image: grenouilleapiti_postgres
+    container_name: "grenouilleapiti_postgres"
+    restart: always
+    build:
+      context: grenouilleapi_postgres
+    volumes:
+      - "/home/docker/grenouilleapiti_postgres/data:/var/lib/postgresql/data"
+    env_file:
+      - './grenouilleapi_postgres/conf.env'
+    ports:
+      - '9996:5432'
+    network_mode: host
+  
   grenouilleapi:
     image: grenouilleapi
     container_name: "grenouilleapi"

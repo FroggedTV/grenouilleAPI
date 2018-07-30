@@ -28,7 +28,7 @@ services:
     ports:
       - '9996:5432'
     network_mode: host
-  
+
   grenouilleapi:
     image: grenouilleapi
     container_name: "grenouilleapi"

@@ -27,7 +27,6 @@ services:
       - './grenouilleapi_postgres/conf.env'
     ports:
       - '9996:5432'
-    network_mode: host
 
   grenouilleapi:
     image: grenouilleapi

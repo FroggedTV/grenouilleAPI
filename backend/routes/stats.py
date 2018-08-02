@@ -149,6 +149,11 @@ def build_api_stats(app):
         @apiParam {String} key CSV key to generate.
         @apiError (Errors){String} KeyInvalid key is not a valid string.
         @apiError (Errors){String} KeyDataDoesntExist key has no data associated.
+
+        @apiParam {Number} [team_id] Optional team id to refine the generation with.
+        @apiError (Errors){String} TeamIdInvalid key is not a valid string.
+        @apiParam {Number} [player_id] Optional player id to refine the generation with.
+        @apiError (Errors){String} PlayerIdInvalid key is not a valid string.
         """
         data = request.get_json(force=True)
 
@@ -166,10 +171,41 @@ def build_api_stats(app):
                             'error': 'KeyDataDoesntExist',
                             'payload': {}
                             }), 200
-        else:
-            ig.generate_csv_image(key)
-            return jsonify({'success': 'yes',
-                            'error': '',
+
+        # Optional parameters check
+        team_id = data.get('team_id', '0')
+        if len(team_id) == 0 or not team_id.isdigit():
+            return jsonify({'success': 'no',
+                            'error': 'TeamIdInvalid',
                             'payload': {}
                             }), 200
+        team_id = int(team_id)
+        if team_id < 0:
+            return jsonify({'success': 'no',
+                            'error': 'TeamIdInvalid',
+                            'payload': {}
+                            }), 200
+        elif team_id == 0:
+            team_id = None
 
+        player_id = data.get('player_id', '0')
+        if len(player_id) == 0 or not player_id.isdigit():
+            return jsonify({'success': 'no',
+                            'error': 'PlayerIdInvalid',
+                            'payload': {}
+                            }), 200
+        player_id = int(player_id)
+        if player_id < 0:
+            return jsonify({'success': 'no',
+                            'error': 'PlayerIdInvalid',
+                            'payload': {}
+                            }), 200
+        elif player_id == 0:
+            player_id = None
+
+        # Generate
+        ig.generate_csv_image(key, team_id, player_id)
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {}
+                        }), 200

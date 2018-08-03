@@ -4,7 +4,7 @@ import os
 from io import StringIO
 
 from flask import request, jsonify, send_file
-from models import db, CSVData
+from models import db, CSVData, DynamicConfiguration
 
 from helpers.general import safe_json_loads
 from helpers.endpoint import secure
@@ -208,4 +208,188 @@ def build_api_stats(app):
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {}
+                        }), 200
+
+    @app.route('/api/stats/scene/status/get', methods=['GET'])
+    @secure(app, ['key', 'user'], ['stats_manage_scene'])
+    def get_stats_scene_status(auth_token):
+        """
+        @api {get} /api/stats/scene/status/get StatsSceneStatusGet
+        @apiVersion 1.1.0
+        @apiName StatsSceneStatusGet
+        @apiGroup Stats
+        @apiDescription Get the status of the stat scene.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiSuccess {Boolean} activated Boolean to show if the stat scene is activated or disabled.
+        """
+
+        stats_scene_status_dc = db.session.query(DynamicConfiguration).filter(DynamicConfiguration.key=='stats_scene_status').one_or_none()
+        if stats_scene_status_dc is None:
+            stats_scene_status = 'False'
+        else:
+            stats_scene_status = stats_scene_status_dc.value
+
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {
+                            'activated': stats_scene_status == 'True'
+                        }
+                        }), 200
+
+    @app.route('/api/stats/scene/status/update', methods=['POST'])
+    @secure(app, ['key', 'user'], ['stats_manage_scene'])
+    def post_stats_scene_status(auth_token):
+        """
+        @api {get} /api/stats/scene/status/update StatsSceneStatusUpdate
+        @apiVersion 1.1.0
+        @apiName StatsSceneStatusUpdate
+        @apiGroup Stats
+        @apiDescription Update the status of the stat scene.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {Boolean} activated New value of the stat scene status.
+        @apiError (Errors){String} ActivatedInvalid activated is not a valid boolean.
+
+        @apiSuccess {Boolean} activated Boolean to show if the stat scene is activated or disabled.
+        """
+        data = request.get_json(force=True)
+
+        # activated check
+        activated = data.get('activated', False)
+        if not isinstance(activated, bool):
+            return jsonify({'success': 'no',
+                            'error': 'ActivatedInvalid',
+                            'payload': {}
+                            }), 200
+
+        # change scene status
+        stats_scene_status_dc = db.session.query(DynamicConfiguration).filter(DynamicConfiguration.key=='stats_scene_status').one_or_none()
+        if stats_scene_status_dc is None:
+            stats_scene_status_dc = DynamicConfiguration('stats_scene_status', str(activated))
+            db.session.add(stats_scene_status_dc)
+        else:
+            stats_scene_status_dc.value = str(activated)
+        db.session.commit()
+
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {
+                            'activated': stats_scene_status_dc.value == 'True'
+                        }
+                        }), 200
+
+
+    @app.route('/api/stats/scene/get', methods=['GET'])
+    def get_stats_scene():
+        """
+        @api {get} /api/stats/scene/get StatsSceneGet
+        @apiVersion 1.1.0
+        @apiName StatsSceneGet
+        @apiGroup Stats
+        @apiDescription Get the stat image.
+
+        @apiSuccess {String} img Image to use in the stat scene.
+        @apiSuccess {String} last_modified Last time the file was modified.
+        @apiSuccess {Boolean} continue Should the stat scene user continue.
+        """
+        stats_scene_dc = db.session.query(DynamicConfiguration).filter(DynamicConfiguration.key=='stats_scene').one_or_none()
+        if stats_scene_dc is None:
+            stats_scene = 'empty'
+        else:
+            stats_scene = stats_scene_dc.value
+        db.session.commit()
+
+        path_file = os.path.join(app.config['IMG_GENERATE_PATH'], stats_scene + '.png')
+        if not os.path.isfile(path_file):
+            last_modified = ''
+        else:
+            last_modified = os.path.getmtime(path_file)
+
+        # Give status inside
+        stats_scene_status_dc = db.session.query(DynamicConfiguration).filter(DynamicConfiguration.key=='stats_scene_status').one_or_none()
+        if stats_scene_status_dc is None:
+            stats_scene_status = 'False'
+        else:
+            stats_scene_status = stats_scene_status_dc.value
+
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {
+                            'continue': stats_scene_status == 'True',
+                            'img': stats_scene,
+                            'last_modified': last_modified
+                        }
+                        }), 200
+
+    @app.route('/api/stats/scene/update', methods=['POST'])
+    @secure(app, ['key', 'user'], ['stats_manage_scene'])
+    def post_stats_scene(auth_token):
+        """
+        @api {get} /api/stats/scene/update StatsSceneUpdate
+        @apiVersion 1.1.0
+        @apiName StatsSceneUpdate
+        @apiGroup Stats
+        @apiDescription Update the stat scene.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiParam {String} img New scene.
+        @apiError (Errors){String} ImgInvalid img is not a valid string.
+        @apiError (Errors){String} ImgNoFile img is not a valid file image.
+
+        @apiSuccess {String} img Image to show appended with a cache bang.
+        @apiSuccess {String} last_modified Last time the file was modified.
+        """
+        data = request.get_json(force=True)
+
+        # activated check
+        img = data.get('img', '')
+        if not isinstance(img, str) or len(img) <= 0:
+            return jsonify({'success': 'no',
+                            'error': 'ImgInvalid',
+                            'payload': {}
+                            }), 200
+
+        # change scene
+        stats_scene_status_dc = db.session.query(DynamicConfiguration).filter(DynamicConfiguration.key=='stats_scene').one_or_none()
+        if stats_scene_status_dc is None:
+            stats_scene_status_dc = DynamicConfiguration('stats_scene', img)
+            db.session.add(stats_scene_status_dc)
+
+        # File look on disk
+        path_file = os.path.join(app.config['IMG_GENERATE_PATH'], img + '.png')
+        if not os.path.isfile(path_file):
+            return jsonify({'success': 'no',
+                            'error': 'ImgNoFile',
+                            'payload': {}
+                            }), 200
+
+        last_modified = os.path.getmtime(path_file)
+        stats_scene_status_dc.value = img
+        db.session.commit()
+
+        return jsonify({'success': 'yes',
+                        'error': '',
+                        'payload': {
+                            'img': stats_scene_status_dc.value,
+                            'last_modified': last_modified
+                        }
                         }), 200

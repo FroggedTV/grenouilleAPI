@@ -1304,6 +1304,126 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/stats/img/generate",
+    "title": "StatsCSVGenerateIMG",
+    "version": "1.1.0",
+    "name": "StatsCSVGenerateIMG",
+    "group": "Stats",
+    "description": "<p>Start the generation of CSV image.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyInvalid",
+            "description": "<p>key is not a valid string.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "KeyDataDoesntExist",
+            "description": "<p>key has no data associated.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "TeamIdInvalid",
+            "description": "<p>key is not a valid string.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "PlayerIdInvalid",
+            "description": "<p>key is not a valid string.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "key",
+            "description": "<p>CSV key to generate.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "team_id",
+            "description": "<p>Optional team id to refine the generation with.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "player_id",
+            "description": "<p>Optional player id to refine the generation with.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
     "url": "/api/stats/csv/get",
     "title": "StatsCSVGet",
     "version": "1.1.0",
@@ -1479,6 +1599,13 @@ define({ "api": [
             "optional": false,
             "field": "ValueInvalid",
             "description": "<p>value is not a valid string.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ValueCSVInvalid",
+            "description": "<p>value CSV is not a valid same length column csv.</p>"
           }
         ]
       }
@@ -1499,6 +1626,332 @@ define({ "api": [
             "optional": false,
             "field": "value",
             "description": "<p>CSV data.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
+    "url": "/api/stats/scene/get",
+    "title": "StatsSceneGet",
+    "version": "1.1.0",
+    "name": "StatsSceneGet",
+    "group": "Stats",
+    "description": "<p>Get the stat image.</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "img",
+            "description": "<p>Image to use in the stat scene.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "last_modified",
+            "description": "<p>Last time the file was modified.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "continue",
+            "description": "<p>Should the stat scene user continue.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
+    "url": "/api/stats/scene/status/get",
+    "title": "StatsSceneStatusGet",
+    "version": "1.1.0",
+    "name": "StatsSceneStatusGet",
+    "group": "Stats",
+    "description": "<p>Get the status of the stat scene.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "activated",
+            "description": "<p>Boolean to show if the stat scene is activated or disabled.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
+    "url": "/api/stats/scene/status/update",
+    "title": "StatsSceneStatusUpdate",
+    "version": "1.1.0",
+    "name": "StatsSceneStatusUpdate",
+    "group": "Stats",
+    "description": "<p>Update the status of the stat scene.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ActivatedInvalid",
+            "description": "<p>activated is not a valid boolean.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": false,
+            "field": "activated",
+            "description": "<p>New value of the stat scene status.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "activated",
+            "description": "<p>Boolean to show if the stat scene is activated or disabled.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stats.py",
+    "groupTitle": "Stats"
+  },
+  {
+    "type": "get",
+    "url": "/api/stats/scene/update",
+    "title": "StatsSceneUpdate",
+    "version": "1.1.0",
+    "name": "StatsSceneUpdate",
+    "group": "Stats",
+    "description": "<p>Update the stat scene.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ImgInvalid",
+            "description": "<p>img is not a valid string.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ImgNoFile",
+            "description": "<p>img is not a valid file image.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "img",
+            "description": "<p>New scene.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "img",
+            "description": "<p>Image to show appended with a cache bang.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "last_modified",
+            "description": "<p>Last time the file was modified.</p>"
           }
         ]
       }

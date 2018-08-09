@@ -49,6 +49,31 @@ class ImageGenerator:
 
             # Generate image
             composition = Image.open(os.path.join(os.path.dirname(__file__), 'img_ressources', 'preti8_teams-background.png')).convert('RGBA')
+
+            logo_array = {
+                '5': { 'position': [400, 650], 'size': [None, 700], 'suffix': ''},
+                '15': { 'position': [300, 650], 'size': [None, 700], 'suffix': '' },
+                '39': { 'position': [400, 650], 'size': [None, 600], 'suffix': '' },
+                '67': { 'position': [400, 650], 'size': [None, 600], 'suffix': '' },
+                '2163': { 'position': [400, 650], 'size': [None, 600], 'suffix': '' },
+                '350190': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '543897': { 'position': [400, 700], 'size': [None, 700], 'suffix': '' },
+                '726228': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '1375614': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '1838315': { 'position': [400, 650], 'size': [None, 500], 'suffix': '' },
+                '1883502': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '2108395': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '2586976': { 'position': [350, 650], 'size': [None, 700], 'suffix': '' },
+                '5026801': { 'position': [375, 630], 'size': [None, 700], 'suffix': '-white' },
+                '5027210': { 'position': [400, 700], 'size': [None, 700], 'suffix': '-white' },
+                '5066616': { 'position': [400, 700], 'size': [None, 500], 'suffix': '' },
+                '5228654': { 'position': [350, 650], 'size': [None, 700], 'suffix': '-white' },
+                '5229127': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+            }
+            composition = self.draw_team_logo(composition,
+                                              row[header['teamid']] + logo_array[row[header['teamid']]]['suffix'],
+                                              logo_array[row[header['teamid']]]['position'],
+                                              logo_array[row[header['teamid']]]['size'])
             image_draw = ImageDraw.Draw(composition)
 
             rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
@@ -89,9 +114,6 @@ class ImageGenerator:
             self.draw_text_outlined(image_draw, [row_4_x, row_2_y + row_2_inc-5], '$ ' + row[header['gains']], font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
 
-            # LOGO
-            # composition = self.draw_team_logo(composition, row[header['teamid']], [400, 400],  [None, 100])
-
             composition.save(image_path)
 
     def generate_csv_preti8_players(self, player_id = None):
@@ -112,6 +134,30 @@ class ImageGenerator:
 
             # Generate image
             composition = Image.open(os.path.join(os.path.dirname(__file__), 'img_ressources', 'preti8_players-background.png')).convert('RGBA')
+            logo_array = {
+                '5': { 'position': [400, 650], 'size': [None, 700], 'suffix': ''},
+                '15': { 'position': [300, 650], 'size': [None, 700], 'suffix': '' },
+                '39': { 'position': [400, 650], 'size': [None, 600], 'suffix': '' },
+                '67': { 'position': [400, 650], 'size': [None, 600], 'suffix': '' },
+                '2163': { 'position': [400, 650], 'size': [None, 600], 'suffix': '' },
+                '350190': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '543897': { 'position': [400, 700], 'size': [None, 700], 'suffix': '' },
+                '726228': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '1375614': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '1838315': { 'position': [400, 650], 'size': [None, 500], 'suffix': '' },
+                '1883502': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '2108395': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+                '2586976': { 'position': [350, 650], 'size': [None, 700], 'suffix': '' },
+                '5026801': { 'position': [375, 630], 'size': [None, 700], 'suffix': '-white' },
+                '5027210': { 'position': [400, 700], 'size': [None, 700], 'suffix': '-white' },
+                '5066616': { 'position': [400, 700], 'size': [None, 500], 'suffix': '' },
+                '5228654': { 'position': [350, 650], 'size': [None, 700], 'suffix': '-white' },
+                '5229127': { 'position': [400, 650], 'size': [None, 700], 'suffix': '' },
+            }
+            composition = self.draw_team_logo(composition,
+                                              row[header['teamid']] + logo_array[row[header['teamid']]]['suffix'],
+                                              logo_array[row[header['teamid']]]['position'],
+                                              logo_array[row[header['teamid']]]['size'])
             image_draw = ImageDraw.Draw(composition)
 
             rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
@@ -130,20 +176,22 @@ class ImageGenerator:
             row_2_x = row_1_x + 40
             row_2_y = 330
             row_2_inc = 225
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y], 'Héros', rift_bold_sub, white)
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_line], 'Signature', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y], 'Héro du', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_line], 'Moment', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc], 'Networth', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc + row_1_line], 'Moyen', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc], 'Nombre de', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc + row_1_line], 'héros joués', rift_bold_sub, white)
-            self.draw_text_outlined(image_draw, [row_2_x, row_2_y-5], row[header['hero_signature']].replace('_', ' '), font=rift_bold_title, fill=green,
+            self.draw_text_outlined(image_draw, [row_2_x, row_2_y-5], row[header['hero_privilegie']].replace('_', ' '), font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y + row_2_inc-5], row[header['networth']], font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y + 2*row_2_inc-5], row[header['nombre_heros']], font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
 
-            composition = self.draw_minimap_hero(composition, row[header['hero_signature']], [1800, 130], [None, 150])
+            composition = self.draw_minimap_hero(composition, row[header['hero_privilegie']], [1450, 130], [None, 150])
+            composition = self.draw_minimap_hero(composition, row[header['hero_signature_1']], [1600, 130], [None, 150])
+            composition = self.draw_minimap_hero(composition, row[header['hero_signature_2']], [1750, 130], [None, 150])
 
             composition.save(image_path)
 
@@ -209,6 +257,7 @@ class ImageGenerator:
                             box=[position[0] - int(team_logo.size[0] / 2),
                                  position[1] - int(team_logo.size[1] / 2)],
                             mask=team_logo)
+        in_place_logo = Image.blend(Image.new('RGBA', (composition.size[0], composition.size[1])), in_place_logo, 0.7)
         return Image.alpha_composite(composition, in_place_logo)
 
     @staticmethod

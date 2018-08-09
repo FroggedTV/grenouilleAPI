@@ -184,7 +184,7 @@ class ImageGenerator:
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc + row_1_line], 'héros joués', rift_bold_sub, white)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y-5], row[header['hero_privilegie']].replace('_', ' '), font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
-            self.draw_text_outlined(image_draw, [row_2_x, row_2_y + row_2_inc-5], row[header['networth']], font=rift_bold_title, fill=green,
+            self.draw_text_outlined(image_draw, [row_2_x, row_2_y + row_2_inc-5], row[header['networth']] + ' K', font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y + 2*row_2_inc-5], row[header['nombre_heros']], font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)

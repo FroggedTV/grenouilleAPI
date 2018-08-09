@@ -291,7 +291,6 @@ def build_api_stats(app):
                         }
                         }), 200
 
-
     @app.route('/api/stats/scene/get', methods=['GET'])
     def get_stats_scene():
         """

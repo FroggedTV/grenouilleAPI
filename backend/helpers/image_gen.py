@@ -73,7 +73,8 @@ class ImageGenerator:
             composition = self.draw_team_logo(composition,
                                               row[header['teamid']] + logo_array[row[header['teamid']]]['suffix'],
                                               logo_array[row[header['teamid']]]['position'],
-                                              logo_array[row[header['teamid']]]['size'])
+                                              logo_array[row[header['teamid']]]['size'],
+                                              0.7)
             image_draw = ImageDraw.Draw(composition)
 
             rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
@@ -157,7 +158,8 @@ class ImageGenerator:
             composition = self.draw_team_logo(composition,
                                               row[header['teamid']] + logo_array[row[header['teamid']]]['suffix'],
                                               logo_array[row[header['teamid']]]['position'],
-                                              logo_array[row[header['teamid']]]['size'])
+                                              logo_array[row[header['teamid']]]['size'],
+                                              0.7)
             image_draw = ImageDraw.Draw(composition)
 
             rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
@@ -212,37 +214,95 @@ class ImageGenerator:
         composition = Image.open(os.path.join(os.path.dirname(__file__), 'img_ressources', 'ti8_group-background.png')).convert('RGBA')
         image_draw = ImageDraw.Draw(composition)
 
+        rift_bold_title = ImageFont.truetype(
+            os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'),
+            120)
+        rift_regular_sub = ImageFont.truetype(
+            os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_regular.otf'),
+            58)
+        rift_bold_sub = ImageFont.truetype(
+            os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'),
+            58)
+        green = ImageColor.getrgb('#83a94c')
+        blue = ImageColor.getrgb('#4C83A9')
+        red = ImageColor.getrgb('#E75348')
+        colors = { 'red': red, 'green': green, 'blue': blue }
+        logo_array = {
+            '5': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
+            '15': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-horiz'},
+            '39': {'offset': [125, 45], 'size': [None, 70], 'suffix': ''},
+            '67': {'offset': [125, 45], 'size': [None, 90], 'suffix': '-white'},
+            '2163': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-solid'},
+            '350190': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
+            '543897': {'offset': [125, 45], 'size': [None, 75], 'suffix': ''},
+            '726228': {'offset': [125, 45], 'size': [None, 70], 'suffix': ''},
+            '1375614': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
+            '1838315': {'offset': [125, 45], 'size': [None, 50], 'suffix': ''},
+            '1883502': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
+            '2108395': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
+            '2586976': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
+            '5026801': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-white'},
+            '5027210': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-noname'},
+            '5066616': {'offset': [125, 45], 'size': [None, 60], 'suffix': ''},
+            '5228654': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-noname'},
+            '5229127': {'offset': [125, 45], 'size': [None, 100], 'suffix': ''},
+        }
+
+        black = ImageColor.getrgb('#000000')
+        white = ImageColor.getrgb('#ffffff')
+
+        self.draw_text_outlined_center_align(image_draw, [480, 45], 'Groupe A', font=rift_bold_title, fill=green, outline_fill=black, outline_width=5)
+        self.draw_text_outlined_center_align(image_draw, [1440, 45], 'Groupe B', font=rift_bold_title, fill=green, outline_fill=black, outline_width=5)
+
         # Draw
-        group_a_x = 102
-        group_b_x = 585
-        group_a_y = 214
-        group_b_y = 214
-        team_slot_offset_y = 55
-        logo_height = 40
-        logo_offset_x = 75
-        logo_offset_y = 25
+        rectangle_height = 90
+        rectangle_start = 215
+        rectangle_group_x_start = [100, 1060]
+        rectangle_group_x_end = [860, 1820]
+        rectangle_padding = 7
+
+        group_a_y = rectangle_start
+        group_b_y = rectangle_start
+        team_offset = [190, 10]
+        win_offset = [615, 10]
+        loses_offset = [705, 10]
+
         for row in csv_reader:
             if row[header['group']] == 'a':
-                current_team_x = group_a_x
+                current_team_x_start = rectangle_group_x_start[0]
+                current_team_x_end = rectangle_group_x_end[0]
                 current_team_y = group_a_y
             else:
-                current_team_x = group_b_x
+                current_team_x_start = rectangle_group_x_start[1]
+                current_team_x_end = rectangle_group_x_end[1]
                 current_team_y = group_b_y
 
+            composition = self.draw_alpha_rectangle(composition,
+                                                    [current_team_x_start,
+                                                     current_team_y + rectangle_padding,
+                                                     current_team_x_end,
+                                                     current_team_y + rectangle_height - rectangle_padding],
+                                                    fill=colors[row[header['color']]],
+                                                    alpha=0.5)
+            image_draw = ImageDraw.Draw(composition)
+
+            image_draw.text([current_team_x_start + team_offset[0], current_team_y + team_offset[1]], row[header['team']], font=rift_regular_sub, fill=white)
+            self.draw_text_center_align(image_draw, [current_team_x_start + win_offset[0], current_team_y + win_offset[1]], row[header['wins']], font=rift_bold_sub, fill=white)
+            self.draw_text_center_align(image_draw, [current_team_x_start + loses_offset[0], current_team_y + loses_offset[1]], row[header['loses']], font=rift_bold_sub, fill=white)
             composition = self.draw_team_logo(composition,
-                                              row[header['teamid']],
-                                              [current_team_x + logo_offset_x, current_team_y + logo_offset_y],
-                                              [None, logo_height])
+                                              row[header['teamid']] + logo_array[row[header['teamid']]]['suffix'],
+                                              [current_team_x_start + logo_array[row[header['teamid']]]['offset'][0], current_team_y + logo_array[row[header['teamid']]]['offset'][1]],
+                                              logo_array[row[header['teamid']]]['size'], 1)
 
             if row[header['group']] == 'a':
-                group_a_y += team_slot_offset_y
+                group_a_y += rectangle_height
             else:
-                group_b_y += team_slot_offset_y
+                group_b_y += rectangle_height
 
         composition.save(image_path)
 
     @staticmethod
-    def draw_team_logo(composition, team_id, position, size):
+    def draw_team_logo(composition, team_id, position, size, alpha):
         team_logo = Image.open(os.path.join(os.path.dirname(__file__),
                                             'img_ressources',
                                             'team_logos',
@@ -257,7 +317,7 @@ class ImageGenerator:
                             box=[position[0] - int(team_logo.size[0] / 2),
                                  position[1] - int(team_logo.size[1] / 2)],
                             mask=team_logo)
-        in_place_logo = Image.blend(Image.new('RGBA', (composition.size[0], composition.size[1])), in_place_logo, 0.7)
+        in_place_logo = Image.blend(Image.new('RGBA', (composition.size[0], composition.size[1])), in_place_logo, alpha)
         return Image.alpha_composite(composition, in_place_logo)
 
     @staticmethod
@@ -306,6 +366,33 @@ class ImageGenerator:
         draw.text(position, text, font=font, fill=fill)
 
     @staticmethod
+    def draw_text_outlined_center_align(draw, position, text, font, fill, outline_fill, outline_width):
+        w, h = draw.textsize(text=text, font=font)
+        new_x = position[0] - int(w/2)
+
+        draw.text((new_x - outline_width, position[1] - outline_width), text, font=font, fill=outline_fill)
+        draw.text((new_x + outline_width, position[1] - outline_width), text, font=font, fill=outline_fill)
+        draw.text((new_x - outline_width, position[1] + outline_width), text, font=font, fill=outline_fill)
+        draw.text((new_x + outline_width, position[1] + outline_width), text, font=font, fill=outline_fill)
+
+        draw.text([new_x, position[1]], text, font=font, fill=fill)
+
+    @staticmethod
+    def draw_text_center_align(draw, position, text, font, fill):
+        w, h = draw.textsize(text=text, font=font)
+        new_x = position[0] - int(w/2)
+        draw.text([new_x, position[1]], text, font=font, fill=fill)
+
+    @staticmethod
     def draw_text_left_align(draw, position, text, font, fill):
         w, h = draw.textsize(text=text, font=font)
         draw.text([position[0] - w, position[1]], text, font=font, fill=fill)
+
+    @staticmethod
+    def draw_alpha_rectangle(composition, positions, fill, alpha):
+        in_place_rectangle = Image.new('RGBA', (composition.size[0], composition.size[1]))
+        image_draw = ImageDraw.Draw(in_place_rectangle)
+        image_draw.rectangle(xy=positions, fill=fill)
+        in_place_rectangle = Image.blend(Image.new('RGBA', (composition.size[0], composition.size[1])), in_place_rectangle, alpha)
+        return Image.alpha_composite(composition, in_place_rectangle)
+

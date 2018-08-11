@@ -353,3 +353,57 @@ class CSVData(db.Model):
             db.session.add(data)
         data.value = value
         db.session.commit()
+
+class DotaHero(db.Model):
+    """Dota heroes"""
+    __tablename__= 'dota_heroes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text(), nullable=False)
+    short_name = db.Column(db.Text(), nullable=False)
+    localized_name = db.Column(db.Text(), nullable=False)
+
+    def __init__(self, id, name, short_name, localized_name):
+        self.id = id
+        self.name = name
+        self.short_name = short_name
+        self.localized_name = localized_name
+
+    @staticmethod
+    def upsert(id, name, short_name, localized_name):
+        hero = db.session.query(DotaHero).filter(DotaHero.id==id).one_or_none()
+        if hero is None:
+            hero = DotaHero(id, name, short_name, localized_name)
+            db.session.add(hero)
+        hero.id = id
+        hero.name = name
+        hero.short_name = short_name
+        hero.localized_name = localized_name
+        db.session.commit()
+
+class DotaItem(db.Model):
+    """Dota items"""
+    __tablename__= 'dota_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text(), nullable=False)
+    short_name = db.Column(db.Text(), nullable=False)
+    localized_name = db.Column(db.Text(), nullable=False)
+
+    def __init__(self, id, name, short_name, localized_name):
+        self.id = id
+        self.name = name
+        self.short_name = short_name
+        self.localized_name = localized_name
+
+    @staticmethod
+    def upsert(id, name, short_name, localized_name):
+        item = db.session.query(DotaItem).filter(DotaItem.id==id).one_or_none()
+        if item is None:
+            item = DotaItem(id, name, short_name, localized_name)
+            db.session.add(item)
+        item.id = id
+        item.name = name
+        item.short_name = short_name
+        item.localized_name = localized_name
+        db.session.commit()

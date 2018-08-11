@@ -1,0 +1,1480 @@
+{
+  "items":[
+    {
+      "id":1,
+      "name":"item_blink",
+      "short_name": "blink",
+      "localized_name": "Blink Dagger"
+    },
+    {
+      "id":2,
+      "name":"item_blades_of_attack",
+      "short_name": "blades_of_attack",
+      "localized_name": "Blades of Attack"
+    },
+    {
+      "id":3,
+      "name":"item_broadsword",
+      "short_name": "broadsword",
+      "localized_name": "Broadsword"
+    },
+    {
+      "id":4,
+      "name":"item_chainmail",
+      "short_name": "chainmail",
+      "localized_name": "Chainmail"
+    },
+    {
+      "id":5,
+      "name":"item_claymore",
+      "short_name": "claymore",
+      "localized_name": "Claymore"
+    },
+    {
+      "id":6,
+      "name":"item_helm_of_iron_will",
+      "short_name": "helm_of_iron_will",
+      "localized_name": "Helm of Iron Will"
+    },
+    {
+      "id":7,
+      "name":"item_javelin",
+      "short_name": "javelin",
+      "localized_name": "Javelin"
+    },
+    {
+      "id":8,
+      "name":"item_mithril_hammer",
+      "short_name": "mithril_hammer",
+      "localized_name": "Mithril Hammer"
+    },
+    {
+      "id":9,
+      "name":"item_platemail",
+      "short_name": "platemail",
+      "localized_name": "Platemail"
+    },
+    {
+      "id":10,
+      "name":"item_quarterstaff",
+      "short_name": "quarterstaff",
+      "localized_name": "Quarterstaff"
+    },
+    {
+      "id":11,
+      "name":"item_quelling_blade",
+      "short_name": "quelling_blade",
+      "localized_name": "Quelling Blade"
+    },
+    {
+      "id":237,
+      "name":"item_faerie_fire",
+      "short_name": "faerie_fire",
+      "localized_name": "Faerie Fire"
+    },
+    {
+      "id":265,
+      "name":"item_infused_raindrop",
+      "short_name": "infused_raindrop",
+      "localized_name": "Infused Raindrop"
+    },
+    {
+      "id":244,
+      "name":"item_wind_lace",
+      "short_name": "wind_lace",
+      "localized_name": "Wind Lace"
+    },
+    {
+      "id":12,
+      "name":"item_ring_of_protection",
+      "short_name": "ring_of_protection",
+      "localized_name": "Ring of Protection"
+    },
+    {
+      "id":182,
+      "name":"item_stout_shield",
+      "short_name": "stout_shield",
+      "localized_name": "Stout Shield"
+    },
+    {
+      "id":246,
+      "name":"item_recipe_moon_shard",
+      "short_name": "rc_moon_shard",
+      "localized_name": "Recipe: Moon Shard"
+    },
+    {
+      "id":247,
+      "name":"item_moon_shard",
+      "short_name": "moon_shard",
+      "localized_name": "Moon Shard"
+    },
+    {
+      "id":13,
+      "name":"item_gauntlets",
+      "short_name": "gauntlets",
+      "localized_name": "Gauntlets of Strength"
+    },
+    {
+      "id":14,
+      "name":"item_slippers",
+      "short_name": "slippers",
+      "localized_name": "Slippers of Agility"
+    },
+    {
+      "id":15,
+      "name":"item_mantle",
+      "short_name": "mantle",
+      "localized_name": "Mantle of Intelligence"
+    },
+    {
+      "id":16,
+      "name":"item_branches",
+      "short_name": "branch",
+      "localized_name": "Iron Branch"
+    },
+    {
+      "id":17,
+      "name":"item_belt_of_strength",
+      "short_name": "belt_of_strength",
+      "localized_name": "Belt of Strength"
+    },
+    {
+      "id":18,
+      "name":"item_boots_of_elves",
+      "short_name": "band_of_elvenskin",
+      "localized_name": "Band of Elvenskin"
+    },
+    {
+      "id":19,
+      "name":"item_robe",
+      "short_name": "robe_magi",
+      "localized_name": "Robe of the Magi"
+    },
+    {
+      "id":20,
+      "name":"item_circlet",
+      "short_name": "circlet",
+      "localized_name": "Circlet"
+    },
+    {
+      "id":21,
+      "name":"item_ogre_axe",
+      "short_name": "ogre_axe",
+      "localized_name": "Ogre Axe"
+    },
+    {
+      "id":22,
+      "name":"item_blade_of_alacrity",
+      "short_name": "blade_alacrity",
+      "localized_name": "Blade of Alacrity"
+    },
+    {
+      "id":23,
+      "name":"item_staff_of_wizardry",
+      "short_name": "staff_wizardry",
+      "localized_name": "Staff of Wizardry"
+    },
+    {
+      "id":24,
+      "name":"item_ultimate_orb",
+      "short_name": "ultimate_orb",
+      "localized_name": "Ultimate Orb"
+    },
+    {
+      "id":25,
+      "name":"item_gloves",
+      "short_name": "gloves_haste",
+      "localized_name": "Gloves of Haste"
+    },
+    {
+      "id":26,
+      "name":"item_lifesteal",
+      "short_name": "morbid_mask",
+      "localized_name": "Morbid Mask"
+    },
+    {
+      "id":27,
+      "name":"item_ring_of_regen",
+      "short_name": "ring_regen",
+      "localized_name": "Ring of Regen"
+    },
+    {
+      "id":28,
+      "name":"item_sobi_mask",
+      "short_name": "sage_mask",
+      "localized_name": "Sage's Mask"
+    },
+    {
+      "id":29,
+      "name":"item_boots",
+      "short_name": "boots_speed",
+      "localized_name": "Boots of Speed"
+    },
+    {
+      "id":30,
+      "name":"item_gem",
+      "short_name": "gem",
+      "localized_name": "Gem of True Sight"
+    },
+    {
+      "id":31,
+      "name":"item_cloak",
+      "short_name": "cloak",
+      "localized_name": "Cloak"
+    },
+    {
+      "id":32,
+      "name":"item_talisman_of_evasion",
+      "short_name": "talisman_evasion",
+      "localized_name": "Talisman of Evasion"
+    },
+    {
+      "id":33,
+      "name":"item_cheese",
+      "short_name": "cheese",
+      "localized_name": "Cheese"
+    },
+    {
+      "id":34,
+      "name":"item_magic_stick",
+      "short_name": "magic_stick",
+      "localized_name": "Magic Stick"
+    },
+    {
+      "id":35,
+      "name":"item_recipe_magic_wand",
+      "short_name": "rc_magic_wand",
+      "localized_name": "Magic Wand"
+    },
+    {
+      "id":36,
+      "name":"item_magic_wand",
+      "short_name": "magic_wand",
+      "localized_name": "Magic Wand"
+    },
+    {
+      "id":37,
+      "name":"item_ghost",
+      "short_name": "ghost_scepter",
+      "localized_name": "Ghost Scepter"
+    },
+    {
+      "id":38,
+      "name":"item_clarity",
+      "short_name": "clarity",
+      "localized_name": "Clarity"
+    },
+    {
+      "id":216,
+      "name":"item_enchanted_mango",
+      "short_name": "mango",
+      "localized_name": "Mango"
+    },
+    {
+      "id":39,
+      "name":"item_flask",
+      "short_name": "healing_salve",
+      "localized_name": "Healing Salve"
+    },
+    {
+      "id":40,
+      "name":"item_dust",
+      "short_name": "dust_appearance",
+      "localized_name": "Dust of Appearance"
+    },
+    {
+      "id":41,
+      "name":"item_bottle",
+      "short_name": "bottle",
+      "localized_name": "Bottle"
+    },
+    {
+      "id":42,
+      "name":"item_ward_observer",
+      "short_name": "observer_ward",
+      "localized_name": "Observer Ward"
+    },
+    {
+      "id":43,
+      "name":"item_ward_sentry",
+      "short_name": "sentry_ward",
+      "localized_name": "Sentry Ward"
+    },
+    {
+      "id":44,
+      "name":"item_tango",
+      "short_name": "tango",
+      "localized_name": "Tango"
+    },
+    {
+      "id":241,
+      "name":"item_tango_single",
+      "short_name": "tango_shared",
+      "localized_name": "tango_shared"
+    },
+    {
+      "id":45,
+      "name":"item_courier",
+      "short_name": "courier",
+      "localized_name": "courier"
+    },
+    {
+      "id":46,
+      "name":"item_tpscroll",
+      "short_name": "tpscroll",
+      "localized_name": "Town Portal Scroll"
+    },
+    {
+      "id":47,
+      "name":"item_recipe_travel_boots",
+      "short_name": "rc_travel_boots",
+      "localized_name": "Recipe: Boots of Travel"
+    },
+    {
+      "id":48,
+      "name":"item_travel_boots",
+      "short_name": "travel_boots_1",
+      "localized_name": "Boots of Travel 1"
+    },
+    {
+      "id":220,
+      "name":"item_travel_boots_2",
+      "short_name": "travel_boots_2",
+      "localized_name": "Boots of Travel 2"
+    },
+    {
+      "id":50,
+      "name":"item_phase_boots",
+      "short_name": "phase_boots",
+      "localized_name": "Phase Boots"
+    },
+    {
+      "id":51,
+      "name":"item_demon_edge",
+      "short_name": "demon_edge",
+      "localized_name": "Demon Edge"
+    },
+    {
+      "id":52,
+      "name":"item_eagle",
+      "short_name": "eaglesong",
+      "localized_name": "Eaglesong"
+    },
+    {
+      "id":53,
+      "name":"item_reaver",
+      "short_name": "reaver",
+      "localized_name": "Reaver"
+    },
+    {
+      "id":54,
+      "name":"item_relic",
+      "short_name": "relic",
+      "localized_name": "Relic"
+    },
+    {
+      "id":55,
+      "name":"item_hyperstone",
+      "short_name": "hypersone",
+      "localized_name": "Hyperstone"
+    },
+    {
+      "id":56,
+      "name":"item_ring_of_health",
+      "short_name": "ring_health",
+      "localized_name": "Ring of Health"
+    },
+    {
+      "id":57,
+      "name":"item_void_stone",
+      "short_name": "void_stone",
+      "localized_name": "Void Stone"
+    },
+    {
+      "id":58,
+      "name":"item_mystic_staff",
+      "short_name": "mystic_staff",
+      "localized_name": "Mystic Staff"
+    },
+    {
+      "id":59,
+      "name":"item_energy_booster",
+      "short_name": "energy_booster",
+      "localized_name": "Energy Booster"
+    },
+    {
+      "id":60,
+      "name":"item_point_booster",
+      "short_name": "point_booster",
+      "localized_name": "Point Booster"
+    },
+    {
+      "id":61,
+      "name":"item_vitality_booster",
+      "short_name": "vitality_booster",
+      "localized_name": "Vitality Booster"
+    },
+    {
+      "id":63,
+      "name":"item_power_treads",
+      "short_name": "power_treads",
+      "localized_name": "Power Treads"
+    },
+    {
+      "id":64,
+      "name":"item_recipe_hand_of_midas",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Hand of Midas"
+    },
+    {
+      "id":65,
+      "name":"item_hand_of_midas",
+      "short_name": "hand_midas",
+      "localized_name": "Hand of Midas"
+    },
+    {
+      "id":67,
+      "name":"item_oblivion_staff",
+      "short_name": "oblivion_staff",
+      "localized_name": "Oblivion Staff"
+    },
+    {
+      "id":69,
+      "name":"item_pers",
+      "short_name": "perseverance",
+      "localized_name": "Perseverance"
+    },
+    {
+      "id":72,
+      "name":"item_recipe_bracer",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Bracer"
+    },
+    {
+      "id":73,
+      "name":"item_bracer",
+      "short_name": "bracer",
+      "localized_name": "Bracer"
+    },
+    {
+      "id":74,
+      "name":"item_recipe_wraith_band",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Wraith Band"
+    },
+    {
+      "id":75,
+      "name":"item_wraith_band",
+      "short_name": "wraith_band",
+      "localized_name": "Wraith Band"
+    },
+    {
+      "id":76,
+      "name":"item_recipe_null_talisman",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Null Talisman"
+    },
+    {
+      "id":77,
+      "name":"item_null_talisman",
+      "short_name": "null_talisman",
+      "localized_name": "Null Talisman"
+    },
+    {
+      "id":78,
+      "name":"item_recipe_mekansm",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Mekansm"
+    },
+    {
+      "id":79,
+      "name":"item_mekansm",
+      "short_name": "mekansm",
+      "localized_name": "Mekansm"
+    },
+    {
+      "id":80,
+      "name":"item_recipe_vladmir",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Vladimir's Offering"
+    },
+    {
+      "id":81,
+      "name":"item_vladmir",
+      "short_name": "vladmir",
+      "localized_name": "Vladimir's Offering"
+    },
+    {
+      "id":85,
+      "name":"item_recipe_buckler",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Buckler"
+    },
+    {
+      "id":86,
+      "name":"item_buckler",
+      "short_name": "buckler",
+      "localized_name": "Buckler"
+    },
+    {
+      "id":87,
+      "name":"item_recipe_ring_of_basilius",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Ring of Basilius"
+    },
+    {
+      "id":88,
+      "name":"item_ring_of_basilius",
+      "short_name": "basilius",
+      "localized_name": "Ring of Basilius"
+    },
+    {
+      "id":89,
+      "name":"item_recipe_pipe",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Pipe of Insight"
+    },
+    {
+      "id":90,
+      "name":"item_pipe",
+      "short_name": "pipe_insight",
+      "localized_name": "Pipe of Insight"
+    },
+    {
+      "id":91,
+      "name":"item_recipe_urn_of_shadows",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Urn of Shadows"
+    },
+    {
+      "id":92,
+      "name":"item_urn_of_shadows",
+      "short_name": "urn_shadow",
+      "localized_name": "Urn of Shadows"
+    },
+    {
+      "id":93,
+      "name":"item_recipe_headdress",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Headdress"
+    },
+    {
+      "id":94,
+      "name":"item_headdress",
+      "short_name": "headdress",
+      "localized_name": "Headdress"
+    },
+    {
+      "id":95,
+      "name":"item_recipe_sheepstick",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Scythe of Vyse"
+    },
+    {
+      "id":96,
+      "name":"item_sheepstick",
+      "short_name": "scythe_vyse",
+      "localized_name": "Scythe of Vyse"
+    },
+    {
+      "id":97,
+      "name":"item_recipe_orchid",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Orchid Malevolence"
+    },
+    {
+      "id":98,
+      "name":"item_orchid",
+      "short_name": "orchid",
+      "localized_name": "Orchid Malevolence"
+    },
+    {
+      "id":245,
+      "name":"item_recipe_bloodthorn",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Bloodthorn"
+    },
+    {
+      "id":250,
+      "name":"item_bloodthorn",
+      "short_name": "bloodthorn",
+      "localized_name": "Bloodthorn"
+    },
+    {
+      "id":252,
+      "name":"item_echo_sabre",
+      "short_name": "echo_sabre",
+      "localized_name": "Echo Sabre"
+    },
+    {
+      "id":99,
+      "name":"item_recipe_cyclone",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Eul's Scepter of Divinity"
+    },
+    {
+      "id":100,
+      "name":"item_cyclone",
+      "short_name": "eul_scepter",
+      "localized_name": "Eul's Scepter of Divinity"
+    },
+    {
+      "id":233,
+      "name":"item_recipe_aether_lens",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Aether Lens"
+    },
+    {
+      "id":232,
+      "name":"item_aether_lens",
+      "short_name": "aether_lens",
+      "localized_name": "Aether Lens"
+    },
+    {
+      "id":101,
+      "name":"item_recipe_force_staff",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Force Staff"
+    },
+    {
+      "id":102,
+      "name":"item_force_staff",
+      "short_name": "force_staff",
+      "localized_name": "Force Staff"
+    },
+    {
+      "id":262,
+      "name":"item_recipe_hurricane_pike",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Hurricane Pike"
+    },
+    {
+      "id":263,
+      "name":"item_hurricane_pike",
+      "short_name": "hurricane_pike",
+      "localized_name": "Hurricane Pike"
+    },
+    {
+      "id":103,
+      "name":"item_recipe_dagon",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Dagon"
+    },
+    {
+      "id":197,
+      "name":"item_recipe_dagon_2",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Dagon 2"
+    },
+    {
+      "id":198,
+      "name":"item_recipe_dagon_3",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Dagon 3"
+    },
+    {
+      "id":199,
+      "name":"item_recipe_dagon_4",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Dagon 4"
+    },
+    {
+      "id":200,
+      "name":"item_recipe_dagon_5",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Dagon 5"
+    },
+    {
+      "id":104,
+      "name":"item_dagon",
+      "short_name": "dagon",
+      "localized_name": "Dagon"
+    },
+    {
+      "id":201,
+      "name":"item_dagon_2",
+      "short_name": "dagon_2",
+      "localized_name": "Dagon 2"
+    },
+    {
+      "id":202,
+      "name":"item_dagon_3",
+      "short_name": "dagon_3",
+      "localized_name": "Dagon 3"
+    },
+    {
+      "id":203,
+      "name":"item_dagon_4",
+      "short_name": "dagon_4",
+      "localized_name": "Dagon 4"
+    },
+    {
+      "id":204,
+      "name":"item_dagon_5",
+      "short_name": "dagon_5",
+      "localized_name": "Dagon 5"
+    },
+    {
+      "id":105,
+      "name":"item_recipe_necronomicon",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Necronomicon"
+    },
+    {
+      "id":191,
+      "name":"item_recipe_necronomicon_2",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Necronomicon 2"
+    },
+    {
+      "id":192,
+      "name":"item_recipe_necronomicon_3",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Necronomicon 3"
+    },
+    {
+      "id":106,
+      "name":"item_necronomicon",
+      "short_name": "necronomicon",
+      "localized_name": "Necronomicon"
+    },
+    {
+      "id":193,
+      "name":"item_necronomicon_2",
+      "short_name": "necronomicon_2",
+      "localized_name": "Necronomicon 2"
+    },
+    {
+      "id":194,
+      "name":"item_necronomicon_3",
+      "short_name": "necronomicon_3",
+      "localized_name": "Necronomicon 3"
+    },
+    {
+      "id":108,
+      "name":"item_ultimate_scepter",
+      "short_name": "aghanim_scepter",
+      "localized_name": "Aghanim's Scepter"
+    },
+    {
+      "id":109,
+      "name":"item_recipe_refresher",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Refresher Orb"
+    },
+    {
+      "id":110,
+      "name":"item_refresher",
+      "short_name": "refresher_orb",
+      "localized_name": "Refresher Orb"
+    },
+    {
+      "id":111,
+      "name":"item_recipe_assault",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Assault Cuirass"
+    },
+    {
+      "id":112,
+      "name":"item_assault",
+      "short_name": "assault_cuirass",
+      "localized_name": "Assault Cuiass"
+    },
+    {
+      "id":113,
+      "name":"item_recipe_heart",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Heart of Tarrasque"
+    },
+    {
+      "id":114,
+      "name":"item_heart",
+      "short_name": "heart_tarrasque",
+      "localized_name": "Heart of Tarrasque"
+    },
+    {
+      "id":115,
+      "name":"item_recipe_black_king_bar",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Black King Bar"
+    },
+    {
+      "id":116,
+      "name":"item_black_king_bar",
+      "short_name": "black_king_bar",
+      "localized_name": "Black King Bar"
+    },
+    {
+      "id":117,
+      "name":"item_aegis",
+      "short_name": "aegis",
+      "localized_name": "Aegis of the Immortal"
+    },
+    {
+      "id":118,
+      "name":"item_recipe_shivas_guard",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Shiva's Guard"
+    },
+    {
+      "id":119,
+      "name":"item_shivas_guard",
+      "short_name": "shivas_guard",
+      "localized_name": "Shiva's Guard"
+    },
+    {
+      "id":120,
+      "name":"item_recipe_bloodstone",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Bloodstone"
+    },
+    {
+      "id":121,
+      "name":"item_bloodstone",
+      "short_name": "bloodstone",
+      "localized_name": "Bloodstone"
+    },
+    {
+      "id":122,
+      "name":"item_recipe_sphere",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Linken's Sphere"
+    },
+    {
+      "id":123,
+      "name":"item_sphere",
+      "short_name": "linkens_sphere",
+      "localized_name": "Linken's Sphere"
+    },
+    {
+      "id":221,
+      "name":"item_recipe_lotus_orb",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Lotus Orb"
+    },
+    {
+      "id":226,
+      "name":"item_lotus_orb",
+      "short_name": "lotus_orb",
+      "localized_name": "Lotus Orb"
+    },
+    {
+      "id":222,
+      "name":"item_recipe_meteor_hammer",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Meteor Hammer"
+    },
+    {
+      "id":223,
+      "name":"item_meteor_hammer",
+      "short_name": "meteor_hammer",
+      "localized_name": "Meteor Hammer"
+    },
+    {
+      "id":224,
+      "name":"item_recipe_nullifier",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Nullifier"
+    },
+    {
+      "id":225,
+      "name":"item_nullifier",
+      "short_name": "nullifier",
+      "localized_name": "Nullifier"
+    },
+    {
+      "id":255,
+      "name":"item_recipe_aeon_disk",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Aeon Disk"
+    },
+    {
+      "id":256,
+      "name":"item_aeon_disk",
+      "short_name": "aeon_disk",
+      "localized_name": "Aeon Disk"
+    },
+    {
+      "id":258,
+      "name":"item_recipe_kaya",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Kaya"
+    },
+    {
+      "id":259,
+      "name":"item_kaya",
+      "short_name": "kaya",
+      "localized_name": "Kaya"
+    },
+    {
+      "id":260,
+      "name":"item_refresher_shard",
+      "short_name": "refresher_shard",
+      "localized_name": "Refresher Shard"
+    },
+    {
+      "id":266,
+      "name":"item_recipe_spirit_vessel",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Spirit Vessel"
+    },
+    {
+      "id":267,
+      "name":"item_spirit_vessel",
+      "short_name": "spirit_vessel",
+      "localized_name": "Spirit Vessel"
+    },
+    {
+      "id":124,
+      "name":"item_recipe_vanguard",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Vanguard"
+    },
+    {
+      "id":125,
+      "name":"item_vanguard",
+      "short_name": "vanguard",
+      "localized_name": "Vanguard"
+    },
+    {
+      "id":243,
+      "name":"item_recipe_crimson_guard",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Crimson Guard"
+    },
+    {
+      "id":242,
+      "name":"item_crimson_guard",
+      "short_name": "crimson_guard",
+      "localized_name": "Crimson Guard"
+    },
+    {
+      "id":126,
+      "name":"item_recipe_blade_mail",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Blade Mail"
+    },
+    {
+      "id":127,
+      "name":"item_blade_mail",
+      "short_name": "blade_mail",
+      "localized_name": "Blade Mail"
+    },
+    {
+      "id":128,
+      "name":"item_recipe_soul_booster",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Soul Booster"
+    },
+    {
+      "id":129,
+      "name":"item_soul_booster",
+      "short_name": "soul_booster",
+      "localized_name": "Soul Booster"
+    },
+    {
+      "id":130,
+      "name":"item_recipe_hood_of_defiance",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Hood of Defiance"
+    },
+    {
+      "id":131,
+      "name":"item_hood_of_defiance",
+      "short_name": "hood_defiance",
+      "localized_name": "Hood of Defiance"
+    },
+    {
+      "id":133,
+      "name":"item_rapier",
+      "short_name": "divine_rapier",
+      "localized_name": "Divine Rapier"
+    },
+    {
+      "id":134,
+      "name":"item_recipe_monkey_king_bar",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Monkey King Bar"
+    },
+    {
+      "id":135,
+      "name":"item_monkey_king_bar",
+      "short_name": "monkey_king_bar",
+      "localized_name": "Monkey King Bar"
+    },
+    {
+      "id":136,
+      "name":"item_recipe_radiance",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Radiance"
+    },
+    {
+      "id":137,
+      "name":"item_radiance",
+      "short_name": "radiance",
+      "localized_name": "Radiance"
+    },
+    {
+      "id":138,
+      "name":"item_recipe_butterfly",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Butterfly"
+    },
+    {
+      "id":139,
+      "name":"item_butterfly",
+      "short_name": "butterfly",
+      "localized_name": "Butterfly"
+    },
+    {
+      "id":140,
+      "name":"item_recipe_greater_crit",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Daedalus"
+    },
+    {
+      "id":141,
+      "name":"item_greater_crit",
+      "short_name": "daedalus",
+      "localized_name": "Daedalus"
+    },
+    {
+      "id":142,
+      "name":"item_recipe_basher",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Skull Basher"
+    },
+    {
+      "id":143,
+      "name":"item_basher",
+      "short_name": "basher",
+      "localized_name": "Skull Basher"
+    },
+    {
+      "id":144,
+      "name":"item_recipe_bfury",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Battlefury"
+    },
+    {
+      "id":145,
+      "name":"item_bfury",
+      "short_name": "battlefury",
+      "localized_name": "Battlefury"
+    },
+    {
+      "id":146,
+      "name":"item_recipe_manta",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Manta Style"
+    },
+    {
+      "id":147,
+      "name":"item_manta",
+      "short_name": "manta",
+      "localized_name": "Manta Style"
+    },
+    {
+      "id":148,
+      "name":"item_recipe_lesser_crit",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Crystalys"
+    },
+    {
+      "id":149,
+      "name":"item_lesser_crit",
+      "short_name": "crystalys",
+      "localized_name": "Crystalys"
+    },
+    {
+      "id":234,
+      "name":"item_recipe_dragon_lance",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Dragon Lance"
+    },
+    {
+      "id":236,
+      "name":"item_dragon_lance",
+      "short_name": "dragon_lance",
+      "localized_name": "Dragon Lance"
+    },
+    {
+      "id":150,
+      "name":"item_recipe_armlet",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Armlet of Mordiggian"
+    },
+    {
+      "id":151,
+      "name":"item_armlet",
+      "short_name": "armlet",
+      "localized_name": "Armlet of Mordiggian"
+    },
+    {
+      "id":183,
+      "name":"item_recipe_invis_sword",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Shadow Blade"
+    },
+    {
+      "id":152,
+      "name":"item_invis_sword",
+      "short_name": "shadow_blade",
+      "localized_name": "Shadow Blade"
+    },
+    {
+      "id":248,
+      "name":"item_recipe_silver_edge",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Silver Edge"
+    },
+    {
+      "id":249,
+      "name":"item_silver_edge",
+      "short_name": "silver_edge",
+      "localized_name": "Silver Edge"
+    },
+    {
+      "id":153,
+      "name":"item_recipe_sange_and_yasha",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Sange and Yasha"
+    },
+    {
+      "id":154,
+      "name":"item_sange_and_yasha",
+      "short_name": "sange_yasha",
+      "localized_name": "Sange and Yasha"
+    },
+    {
+      "id":155,
+      "name":"item_recipe_satanic",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Satanic"
+    },
+    {
+      "id":156,
+      "name":"item_satanic",
+      "short_name": "satanic",
+      "localized_name": "Satanic"
+    },
+    {
+      "id":157,
+      "name":"item_recipe_mjollnir",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Mjollnir"
+    },
+    {
+      "id":158,
+      "name":"item_mjollnir",
+      "short_name": "mjollnir",
+      "localized_name": "Mjollnir"
+    },
+    {
+      "id":159,
+      "name":"item_recipe_skadi",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Eye of Skadi"
+    },
+    {
+      "id":160,
+      "name":"item_skadi",
+      "short_name": "skadi",
+      "localized_name": "Eye of Skadi"
+    },
+    {
+      "id":161,
+      "name":"item_recipe_sange",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Sange"
+    },
+    {
+      "id":162,
+      "name":"item_sange",
+      "short_name": "sange",
+      "localized_name": "Sange"
+    },
+    {
+      "id":163,
+      "name":"item_recipe_helm_of_the_dominator",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Helm of the Dominator"
+    },
+    {
+      "id":164,
+      "name":"item_helm_of_the_dominator",
+      "short_name": "helm_dominator",
+      "localized_name": "Helm of the Dominator"
+    },
+    {
+      "id":165,
+      "name":"item_recipe_maelstrom",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Maelstrom"
+    },
+    {
+      "id":166,
+      "name":"item_maelstrom",
+      "short_name": "maelstrom",
+      "localized_name": "Maelstrom"
+    },
+    {
+      "id":167,
+      "name":"item_recipe_desolator",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Desolator"
+    },
+    {
+      "id":168,
+      "name":"item_desolator",
+      "short_name": "desolator",
+      "localized_name": "Desolator"
+    },
+    {
+      "id":169,
+      "name":"item_recipe_yasha",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Yasha"
+    },
+    {
+      "id":170,
+      "name":"item_yasha",
+      "short_name": "yasha",
+      "localized_name": "Yasha"
+    },
+    {
+      "id":171,
+      "name":"item_recipe_mask_of_madness",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Mask of Madness"
+    },
+    {
+      "id":172,
+      "name":"item_mask_of_madness",
+      "short_name": "mask_madness",
+      "localized_name": "Mask of Madness"
+    },
+    {
+      "id":173,
+      "name":"item_recipe_diffusal_blade",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Diffusal Blade"
+    },
+    {
+      "id":174,
+      "name":"item_diffusal_blade",
+      "short_name": "diffusal_blade",
+      "localized_name": "Diffusal Blade"
+    },
+    {
+      "id":175,
+      "name":"item_recipe_ethereal_blade",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Ethereal Blade"
+    },
+    {
+      "id":176,
+      "name":"item_ethereal_blade",
+      "short_name": "ethereal_blade",
+      "localized_name": "Ethereal Blade"
+    },
+    {
+      "id":177,
+      "name":"item_recipe_soul_ring",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Soul Ring"
+    },
+    {
+      "id":178,
+      "name":"item_soul_ring",
+      "short_name": "soul_ring",
+      "localized_name": "Soul Ring"
+    },
+    {
+      "id":179,
+      "name":"item_recipe_arcane_boots",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Arcane Boots"
+    },
+    {
+      "id":180,
+      "name":"item_arcane_boots",
+      "short_name": "arcane_boots",
+      "localized_name": "Arcane Boots"
+    },
+    {
+      "id":228,
+      "name":"item_recipe_octarine_core",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Octarine Core"
+    },
+    {
+      "id":235,
+      "name":"item_octarine_core",
+      "short_name": "octarine_core",
+      "localized_name": "Octarine Core"
+    },
+    {
+      "id":181,
+      "name":"item_orb_of_venom",
+      "short_name": "orb_venom",
+      "localized_name": "Orb of Venom"
+    },
+    {
+      "id":240,
+      "name":"item_blight_stone",
+      "short_name": "blight_stone",
+      "localized_name": "Blight Stone"
+    },
+    {
+      "id":184,
+      "name":"item_recipe_ancient_janggo",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Drum of Endurance"
+    },
+    {
+      "id":185,
+      "name":"item_ancient_janggo",
+      "short_name": "drum_endurance",
+      "localized_name": "Drum of Endurance"
+    },
+    {
+      "id":186,
+      "name":"item_recipe_medallion_of_courage",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Medallion of Courage"
+    },
+    {
+      "id":187,
+      "name":"item_medallion_of_courage",
+      "short_name": "medallion_courage",
+      "localized_name": "Medallion of Courage"
+    },
+    {
+      "id":227,
+      "name":"item_recipe_solar_crest",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Solar Crest"
+    },
+    {
+      "id":229,
+      "name":"item_solar_crest",
+      "short_name": "solar_crest",
+      "localized_name": "Solar Crest"
+    },
+    {
+      "id":188,
+      "name":"item_smoke_of_deceit",
+      "short_name": "smoke_deceit",
+      "localized_name": "Smoke of Deceit"
+    },
+    {
+      "id":257,
+      "name":"item_tome_of_knowledge",
+      "short_name": "tome_knowledge",
+      "localized_name": "Tome of Knowledge"
+    },
+    {
+      "id":189,
+      "name":"item_recipe_veil_of_discord",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Veil of Discord"
+    },
+    {
+      "id":190,
+      "name":"item_veil_of_discord",
+      "short_name": "veil_discord",
+      "localized_name": "Veil of Discord"
+    },
+    {
+      "id":230,
+      "name":"item_recipe_guardian_greaves",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Guardian Greaves"
+    },
+    {
+      "id":231,
+      "name":"item_guardian_greaves",
+      "short_name": "guardian_greaves",
+      "localized_name": "Guardian Greaves"
+    },
+    {
+      "id":205,
+      "name":"item_recipe_rod_of_atos",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Rod of Atos"
+    },
+    {
+      "id":206,
+      "name":"item_rod_of_atos",
+      "short_name": "rod_atos",
+      "localized_name": "Rod of Atos"
+    },
+    {
+      "id":207,
+      "name":"item_recipe_abyssal_blade",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Abyssal Blade"
+    },
+    {
+      "id":208,
+      "name":"item_abyssal_blade",
+      "short_name": "abyssal_blade",
+      "localized_name": "Abyssal Blade"
+    },
+    {
+      "id":209,
+      "name":"item_recipe_heavens_halberd",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Heaven's Halberd"
+    },
+    {
+      "id":210,
+      "name":"item_heavens_halberd",
+      "short_name": "heavens_halberd",
+      "localized_name": "Heaven's Halberd"
+    },
+    {
+      "id":211,
+      "name":"item_recipe_ring_of_aquila",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Ring of Aquila"
+    },
+    {
+      "id":212,
+      "name":"item_ring_of_aquila",
+      "short_name": "ring_aquila",
+      "localized_name": "Ring of Aquila"
+    },
+    {
+      "id":213,
+      "name":"item_recipe_tranquil_boots",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Tranquil Boots"
+    },
+    {
+      "id":214,
+      "name":"item_tranquil_boots",
+      "short_name": "tranquil_boots",
+      "localized_name": "Tranquil Boots"
+    },
+    {
+      "id":215,
+      "name":"item_shadow_amulet",
+      "short_name": "shadow_amulet",
+      "localized_name": "Shadow Amulet"
+    },
+    {
+      "id":253,
+      "name":"item_recipe_glimmer_cape",
+      "short_name": "recipe",
+      "localized_name": "Recipe: Glimmer Cape"
+    },
+    {
+      "id":254,
+      "name":"item_glimmer_cape",
+      "short_name": "glimmer_cape",
+      "localized_name": "Glimmer Cape"
+    }
+  ]
+}

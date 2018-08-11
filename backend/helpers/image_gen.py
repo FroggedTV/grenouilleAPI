@@ -1,4 +1,6 @@
 import logging
+import requests
+import json
 import csv
 import os
 from io import StringIO
@@ -17,7 +19,7 @@ class ImageGenerator:
     def __init__(self, app):
         self.app = app
 
-    def generate_csv_image(self, key, team_id = None, player_id = None):
+    def generate_image(self, key, team_id = None, player_id = None, game_id = None):
         """Generate images of a target CSV key.
 
         Args:
@@ -31,6 +33,8 @@ class ImageGenerator:
             self.generate_csv_preti8_players(player_id)
         elif key == "ti8_groups":
             self.generate_csv_ti8_groups()
+        elif key == "post_game":
+            self.generate_post_game(game_id)
 
     def generate_csv_preti8_teams(self, team_id = None):
         csv_data = db.session.query(CSVData).filter(CSVData.key=='preti8_teams').one_or_none()
@@ -48,7 +52,7 @@ class ImageGenerator:
             if os.path.isfile(image_path): os.remove(image_path)
 
             # Generate image
-            composition = Image.open(os.path.join(os.path.dirname(__file__), 'img_ressources', 'preti8_teams-background.png')).convert('RGBA')
+            composition = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'preti8_teams-background.png')).convert('RGBA')
 
             logo_array = {
                 '5': { 'position': [400, 650], 'size': [None, 700], 'suffix': ''},
@@ -77,8 +81,8 @@ class ImageGenerator:
                                               0.7)
             image_draw = ImageDraw.Draw(composition)
 
-            rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
-            rift_bold_sub = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 58)
+            rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
+            rift_bold_sub = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 58)
             green = ImageColor.getrgb('#83a94c')
             black = ImageColor.getrgb('#000000')
             white = ImageColor.getrgb('#ffffff')
@@ -95,10 +99,10 @@ class ImageGenerator:
             row_4_x = row_3_x + 40
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y], 'Classement', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_line], 'DPC', rift_bold_sub, white)
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc], 'DPC', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc], 'Points DPC', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc + row_1_line], 'Obtenus', rift_bold_sub, white)
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc], 'Nombre', rift_bold_sub, white)
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc + row_1_line], 'De games', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc], 'Games', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc + row_1_line], '4 Mois -', rift_bold_sub, white)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y-5], row[header['classement_dpc']], font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y + row_2_inc-5], row[header['total_dpc']], font=rift_bold_title, fill=green,
@@ -134,7 +138,7 @@ class ImageGenerator:
             if os.path.isfile(image_path): os.remove(image_path)
 
             # Generate image
-            composition = Image.open(os.path.join(os.path.dirname(__file__), 'img_ressources', 'preti8_players-background.png')).convert('RGBA')
+            composition = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'preti8_players-background.png')).convert('RGBA')
             logo_array = {
                 '5': { 'position': [400, 650], 'size': [None, 700], 'suffix': ''},
                 '15': { 'position': [300, 650], 'size': [None, 700], 'suffix': '' },
@@ -162,8 +166,8 @@ class ImageGenerator:
                                               0.7)
             image_draw = ImageDraw.Draw(composition)
 
-            rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
-            rift_bold_sub = ImageFont.truetype(os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 58)
+            rift_bold_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 150)
+            rift_bold_sub = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 58)
             green = ImageColor.getrgb('#83a94c')
             black = ImageColor.getrgb('#000000')
             white = ImageColor.getrgb('#ffffff')
@@ -178,22 +182,22 @@ class ImageGenerator:
             row_2_x = row_1_x + 40
             row_2_y = 330
             row_2_inc = 225
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y], 'Héro du', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y], 'Héros du', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_line], 'Moment', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc], 'Networth', rift_bold_sub, white)
-            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc + row_1_line], 'Moyen', rift_bold_sub, white)
+            self.draw_text_left_align(image_draw, [row_1_x, row_1_y + row_1_inc + row_1_line], "Dans l'équipe", rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc], 'Nombre de', rift_bold_sub, white)
             self.draw_text_left_align(image_draw, [row_1_x, row_1_y + 2*row_1_inc + row_1_line], 'héros joués', rift_bold_sub, white)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y-5], row[header['hero_privilegie']].replace('_', ' '), font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
-            self.draw_text_outlined(image_draw, [row_2_x, row_2_y + row_2_inc-5], row[header['networth']] + ' K', font=rift_bold_title, fill=green,
+            self.draw_text_outlined(image_draw, [row_2_x, row_2_y + row_2_inc-5], row[header['networth']] + ' %', font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
             self.draw_text_outlined(image_draw, [row_2_x, row_2_y + 2*row_2_inc-5], row[header['nombre_heros']], font=rift_bold_title, fill=green,
                                     outline_fill=black, outline_width=5)
 
-            composition = self.draw_minimap_hero(composition, row[header['hero_privilegie']], [1450, 130], [None, 150])
-            composition = self.draw_minimap_hero(composition, row[header['hero_signature_1']], [1600, 130], [None, 150])
-            composition = self.draw_minimap_hero(composition, row[header['hero_signature_2']], [1750, 130], [None, 150])
+            composition = self.draw_minimap_hero(composition, row[header['hero_signature_1']], [1450, 130], [None, 150])
+            composition = self.draw_minimap_hero(composition, row[header['hero_signature_2']], [1600, 130], [None, 150])
+            composition = self.draw_minimap_hero(composition, row[header['hero_signature_3']], [1750, 130], [None, 150])
 
             composition.save(image_path)
 
@@ -211,41 +215,42 @@ class ImageGenerator:
         if os.path.isfile(image_path): os.remove(image_path)
 
         # Generate image
-        composition = Image.open(os.path.join(os.path.dirname(__file__), 'img_ressources', 'ti8_group-background.png')).convert('RGBA')
+        composition = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'ti8_group-background.png')).convert('RGBA')
         image_draw = ImageDraw.Draw(composition)
 
         rift_bold_title = ImageFont.truetype(
-            os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'),
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'),
             120)
         rift_regular_sub = ImageFont.truetype(
-            os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_regular.otf'),
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_regular.otf'),
             58)
         rift_bold_sub = ImageFont.truetype(
-            os.path.join(os.path.dirname(__file__), 'img_ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'),
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'),
             58)
         green = ImageColor.getrgb('#83a94c')
         blue = ImageColor.getrgb('#4C83A9')
         red = ImageColor.getrgb('#E75348')
-        colors = { 'red': red, 'green': green, 'blue': blue }
+        grey = ImageColor.getrgb('#aaaaaa')
+        colors = { 'red': red, 'green': green, 'blue': blue, 'grey': grey }
         logo_array = {
-            '5': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
-            '15': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-horiz'},
-            '39': {'offset': [125, 45], 'size': [None, 70], 'suffix': ''},
-            '67': {'offset': [125, 45], 'size': [None, 90], 'suffix': '-white'},
-            '2163': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-solid'},
-            '350190': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
-            '543897': {'offset': [125, 45], 'size': [None, 75], 'suffix': ''},
-            '726228': {'offset': [125, 45], 'size': [None, 70], 'suffix': ''},
-            '1375614': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
-            '1838315': {'offset': [125, 45], 'size': [None, 50], 'suffix': ''},
-            '1883502': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
-            '2108395': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
-            '2586976': {'offset': [125, 45], 'size': [None, 65], 'suffix': ''},
-            '5026801': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-white'},
-            '5027210': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-noname'},
-            '5066616': {'offset': [125, 45], 'size': [None, 60], 'suffix': ''},
-            '5228654': {'offset': [125, 45], 'size': [None, 75], 'suffix': '-noname'},
-            '5229127': {'offset': [125, 45], 'size': [None, 100], 'suffix': ''},
+            '5': {'offset': [100, 45], 'size': [None, 65], 'suffix': ''},
+            '15': {'offset': [100, 45], 'size': [None, 75], 'suffix': '-horiz'},
+            '39': {'offset': [100, 45], 'size': [None, 70], 'suffix': ''},
+            '67': {'offset': [100, 45], 'size': [None, 90], 'suffix': '-white'},
+            '2163': {'offset': [100, 45], 'size': [None, 75], 'suffix': '-solid'},
+            '350190': {'offset': [100, 45], 'size': [None, 65], 'suffix': ''},
+            '543897': {'offset': [100, 45], 'size': [None, 75], 'suffix': ''},
+            '726228': {'offset': [100, 45], 'size': [None, 70], 'suffix': ''},
+            '1375614': {'offset': [100, 45], 'size': [None, 65], 'suffix': ''},
+            '1838315': {'offset': [100, 45], 'size': [None, 50], 'suffix': ''},
+            '1883502': {'offset': [100, 45], 'size': [None, 65], 'suffix': ''},
+            '2108395': {'offset': [100, 45], 'size': [None, 65], 'suffix': ''},
+            '2586976': {'offset': [100, 45], 'size': [None, 65], 'suffix': ''},
+            '5026801': {'offset': [100, 45], 'size': [None, 75], 'suffix': '-white'},
+            '5027210': {'offset': [100, 45], 'size': [None, 75], 'suffix': '-noname'},
+            '5066616': {'offset': [100, 45], 'size': [None, 60], 'suffix': ''},
+            '5228654': {'offset': [100, 45], 'size': [None, 75], 'suffix': '-noname'},
+            '5229127': {'offset': [100, 45], 'size': [None, 100], 'suffix': ''},
         }
 
         black = ImageColor.getrgb('#000000')
@@ -301,10 +306,45 @@ class ImageGenerator:
 
         composition.save(image_path)
 
+    def generate_post_game(self, match_id):
+        match_id = 4052701177
+        json = self.download_opendata_if_necessary(self.app.config['JSON_CACHE_PATH'], match_id)
+
+        # Delete previous image
+        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], 'post_game-{0}.png'.format(match_id))
+        if os.path.isfile(image_path): os.remove(image_path)
+
+        # Generate image
+        composition = Image.open(
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'post_game-background.png')).convert('RGBA')
+        image_draw = ImageDraw.Draw(composition)
+
+        composition.save(image_path)
+
+    @staticmethod
+    def download_opendata_if_necessary(cache_path, match_id):
+        # Delete previous image
+        json_path = os.path.join(cache_path, 'post_game-{0}.json'.format(match_id))
+        if os.path.isfile(json_path):
+            with open(json_path, 'r') as json_file:
+                json_content = json.loads(json_file.read())
+            return json_content
+
+        # Download json to file
+        r = requests.get("https://api.opendota.com/api/matches/{0}".format(match_id))
+        if r.status_code != 200:
+            return None
+
+        json_content = r.json()
+        with open(json_path, "w") as json_file:
+            json_file.write(json.dumps(json_content))
+
+        return json_content
+
     @staticmethod
     def draw_team_logo(composition, team_id, position, size, alpha):
         team_logo = Image.open(os.path.join(os.path.dirname(__file__),
-                                            'img_ressources',
+                                             '..', 'ressources', 'img',
                                             'team_logos',
                                             team_id + '.png')).convert('RGBA')
 
@@ -323,7 +363,7 @@ class ImageGenerator:
     @staticmethod
     def draw_minimap_hero(composition, hero, position, size):
         team_logo = Image.open(os.path.join(os.path.dirname(__file__),
-                                            'img_ressources',
+                                             '..', 'ressources', 'img',
                                             'hero_minimap',
                                             hero + '.png')).convert('RGBA')
 
@@ -341,7 +381,7 @@ class ImageGenerator:
     @staticmethod
     def draw_player_portrait(composition, player_id, position, size):
         player_portrait = Image.open(os.path.join(os.path.dirname(__file__),
-                                                  'img_ressources',
+                                                   '..', 'ressources', 'img',
                                                   'player_portrait',
                                                   player_id + '.png')).convert('RGBA')
 
@@ -395,4 +435,3 @@ class ImageGenerator:
         image_draw.rectangle(xy=positions, fill=fill)
         in_place_rectangle = Image.blend(Image.new('RGBA', (composition.size[0], composition.size[1])), in_place_rectangle, alpha)
         return Image.alpha_composite(composition, in_place_rectangle)
-

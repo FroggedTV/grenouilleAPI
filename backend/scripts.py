@@ -1,10 +1,13 @@
+import logging
+import json
+import os
 from datetime import datetime
 import hashlib
 
 from flask_script import Manager
 
 from app import create_app
-from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType
+from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType, DotaHero, DotaItem
 
 app = create_app()
 manager = Manager(app)
@@ -124,103 +127,25 @@ def clean_rogue_scopes():
             db.session.delete(key_scope)
     db.session.commit()
 
-@manager.option('--id', dest='id', default=None)
-@manager.option('--scope', dest='scope', default=None)
-def remove_scope_user(id, scope):
-    """Remove a scope to from steam ID.
-
-    Args:
-        id: user steam ID value.
-        scope: scope to remove.
-    """
-    if id is None:
-        print('No user steamId')
-        return
-    if scope is None:
-        print('No scope specified')
-        return
-    user_scope = db.session().query(UserScope).filter(UserScope.id==id, UserScope.scope==scope).one_or_none()
-
-    if user_scope is None:
-        print('UserScope not present!')
-    else:
-        db.session.delete(user_scope)
-        db.session.commit()
-        print('Scope removed')
-
 @manager.command
-def insert_all_vips():
-    """Upsert all VIP (admins and caster) for the FroggedTV league season 2."""
-    db.session().query(GameVIP).delete()
-    db.session().commit()
-    users = [
-        [76561198051212435, GameVIPType.ADMIN, 'Xavier'],
-        [76561198211842660, GameVIPType.ADMIN, 'Llewela'],
-        [76561198098675996, GameVIPType.ADMIN, 'Autowash'],
-        [76561198014066928, GameVIPType.ADMIN, 'Mexx'],
-        [76561198038914414, GameVIPType.ADMIN, 'NkZ_'],
-        [76561197968638037, GameVIPType.ADMIN, 'DetaX'],
-        [76561197990849508, GameVIPType.ADMIN, 'Nark!'],
-        [76561197978959964, GameVIPType.ADMIN, 'Nark!2'],
-        [76561198072527807, GameVIPType.ADMIN, 'MLC'],
-        [76561197961298382, GameVIPType.ADMIN, 'Philaeux'],
-        [76561197993366373, GameVIPType.CASTER, 'Luciqno'],
-        [76561198009684017, GameVIPType.CASTER, 'v0ja'],
-        [76561198017952409, GameVIPType.CASTER, 'Hugo'],
-        [76561198131038874, GameVIPType.CASTER, 'YouYou'],
-        [76561198277308914, GameVIPType.CASTER, 'Namax'],
-        [76561198047244470, GameVIPType.CASTER, 'Bartsake'],
-        [76561198078547785, GameVIPType.CASTER, 'Key_'],
-        [76561198150315161, GameVIPType.CASTER, 'Apoc'],
-        [76561198007225076, GameVIPType.CASTER, 'Profchen'],
-        [76561198021075598, GameVIPType.CASTER, 'Celhest'],
-        [76561198030827104, GameVIPType.CASTER, 'Kinroi'],
-        [76561198280010661, GameVIPType.CASTER, 'InDotaWeTrust'],
-        [76561197984501634, GameVIPType.CASTER, 'Neogarfield'],
-        [76561198047142880, GameVIPType.CASTER, 'Magic'],
-        [76561198045162287, GameVIPType.CASTER, 'Roxa'],
-        [76561198073845741, GameVIPType.CASTER, 'PoneySGuito'],
-        [76561197966937903, GameVIPType.CASTER, 'Kaeinie'],
-        [76561198047949626, GameVIPType.CASTER, 'Kleber'],
-        [76561198078233972, GameVIPType.CASTER, 'Manorot20'],
-        [76561198062806656, GameVIPType.CASTER, 'BoomEsport1'],
-        [76561197979979281, GameVIPType.CASTER, 'BoomEsport2'],
-        [76561198347635223, GameVIPType.CASTER, 'SoteyOS'],
-        [76561198094493830, GameVIPType.CASTER, 'Whyll'],
-        [76561198079970517, GameVIPType.CASTER, 'Yugnatt']
-    ]
-    for user in users:
-        GameVIP.upsert(user[0], user[1], user[2])
+def init_database():
+    """Initialize database with dota value."""
 
-@manager.command
-def clean_game_database():
-    """Clean all matches from database. BE CAREFULL WITH DIS !!!"""
-    db.session().query(Game).delete()
-    db.session().commit()
+    # Insert Heroes
+    hero_json_path = os.path.join(os.path.dirname(__file__), 'ressources', 'json', 'dota_heroes.json')
+    if os.path.isfile(hero_json_path):
+        with open(hero_json_path, 'r') as hero_json_file:
+            hero_json = json.loads(hero_json_file.read())
+        for hero in hero_json['heroes']:
+            DotaHero.upsert(hero['id'], hero['name'], hero['short_name'], hero['localized_name'])
 
-@manager.option('--id', dest='id', default=None)
-@manager.option('--status', dest='status', default=None)
-@manager.option('--vid', dest='vid', default=None)
-@manager.option('--winner', dest='winner', default=None)
-def force_game_status(id, status, vid, winner):
-    """Force some game status options."""
-    game = db.session().query(Game).filter(Game.id==id).one_or_none()
-    if game is None:
-        print('No game with such id.')
-        return
-
-    if status == 'COMPLETED':
-        game.status = GameStatus.COMPLETED
-    elif status == 'CANCELLED':
-        game.status = GameStatus.CANCELLED
-
-    if game.status == GameStatus.COMPLETED:
-        if vid is not None and str.isdigit(vid):
-            game.valve_id = int(vid)
-        if winner is not None and winner in ['1', '2']:
-            game.winner = winner
-
-    db.session().commit()
+    # Insert Items
+    item_json_path = os.path.join(os.path.dirname(__file__), 'ressources', 'json', 'dota_items.json')
+    if os.path.isfile(item_json_path):
+        with open(item_json_path, 'r') as item_json_file:
+            item_json = json.loads(item_json_file.read())
+        for item in item_json['items']:
+            DotaItem.upsert(item['id'], item['name'], item['short_name'], item['localized_name'])
 
 #######################
 # Setup Manage Script #

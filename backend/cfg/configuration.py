@@ -28,6 +28,7 @@ class Config(object):
 
     VOD_PATH='/tmp'
     IMG_GENERATE_PATH='/tmp'
+    JSON_CACHE_PATH='/tmp'
 
     STEAM_BOTS = 'login1@pass1@login2@pass2'
     DOTA_LOBBY_CHEATS = False

@@ -407,3 +407,51 @@ class DotaItem(db.Model):
         item.short_name = short_name
         item.localized_name = localized_name
         db.session.commit()
+
+class DotaProPlayer(db.Model):
+    """Dota pro players"""
+    __tablename__= 'dota_pro_players'
+
+    id = db.Column(db.BigInteger(), primary_key=True)
+    name = db.Column(db.Text(), nullable=False)
+    nickname = db.Column(db.Text(), nullable=False)
+    team = db.Column(db.BigInteger(), nullable=False)
+
+    def __init__(self, id, name, nickname, team):
+        self.id = id
+        self.name = name
+        self.nickname = nickname
+        self.team = team
+
+    @staticmethod
+    def upsert(id, name, nickname, team):
+        player = db.session.query(DotaProPlayer).filter(DotaProPlayer.id==id).one_or_none()
+        if player is None:
+            player = DotaProPlayer(id, name, nickname, team)
+            db.session.add(player)
+        player.id = id
+        player.name = name
+        player.nickname = nickname
+        player.team = team
+        db.session.commit()
+
+class DotaProTeam(db.Model):
+    """Dota pro players"""
+    __tablename__= 'dota_pro_teams'
+
+    id = db.Column(db.BigInteger(), primary_key=True)
+    name = db.Column(db.Text(), nullable=False)
+
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+    @staticmethod
+    def upsert(id, name):
+        team = db.session.query(DotaProTeam).filter(DotaProTeam.id==id).one_or_none()
+        if team is None:
+            team = DotaProTeam(id, name)
+            db.session.add(team)
+        team.id = id
+        team.name = name
+        db.session.commit()

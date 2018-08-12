@@ -1,0 +1,76 @@
+{
+  "teams": [
+    {
+      "id": 39,
+      "name": "Evil Geniuses"
+    },
+    {
+      "id": 350190,
+      "name": "Fnatic"
+    },
+    {
+      "id": 5,
+      "name": "Invictus Gaming"
+    },
+    {
+      "id": 543897,
+      "name": "Mineski"
+    },
+    {
+      "id": 1375614,
+      "name": "Newbee"
+    },
+    {
+      "id": 2586976,
+      "name": "OG"
+    },
+    {
+      "id": 5026801,
+      "name": "OpTic Gaming"
+    },
+    {
+      "id": 67,
+      "name": "paiN Gaming"
+    },
+    {
+      "id": 15,
+      "name": "PSG.LGD"
+    },
+    {
+      "id": 2163,
+      "name": "Team Liquid"
+    },
+    {
+      "id": 1838315,
+      "name": "Team Secret"
+    },
+    {
+      "id": 5066616,
+      "name": "Team Serenity"
+    },
+    {
+      "id": 2108395,
+      "name": "TNC Predator"
+    },
+    {
+      "id": 5228654,
+      "name": "VGJ.Storm"
+    },
+    {
+      "id": 5027210,
+      "name": "VGJ.Thunder"
+    },
+    {
+      "id": 726228,
+      "name": "Vici Gaming"
+    },
+    {
+      "id": 1883502,
+      "name": "Virtus Pro"
+    },
+    {
+      "id": 5229127,
+      "name": "Winstrike Team"
+    }
+  ]
+}

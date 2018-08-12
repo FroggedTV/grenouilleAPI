@@ -7,7 +7,7 @@ import hashlib
 from flask_script import Manager
 
 from app import create_app
-from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType, DotaHero, DotaItem
+from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType, DotaHero, DotaItem, DotaProPlayer, DotaProTeam
 
 app = create_app()
 manager = Manager(app)
@@ -130,7 +130,6 @@ def clean_rogue_scopes():
 @manager.command
 def init_database():
     """Initialize database with dota value."""
-
     # Insert Heroes
     hero_json_path = os.path.join(os.path.dirname(__file__), 'ressources', 'json', 'dota_heroes.json')
     if os.path.isfile(hero_json_path):
@@ -146,6 +145,23 @@ def init_database():
             item_json = json.loads(item_json_file.read())
         for item in item_json['items']:
             DotaItem.upsert(item['id'], item['name'], item['short_name'], item['localized_name'])
+
+    # Insert Pro Players
+    players_json_path = os.path.join(os.path.dirname(__file__), 'ressources', 'json', 'dota_pro_players.json')
+    if os.path.isfile(players_json_path):
+        with open(players_json_path, 'r') as players_json_file:
+            players_json = json.loads(players_json_file.read())
+        for player in players_json['players']:
+            DotaProPlayer.upsert(player['account_id'], player['name'], player['nickname'], player['team_id'])
+
+    # Insert Pro Teams
+    teams_json_path = os.path.join(os.path.dirname(__file__), 'ressources', 'json', 'dota_pro_teams.json')
+    if os.path.isfile(teams_json_path):
+        with open(teams_json_path, 'r') as teams_json_file:
+            teams_json = json.loads(teams_json_file.read())
+        for team in teams_json['teams']:
+            DotaProTeam.upsert(team['id'], team['name'])
+
 
 #######################
 # Setup Manage Script #

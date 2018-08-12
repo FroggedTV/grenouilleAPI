@@ -1475,6 +1475,12 @@
       "name":"item_glimmer_cape",
       "short_name": "glimmer_cape",
       "localized_name": "Glimmer Cape"
+    },
+    {
+      "id": 218,
+      "name": "item_ward_dispenser",
+      "short_name": "ward_sentry",
+      "localized_name": "Observer and Sentry Wards"
     }
   ]
 }

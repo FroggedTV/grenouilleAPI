@@ -1,0 +1,538 @@
+{
+  "players": [
+    {
+      "account_id": 86745912,
+      "nickname": "Arteezy",
+      "name": "Artour Babaev",
+      "team_id": 39
+    },
+    {
+      "account_id": 111620041,
+      "nickname": "SumaiL",
+      "name": "Syed Sumail Hassan",
+      "team_id": 39
+    },
+	 {
+      "account_id": 41231571,
+      "nickname": "s4",
+      "name": "Gustav Magnusson",
+      "team_id": 39
+    },
+	 {
+      "account_id": 94155156,
+      "nickname": "Fly",
+      "name": "Tal Aizik",
+      "team_id": 39
+    },
+	 {
+      "account_id": 25907144,
+      "nickname": "Cr1t-",
+      "name": "Andreas Nielsen",
+      "team_id": 39
+    },
+	{
+      "account_id": 43276219,
+      "nickname": "EternaLEnvy",
+      "name": "Jacky Mao",
+      "team_id": 350190
+    },
+    {
+      "account_id": 154715080,
+      "nickname": "Abed",
+      "name": "Abed Azel Yusop",
+      "team_id": 350190
+    },
+	 {
+      "account_id": 87276347,
+      "nickname": "UNiVeRsE",
+      "name": "Saahil Arora",
+      "team_id": 350190
+    },
+	 {
+      "account_id": 102099826,
+      "nickname": "DJ",
+      "name": "Djardel Mampusti",
+      "team_id": 350190
+    },
+	 {
+      "account_id": 6922000,
+      "nickname": "pieliedie",
+      "name": "Johan Âström",
+      "team_id": 350190
+    },
+	{
+      "account_id": 130416036,
+      "nickname": "Agressif",
+      "name": "Sun Zheng",
+      "team_id": 5
+    },
+	{
+      "account_id": 129958758,
+      "nickname": "Xxs",
+      "name": "Lin Jing",
+      "team_id": 5
+    },
+	{
+      "account_id": 156662698,
+      "nickname": "Srf",
+      "name": "Sun Runfa",
+      "team_id": 5
+    },
+	{
+      "account_id": 207829314,
+      "nickname": "BoBoKa",
+      "name": "Ye Zhibiao",
+      "team_id": 5
+    },
+	{
+      "account_id": 140153524,
+      "nickname": "Q",
+      "name": "Fu Bin",
+      "team_id": 5
+    },
+	{
+      "account_id": 89871557,
+      "nickname": "Mushi",
+      "name": "Chai Yee Fung",
+      "team_id": 543897
+    },
+	{
+      "account_id": 113457795,
+      "nickname": "Moonn",
+      "name": "Kam Boon Seng",
+      "team_id": 543897
+    },
+	{
+      "account_id": 84772440,
+      "nickname": "iceiceice",
+      "name": "Daryl Koh Pei Xiang",
+      "team_id": 543897
+    },
+	{
+      "account_id": 100471531,
+      "nickname": "ninjaboogie",
+      "name": "Michael Ross Jr.",
+      "team_id": 543897
+    },
+	{
+      "account_id": 117281554,
+      "nickname": "Moogy",
+      "name": "Xu Huan",
+      "team_id": 1375614
+    },
+	{
+      "account_id": 149486894,
+      "nickname": "Sccc",
+      "name": "Song Chun",
+      "team_id": 1375614
+    },
+	{
+      "account_id": 87012746,
+      "nickname": "kpii",
+      "name": "Damien Chok",
+      "team_id": 1375614
+    },
+	{
+      "account_id": 139876032,
+      "nickname": "Kaka",
+      "name": "Hu Liangzhi",
+      "team_id": 1375614
+    },
+	{
+      "account_id": 82327674,
+      "nickname": "Faith",
+      "name": "Zeng Hongda",
+      "team_id": 1375614
+    },
+	{
+      "account_id": 311360822,
+      "nickname": "Ana",
+      "name": "Anathan Pham",
+      "team_id": 2586976
+    },
+	{
+      "account_id": 94054712,
+      "nickname": "Topson",
+      "name": "Topias Taavitsainen",
+      "team_id": 2586976
+    },
+	{
+      "account_id": 88271237,
+      "nickname": "Ceb",
+      "name": "Sébastien Debs",
+      "team_id": 2586976
+    },
+	{
+      "account_id": 26771994,
+      "nickname": "Jerax",
+      "name": "Jesse Vainikka",
+      "team_id": 2586976
+    },
+	{
+      "account_id": 19672354,
+      "nickname": "N0tail",
+      "name": "Johan Sundstein",
+      "team_id": 2586976
+    },
+	{
+      "account_id": 87285329,
+      "nickname": "Pajkatt",
+      "name": "Per Olsson Lille",
+      "team_id": 5026801
+    },
+	{
+      "account_id": 221666230,
+      "nickname": "CC&C",
+      "name": "Quinn Callahan",
+      "team_id": 5026801
+    },
+	{
+      "account_id": 86698277,
+      "nickname": "33",
+      "name": "Neta Shapira",
+      "team_id": 5026801
+    },
+	{
+      "account_id": 73562326,
+      "nickname": "zai",
+      "name": "Ludwig Wahlberg",
+      "team_id": 5026801
+    },
+	{
+      "account_id": 86727555,
+      "nickname": "ppd",
+      "name": "Peter Dager",
+      "team_id": 5026801
+    },
+	{
+      "account_id": 94004717,
+      "nickname": "hFn",
+      "name": "William Medeiros",
+      "team_id": 67
+    },
+	{
+      "account_id": 86700461,
+      "nickname": "w33",
+      "name": "Aliwi Omar",
+      "team_id": 67
+    },
+	{
+      "account_id": 117956848,
+      "nickname": "Tavo",
+      "name": "Otavio Gabriel",
+      "team_id": 67
+    },
+	{
+      "account_id": 84853828,
+      "nickname": "Kingrd",
+      "name": "Danylo Nascimento",
+      "team_id": 67
+    },
+	{
+      "account_id": 116525052,
+      "nickname": "Duster",
+      "name": "Heitor Pereira",
+      "team_id": 67
+    },
+	{
+      "account_id": 125581247,
+      "nickname": "Ame",
+      "name": "Wang Chunyu",
+      "team_id": 15
+    },
+	{
+      "account_id": 106863163,
+      "nickname": "Somnus`M",
+      "name": "Lu Yao",
+      "team_id": 15
+    },
+	{
+      "account_id": 94738847,
+      "nickname": "Chalice",
+      "name": "Yang Shenyi",
+      "team_id": 15
+    },
+	{
+      "account_id": 101695162,
+      "nickname": "fy",
+      "name": "Xu Linsen",
+      "team_id": 15
+    },
+	{
+      "account_id": 94296097,
+      "nickname": "xNova",
+      "name": "Yap Jian Wei",
+      "team_id": 15
+    },
+	{
+      "account_id": 72312627,
+      "nickname": "MATUMBAMAN",
+      "name": "Lasse Urpalainen",
+      "team_id": 2163
+    },
+	{
+      "account_id": 105248644,
+      "nickname": "Miracle-",
+      "name": "Amer Al-Barkawi",
+      "team_id": 2163
+    },
+	{
+      "account_id": 34505203,
+      "nickname": "MinD_ContRoL",
+      "name": "Ivan Ivanov",
+      "team_id": 2163
+    },
+	{
+      "account_id": 101356886,
+      "nickname": "GH",
+      "name": "Maroun Merhej",
+      "team_id": 2163
+    },
+	{
+      "account_id": 82262664,
+      "nickname": "KuroKy",
+      "name": "Kuro Salehi Takhasomi",
+      "team_id": 2163
+    },
+	{
+      "account_id": 97590558,
+      "nickname": "Ace",
+      "name": "Marcus Hoelgaard",
+      "team_id": 1838315
+    },
+	{
+      "account_id": 116585378,
+      "nickname": "MidOne",
+      "name": "Yeik Nai Zheng",
+      "team_id": 1838315
+    },
+	{
+      "account_id": 86799300,
+      "nickname": "Fata",
+      "name": "Adrian trinks",
+      "team_id": 1838315
+    },
+	{
+      "account_id": 89117038,
+      "nickname": "YapzOr",
+      "name": "Yazied Jaradat",
+      "team_id": 1838315
+    },
+	{
+      "account_id": 87278757,
+      "nickname": "Puppey",
+      "name": "Clement Ivanov",
+      "team_id": 1838315
+    },
+	{
+      "account_id": 168028715,
+      "nickname": "zhizhizhi",
+      "name": "Jin Zhiyi",
+      "team_id": 5066616
+    },
+	{
+      "account_id": 124936122,
+      "nickname": "Zyd",
+      "name": "Zhang Quanda",
+      "team_id": 5066616
+    },
+	{
+      "account_id": 157475523,
+      "nickname": "XinQ",
+      "name": "Zhao Zixing",
+      "team_id": 5066616
+    },
+	{
+      "account_id": 138543123,
+      "nickname": "Pyw",
+      "name": "Xiong Jiahan",
+      "team_id": 5066616
+    },
+	{
+      "account_id": 117731777,
+      "nickname": "XCJ",
+      "name": "Xiao Chaojian",
+      "team_id": 5066616
+    },
+	{
+      "account_id": 132309493,
+      "nickname": "Raven",
+      "name": "Marc Fausto",
+      "team_id": 2108395
+    },
+	{
+      "account_id": 164532005,
+      "nickname": "Armel",
+      "name": "Armel Paul Tabios",
+      "team_id": 2108395
+    },
+	{
+      "account_id": 187619311,
+      "nickname": "Sam_H",
+      "name": "Sam Hidalgo",
+      "team_id": 2108395
+    },
+	{
+      "account_id": 155494381,
+      "nickname": "Tims",
+      "name": "Timothy Randrup",
+      "team_id": 2108395
+    },
+	{
+      "account_id": 184950344,
+      "nickname": "Kuku",
+      "name": "Carlo Palad",
+      "team_id": 2108395
+    },
+	{
+      "account_id": 108452107,
+      "nickname": "YawaR",
+      "name": "Yawar Hassan",
+      "team_id": 5228654
+    },
+	{
+      "account_id": 86725175,
+      "nickname": "Resolution",
+      "name": "Roman Fominok",
+      "team_id": 5228654
+    },
+	{
+      "account_id": 10366616,
+      "nickname": "Sneyking",
+      "name": "Jingjun Wu",
+      "team_id": 5228654
+    },
+	{
+      "account_id": 86726887,
+      "nickname": "MSS",
+      "name": "Arif Anwar",
+      "team_id": 5228654
+    },
+	{
+      "account_id": 47434686,
+      "nickname": "SVG",
+      "name": "Avery Silverman",
+      "team_id": 5228654
+    },
+	{
+      "account_id": 108382060,
+      "nickname": "Sylar",
+      "name": "Liu Jiajun",
+      "team_id": 5027210
+    },
+	{
+      "account_id": 137272985,
+      "nickname": "Freeze",
+      "name": "Liu Chang",
+      "team_id": 5027210
+    },
+	{
+      "account_id": 139937922,
+      "nickname": "Yang",
+      "name": "Zhou Haiyang",
+      "team_id": 5027210
+    },
+	{
+      "account_id": 182331313,
+      "nickname": "Yang",
+      "name": "Pan Yi",
+      "team_id": 5027210
+    },
+	{
+      "account_id": 114239371,
+      "nickname": "ddc",
+      "name": "Leong Fat-meng",
+      "team_id": 5027210
+    },
+	{
+      "account_id": 137193239,
+      "nickname": "Paparazi",
+      "name": "Zhang Chengjun",
+      "team_id": 726228
+    },
+	{
+      "account_id": 107803494,
+      "nickname": "Ori",
+      "name": "Zeng Jiaoyang",
+      "team_id": 726228
+    },
+	{
+      "account_id": 134276083,
+      "nickname": "eLeVeN",
+      "name": "Ren Yangwei",
+      "team_id": 726228
+    },
+	{
+      "account_id": 89423756,
+      "nickname": "LaNm",
+      "name": "Zhang Zhicheng",
+      "team_id": 726228
+    },
+	{
+      "account_id": 113800818,
+      "nickname": "Fenrir",
+      "name": "Lu Chao",
+      "team_id": 726228
+    },
+	{
+      "account_id": 132851371,
+      "nickname": "RAMZES666",
+      "name": "Roman Kushnarev",
+      "team_id": 1883502
+    },
+	{
+      "account_id": 106573901,
+      "nickname": "No[o]ne",
+      "name": "Vladimir Minenko",
+      "team_id": 1883502
+    },
+	{
+      "account_id": 92423451,
+      "nickname": "9pasha",
+      "name": "Pavel Khvastunov",
+      "team_id": 1883502
+    },
+	{
+      "account_id": 159020918,
+      "nickname": "RodjER",
+      "name": "Vladimir Nikogosyan",
+      "team_id": 1883502
+    },
+	{
+      "account_id": 134556694,
+      "nickname": "Solo",
+      "name": "Alexei Berezin",
+      "team_id": 1883502
+    },
+	{
+      "account_id": 89269794,
+      "nickname": "Silent",
+      "name": "Airat Gaziev",
+      "team_id": 5229127
+    },
+	{
+      "account_id": 250114507,
+      "nickname": "Iceberg",
+      "name": "Bogdan Vasilenko",
+      "team_id": 5229127
+    },
+	{
+      "account_id": 130801103,
+      "nickname": "nongrata",
+      "name": "Alexey Vasilev",
+      "team_id": 5229127
+    },
+	{
+      "account_id": 93552791,
+      "nickname": "Nofear",
+      "name": "Aleksander Churochkin",
+      "team_id": 5229127
+    },
+	{
+      "account_id": 91064780,
+      "nickname": "ALWAYSWANNAFLY",
+      "name": "Andrey Bondarenko",
+      "team_id": 5229127
+    }
+  ]
+}

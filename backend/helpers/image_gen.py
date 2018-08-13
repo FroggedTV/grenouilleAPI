@@ -559,11 +559,25 @@ class ImageGenerator:
         if dire_team_info is not None:
             dire_team = dire_team_info.name
 
+        rift_team = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 50)
+        radiant_color = green
+        dire_color = green
+        laurels_icon = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'icon', 'laurels.png')).convert('RGBA')
+        if json['radiant_win']:
+            laurels_x =[int((graph_start_x + graph_end_x - image_draw.textsize(radiant_team, rift_team)[0])/2) - 40,
+                        int((graph_start_x + graph_end_x + image_draw.textsize(radiant_team, rift_team)[0])/2) + 40]
+            laurels_y = 45
+            dire_color = ImageColor.getrgb('#cecece')
+        else:
+            laurels_x =[int((graph_start_x + graph_end_x - image_draw.textsize(dire_team, rift_team)[0])/2) - 40,
+                        int((graph_start_x + graph_end_x + image_draw.textsize(dire_team, rift_team)[0])/2) + 40]
+            laurels_y = 1035
+            radiant_color = ImageColor.getrgb('#cecece')
+        self.draw_text_outlined_center_align(image_draw, [int((graph_start_x + graph_end_x)/2), 15], radiant_team, font=rift_team, fill=radiant_color, outline_fill=black, outline_width=4)
+        self.draw_text_outlined_center_align(image_draw, [int((graph_start_x + graph_end_x)/2), 1005], dire_team, font=rift_team, fill=dire_color, outline_fill=black, outline_width=4)
 
-        rift_team = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources',
-                                              'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 50)
-        self.draw_text_outlined_center_align(image_draw, [int((graph_start_x + graph_end_x)/2), 15], radiant_team, font=rift_team, fill=green, outline_fill=black, outline_width=4)
-        self.draw_text_outlined_center_align(image_draw, [int((graph_start_x + graph_end_x)/2), 1005], dire_team, font=rift_team, fill=green, outline_fill=black, outline_width=4)
+        composition = self.draw_image_centered(composition, laurels_icon, [laurels_x[0], laurels_y], [40, 40])
+        composition = self.draw_image_centered(composition, laurels_icon, [laurels_x[1], laurels_y], [40, 40])
 
         composition.save(image_path)
 

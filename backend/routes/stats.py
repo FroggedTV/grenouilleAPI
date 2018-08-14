@@ -149,12 +149,7 @@ def build_api_stats(app):
         @apiParam {String} key CSV key to generate.
         @apiError (Errors){String} KeyInvalid key is not a valid string.
 
-        @apiParam {Number} [team_id] Optional team id to refine the generation with.
-        @apiError (Errors){String} TeamIdInvalid team is not a valid number string.
-        @apiParam {Number} [player_id] Optional player id to refine the generation with.
-        @apiError (Errors){String} PlayerIdInvalid player is not a valid number string.
-        @apiParam {Number} [match_id] Optional match id to refine the generation with.
-        @apiError (Errors){String} MatchIdInvalid match_id is not a valid number string.
+        @apiParam {Number} [payload] Optional payload to refine the generation with.
         """
         data = request.get_json(force=True)
 
@@ -166,54 +161,10 @@ def build_api_stats(app):
                             'payload': {}
                             }), 200
 
-        # Optional parameters check
-        team_id = data.get('team_id', '0')
-        if len(team_id) == 0 or not team_id.isdigit():
-            return jsonify({'success': 'no',
-                            'error': 'TeamIdInvalid',
-                            'payload': {}
-                            }), 200
-        team_id = int(team_id)
-        if team_id < 0:
-            return jsonify({'success': 'no',
-                            'error': 'TeamIdInvalid',
-                            'payload': {}
-                            }), 200
-        elif team_id == 0:
-            team_id = None
-
-        player_id = data.get('player_id', '0')
-        if len(player_id) == 0 or not player_id.isdigit():
-            return jsonify({'success': 'no',
-                            'error': 'PlayerIdInvalid',
-                            'payload': {}
-                            }), 200
-        player_id = int(player_id)
-        if player_id < 0:
-            return jsonify({'success': 'no',
-                            'error': 'PlayerIdInvalid',
-                            'payload': {}
-                            }), 200
-        elif player_id == 0:
-            player_id = None
-
-        match_id = data.get('match_id', '0')
-        if len(match_id) == 0 or not match_id.isdigit():
-            return jsonify({'success': 'no',
-                            'error': 'MatchIdInvalid',
-                            'payload': {}
-                            }), 200
-        match_id = int(match_id)
-        if match_id < 0:
-            return jsonify({'success': 'no',
-                            'error': 'MatchIdInvalid',
-                            'payload': {}
-                            }), 200
-        elif match_id == 0:
-            match_id = None
+        payload = data.get('payload', {})
 
         # Generate
-        ig.generate_image(key, team_id, player_id, match_id)
+        ig.generate_image(key, payload)
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {}

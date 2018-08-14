@@ -455,3 +455,15 @@ class DotaProTeam(db.Model):
         team.id = id
         team.name = name
         db.session.commit()
+
+class DotaStatTounamentHero(db.Model):
+    """Tournament stats of a specific hero"""
+    __tablename__ = 'stat_tn_hero'
+    __bind_key__ = 'stats'
+
+    hero_id = db.Column(db.Numeric(), primary_key=True)
+    id_tn = db.Column(db.Numeric(), primary_key=True)
+    nb_pick = db.Column(db.Numeric())
+    nb_ban = db.Column(db.Numeric())
+    nb_match = db.Column(db.Numeric())
+    mean_is_win = db.Column(db.Numeric())

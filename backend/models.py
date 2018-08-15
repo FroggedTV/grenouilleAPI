@@ -467,3 +467,13 @@ class DotaStatTounamentHero(db.Model):
     nb_ban = db.Column(db.Numeric())
     nb_match = db.Column(db.Numeric())
     mean_is_win = db.Column(db.Numeric())
+
+class DotaStatTournament(db.Model):
+    """Tournament stats of a specific hero"""
+    __tablename__ = 'stat_tn_tn'
+    __bind_key__ = 'stats'
+
+    id_tn = db.Column(db.Numeric(), primary_key=True)
+    nb_match = db.Column(db.Numeric())
+    mean_radiant_win = db.Column(db.Numeric())
+    mean_duration = db.Column(db.Numeric())

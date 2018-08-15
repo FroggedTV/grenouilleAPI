@@ -10,7 +10,7 @@ from sqlalchemy import desc
 
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
-from models import db, CSVData, DotaHero, DotaItem, DotaProPlayer, DotaProTeam, DotaStatTounamentHero
+from models import db, CSVData, DotaHero, DotaItem, DotaProPlayer, DotaProTeam, DotaStatTounamentHero, DotaStatTournament
 
 class ImageGenerator:
     """Class helper to generate stats images.
@@ -40,7 +40,8 @@ class ImageGenerator:
         'grey': ImageColor.getrgb('#cecece'),
         'light_blue': ImageColor.getrgb('#4C83A9'),
         'light_red': ImageColor.getrgb('#E75348'),
-        'light_grey': ImageColor.getrgb('#aaaaaa')
+        'dota_green': ImageColor.getrgb('#00bb00'),
+        'dota_red': ImageColor.getrgb('#bb0000')
     }
 
     def __init__(self, app):
@@ -643,7 +644,7 @@ class ImageGenerator:
         successful = []
         successful_stat = []
         for hero_stat in db.session.query(DotaStatTounamentHero)\
-                .filter(DotaStatTounamentHero.id_tn==tournament_id, DotaStatTounamentHero.nb_pick!=0)\
+                .filter(DotaStatTounamentHero.id_tn==tournament_id, DotaStatTounamentHero.nb_pick!=0, DotaStatTounamentHero.nb_pick >= 5)\
                 .order_by(desc(DotaStatTounamentHero.mean_is_win))\
                 .limit(8)\
                 .all():
@@ -653,8 +654,19 @@ class ImageGenerator:
                 successful_stat.append(hero_stat)
 
         # Side WR
-        radian_wr = 49.5
-        dire_wr = 50.5
+        radian_wr = 0
+        dire_wr = 0
+        nb_games = 0
+        mean_duration_min = 0
+        mean_duration_sec = 0
+        stat_tn = db.session.query(DotaStatTournament).filter(DotaStatTournament.id_tn==tournament_id).one_or_none()
+        if stat_tn is not None:
+            nb_games = int(stat_tn.nb_match)
+            radian_wr = stat_tn.mean_radiant_win*100
+            dire_wr = 100 - radian_wr
+            mean_duration_sec = math.ceil(stat_tn.mean_duration) % 60
+            mean_duration_min = int(math.ceil(stat_tn.mean_duration - mean_duration_sec) / 60)
+
 
         # Remaining heroes
         not_picked_heroes = []
@@ -680,7 +692,6 @@ class ImageGenerator:
                 bans_stat.append(hero_stat)
 
         # Draw everything
-
         hero_height = 90
         hero_width = int(256*hero_height/144)
         hero_x = 1350
@@ -712,19 +723,44 @@ class ImageGenerator:
                                                 'hero_rectangle', successful[i].short_name + '.png')).convert('RGBA')
             self.draw_image(composition, hero_image, [hero_x- successful_x_padding, hero_y[0][i]], [None, hero_height])
 
+        i = 0
+        j = 0
+        while i + 4*j < min(len(not_picked_heroes), 12):
+            hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
+                                                'hero_rectangle', not_picked_heroes[i + 4*j].short_name + '.png')).convert('RGBA')
+            if i+4*j == 11:
+                if len(not_picked_heroes) == 12:
+                    self.draw_image(composition, hero_image, [75 + i*(hero_width + hero_y_padding), hero_y[0][5+j]], [None, hero_height])
+                else:
+                    self.draw_text_center_align(image_draw, [75 + i*(hero_width + hero_y_padding) + int(hero_width/2), hero_y[0][5+j]], text='+{0}'.format(len(not_picked_heroes)-11), font=rift_title, fill=self.colors['ti_green'])
+            else:
+                self.draw_image(composition, hero_image, [75 + i*(hero_width + hero_y_padding), hero_y[0][5+j]], [None, hero_height])
+            i += 1
+            if i == 4:
+                i = 0
+                j += 1
+
         image_draw = ImageDraw.Draw(composition)
         for i in range(0, len(picks)):
-            image_draw.text([hero_x + hero_width + 20, hero_y[0][i]], '{0} ({1:.1f} %)'.format(picks_stat[i].nb_pick, picks_stat[i].mean_is_win*100), font=rift_text, fill=self.colors['white'])
+            image_draw.text([hero_x + hero_width + 20, hero_y[0][i]], '{0:.0f} ({1:.1f} %)'.format(picks_stat[i].nb_pick, picks_stat[i].mean_is_win*100), font=rift_text, fill=self.colors['white'])
         for i in range(0, len(bans)):
-            image_draw.text([hero_x + hero_width + 20, hero_y[1][i]], '{0} ({1:.1f} %)'.format(bans_stat[i].nb_ban, bans_stat[i].mean_is_win*100), font=rift_text, fill=self.colors['white'])
+            image_draw.text([hero_x + hero_width + 20, hero_y[1][i]], '{0:.0f} ({1:.1f} %)'.format(bans_stat[i].nb_ban, bans_stat[i].mean_is_win*100), font=rift_text, fill=self.colors['white'])
         self.draw_text_center_align(image_draw, [hero_x + 250, hero_y[0][0] - 100], 'Most Picks', font=rift_subtitle, fill=self.colors['white'])
         self.draw_text_center_align(image_draw, [hero_x + 250, hero_y[1][0] - 100], 'Most Bans', font=rift_subtitle, fill=self.colors['white'])
 
         self.draw_text_center_align(image_draw, [hero_x + 250 - successful_x_padding, hero_y[0][0] - 100], 'Best Picks', font=rift_subtitle, fill=self.colors['white'])
-        for i in range(0, 8):
-            image_draw.text([hero_x + hero_width + 20 - successful_x_padding, hero_y[0][i]], '{0:.1f} % ({1})'.format(successful_stat[i].mean_is_win*100, successful_stat[i].nb_pick), font=rift_text, fill=self.colors['white'])
-        min_never_picked_x = 50
-        max_never_picked_x = 800
+        for i in range(0, len(successful)):
+            image_draw.text([hero_x + hero_width + 20 - successful_x_padding, hero_y[0][i]], '{0:.1f} % ({1:.0f})'.format(successful_stat[i].mean_is_win*100, successful_stat[i].nb_pick), font=rift_text, fill=self.colors['white'])
+
+        self.draw_text_center_align(image_draw, [425, hero_y[0][0] - 100], text='WR Sides', font=rift_subtitle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [212, hero_y[0][0]], text='RADIANT', font=rift_subtitle, fill=self.colors['dota_green'])
+        self.draw_text_center_align(image_draw, [212, hero_y[0][1]], text='{0:.1f} %'.format(radian_wr), font=rift_text, fill=self.colors['dota_green'])
+        self.draw_text_center_align(image_draw, [637, hero_y[0][0]], text='DIRE', font=rift_subtitle, fill=self.colors['dota_red'])
+        self.draw_text_center_align(image_draw, [637, hero_y[0][1]], text='{0:.1f} %'.format(dire_wr), font=rift_text, fill=self.colors['dota_red'])
+        self.draw_text_center_align(image_draw, [212, hero_y[0][2]], text='Games', font=rift_subtitle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [212, hero_y[0][3]], text='{0}'.format(nb_games), font=rift_text, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [637, hero_y[0][2]], text='Duration', font=rift_subtitle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [637, hero_y[0][3]], text='{0:02}:{1:02}'.format(mean_duration_min, mean_duration_sec), font=rift_text, fill=self.colors['white'])
         self.draw_text_center_align(image_draw, [425, hero_y[1][0] - 100], 'Never Picked', font=rift_subtitle, fill=self.colors['white'])
 
         composition.save(image_path)

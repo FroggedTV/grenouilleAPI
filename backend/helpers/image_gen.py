@@ -611,7 +611,10 @@ class ImageGenerator:
         if os.path.isfile(json_path):
             with open(json_path, 'r') as json_file:
                 json_content = json.loads(json_file.read())
-            return json_content
+            if json_content['chat'] is None:
+                os.remove(json_path)
+            else:
+                return json_content
 
         # Download json to file
         r = requests.get("https://api.opendota.com/api/matches/{0}".format(match_id))
@@ -619,6 +622,8 @@ class ImageGenerator:
             return None
 
         json_content = r.json()
+        if json_content['chat'] is None:
+            return None
         with open(json_path, "w") as json_file:
             json_file.write(json.dumps(json_content))
 

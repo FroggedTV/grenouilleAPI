@@ -40,6 +40,7 @@ class ImageGenerator:
         'grey': ImageColor.getrgb('#cecece'),
         'light_blue': ImageColor.getrgb('#4C83A9'),
         'light_red': ImageColor.getrgb('#E75348'),
+        'light_grey': ImageColor.getrgb('#aaaaaa'),
         'dota_green': ImageColor.getrgb('#00bb00'),
         'dota_red': ImageColor.getrgb('#bb0000')
     }

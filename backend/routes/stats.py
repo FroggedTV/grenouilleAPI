@@ -148,8 +148,9 @@ def build_api_stats(app):
 
         @apiParam {String} key CSV key to generate.
         @apiError (Errors){String} KeyInvalid key is not a valid string.
-
         @apiParam {Number} [payload] Optional payload to refine the generation with.
+
+        @apiError (Errors){String} OpenDotaNotReady Data is not ready on OpenDota.
         """
         data = request.get_json(force=True)
 
@@ -164,11 +165,17 @@ def build_api_stats(app):
         payload = data.get('payload', {})
 
         # Generate
-        ig.generate_image(key, payload)
-        return jsonify({'success': 'yes',
-                        'error': '',
-                        'payload': {}
-                        }), 200
+        result = ig.generate_image(key, payload)
+        if result:
+            return jsonify({'success': 'yes',
+                            'error': '',
+                            'payload': {}
+                            }), 200
+        else:
+            return jsonify({'success': 'no',
+                            'error': 'OpenDotaNotReady',
+                            'payload': {}
+                            }), 200
 
     @app.route('/api/stats/scene/status/get', methods=['GET'])
     @secure(app, ['key', 'user'], ['stats_manage_scene'])

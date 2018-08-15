@@ -56,17 +56,17 @@ class ImageGenerator:
             payload: Payload information for image generation
         """
         if key == "preti8_teams":
-            self.generate_csv_preti8_teams(payload['team_id'])
+            return self.generate_csv_preti8_teams(payload['team_id'])
         elif key == "preti8_players":
-            self.generate_csv_preti8_players(payload['player_id'])
+            return self.generate_csv_preti8_players(payload['player_id'])
         elif key == "ti8_groups":
-            self.generate_csv_ti8_groups()
+            return self.generate_csv_ti8_groups()
         elif key == "post_game":
-            self.generate_post_game(payload['match_id'])
+            return self.generate_post_game(payload['match_id'])
         elif key == "tournament_global":
-            self.generate_tournament_global(payload['tournament_id'])
+            return self.generate_tournament_global(payload['tournament_id'])
         elif key == "team_faceoff":
-            self.generate_team_faceoff(payload['team_id'], payload['team_id_2'])
+            return self.generate_team_faceoff(payload['team_id'], payload['team_id_2'])
 
     def generate_csv_preti8_teams(self, team_id = None):
         csv_data = db.session.query(CSVData).filter(CSVData.key=='preti8_teams').one_or_none()
@@ -157,6 +157,7 @@ class ImageGenerator:
             self.draw_text_center_align(image_draw, [960, 230], text=player_string, font=rift_player_nickname, fill=self.colors['white'])
 
             composition.save(image_path)
+        return True
 
     def generate_csv_preti8_players(self, player_id = None):
         csv_data = db.session.query(CSVData).filter(CSVData.key == 'preti8_players').one_or_none()
@@ -235,6 +236,7 @@ class ImageGenerator:
             composition = self.draw_minimap_hero(composition, row[header['hero_signature_3']], [1750, 130], [None, 150])
 
             composition.save(image_path)
+        return True
 
     def generate_csv_ti8_groups(self):
         csv_data = db.session.query(CSVData).filter(CSVData.key == 'ti8_groups').one_or_none()
@@ -335,10 +337,12 @@ class ImageGenerator:
 
         composition.save(image_path)
 
+        return True
+
     def generate_post_game(self, match_id):
         json = self.download_opendata_if_necessary(self.app.config['JSON_CACHE_PATH'], match_id)
         if json is None or json['version'] is None:
-            return
+            return False
         heroes = db.session.query(DotaHero).all()
         items = db.session.query(DotaItem).all()
         players = db.session.query(DotaProPlayer).all()
@@ -603,6 +607,7 @@ class ImageGenerator:
         composition = self.draw_image_centered(composition, laurels_icon, [laurels_x[1], laurels_y], [40, 40])
 
         composition.save(image_path)
+        return True
 
     @staticmethod
     def download_opendata_if_necessary(cache_path, match_id):
@@ -611,7 +616,7 @@ class ImageGenerator:
         if os.path.isfile(json_path):
             with open(json_path, 'r') as json_file:
                 json_content = json.loads(json_file.read())
-            if json_content['chat'] is None:
+            if json_content['version'] is None:
                 os.remove(json_path)
             else:
                 return json_content
@@ -622,7 +627,7 @@ class ImageGenerator:
             return None
 
         json_content = r.json()
-        if json_content['chat'] is None:
+        if json_content['version'] is None:
             return None
         with open(json_path, "w") as json_file:
             json_file.write(json.dumps(json_content))
@@ -770,6 +775,7 @@ class ImageGenerator:
         self.draw_text_center_align(image_draw, [425, hero_y[1][0] - 100], 'Never Picked', font=rift_subtitle, fill=self.colors['white'])
 
         composition.save(image_path)
+        return True
 
     def generate_team_faceoff(self, team_id_1, team_id_2):
         # Delete previous image
@@ -787,6 +793,7 @@ class ImageGenerator:
         image_draw.text([500, 700], '{0}'.format(team_id_2), font=rift_title, fill=self.colors['ti_green'])
 
         composition.save(image_path)
+        return True
 
     @staticmethod
     def draw_image(composition, image, position, size):

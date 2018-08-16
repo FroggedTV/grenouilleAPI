@@ -759,8 +759,8 @@ class ImageGenerator:
             if bans_stat[i].mean_is_win is not None:
                 ban_wr = '{0:.1f}'.format(bans_stat[i].mean_is_win*100)
             image_draw.text([hero_x + hero_width + 20, hero_y[1][i]], '{0:.0f} ({1} %)'.format(bans_stat[i].nb_ban, ban_wr), font=rift_text, fill=self.colors['white'])
-        self.draw_text_center_align(image_draw, [hero_x + 250, hero_y[0][0] - 100], 'Most Picks', font=rift_subtitle, fill=self.colors['white'])
-        self.draw_text_center_align(image_draw, [hero_x + 250, hero_y[1][0] - 100], 'Most Bans', font=rift_subtitle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [hero_x + 250, hero_y[0][0] - 100], 'Most Picked', font=rift_subtitle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [hero_x + 250, hero_y[1][0] - 100], 'Most Banned', font=rift_subtitle, fill=self.colors['white'])
 
         self.draw_text_center_align(image_draw, [hero_x + 250 - successful_x_padding, hero_y[0][0] - 100], 'Best Picks', font=rift_subtitle, fill=self.colors['white'])
         for i in range(0, len(successful)):

@@ -468,6 +468,42 @@ class DotaStatTounamentHero(db.Model):
     nb_match = db.Column(db.Numeric())
     mean_is_win = db.Column(db.Numeric())
 
+
+class DotaStatTounamentTeamHero(db.Model):
+    """Tournament stats of a specific team and heroes"""
+    __tablename__ = 'stat_tn_team_hero'
+    __bind_key__ = 'stats'
+
+    hero_id = db.Column(db.Numeric(), primary_key=True)
+    id_tn = db.Column(db.Numeric(), primary_key=True)
+    team_id = db.Column(db.Numeric(), primary_key=True)
+
+    nb_pick = db.Column(db.Numeric())
+    nb_ban = db.Column(db.Numeric())
+    nb_match = db.Column(db.Numeric())
+    mean_is_win = db.Column(db.Numeric())
+
+
+class DotaStatTounamentTeam(db.Model):
+    """Tournament stats of a specific team and heroes"""
+    __tablename__ = 'stat_tn_team'
+    __bind_key__ = 'stats'
+
+    tn_id = db.Column(db.Numeric(), primary_key=True)
+    team_id = db.Column(db.Numeric(), primary_key=True)
+
+    nb_match = db.Column(db.Numeric())
+    mean_is_radiant = db.Column(db.Numeric())
+    mean_is_radiant_win = db.Column(db.Numeric())
+    mean_is_dire_win = db.Column(db.Numeric())
+    mean_is_win = db.Column(db.Numeric())
+    mean_is_firstpick = db.Column(db.Numeric())
+    mean_duration = db.Column(db.Numeric())
+    win_duration = db.Column(db.Numeric())
+    lose_duration = db.Column(db.Numeric())
+    mean_pct_bounty = db.Column(db.Numeric())
+
+
 class DotaStatTournament(db.Model):
     """Tournament stats of a specific hero"""
     __tablename__ = 'stat_tn_tn'

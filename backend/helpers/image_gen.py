@@ -10,7 +10,7 @@ from sqlalchemy import desc
 
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
-from models import db, CSVData, DotaHero, DotaItem, DotaProPlayer, DotaProTeam, DotaStatTounamentHero, DotaStatTournament
+from models import db, CSVData, DotaHero, DotaItem, DotaProPlayer, DotaProTeam, DotaStatTounamentHero, DotaStatTounamentTeamHero, DotaStatTournament, DotaStatTounamentTeam
 
 class ImageGenerator:
     """Class helper to generate stats images.
@@ -66,7 +66,7 @@ class ImageGenerator:
         elif key == "tournament_global":
             return self.generate_tournament_global(payload['tournament_id'])
         elif key == "team_faceoff":
-            return self.generate_team_faceoff(payload['team_id'], payload['team_id_2'])
+            return self.generate_team_faceoff(payload['tournament_id'], payload['team_id'], payload['team_id_2'])
 
     def generate_csv_preti8_teams(self, team_id = None):
         csv_data = db.session.query(CSVData).filter(CSVData.key=='preti8_teams').one_or_none()
@@ -780,23 +780,197 @@ class ImageGenerator:
         composition.save(image_path)
         return True
 
-    def generate_team_faceoff(self, team_id_1, team_id_2):
+    def generate_team_faceoff(self, tournament_id, team_id_1, team_id_2):
+
+        # Get Data
+        teams = [
+            db.session.query(DotaProTeam).filter(DotaProTeam.id == int(team_id_1)).one_or_none(),
+            db.session.query(DotaProTeam).filter(DotaProTeam.id == int(team_id_2)).one_or_none()
+        ]
+        if teams[0] is None or teams[1] is None:
+            return
+        team_stats = [
+            db.session.query(DotaStatTounamentTeam).filter(DotaStatTounamentTeam.tn_id == tournament_id,
+                                                           DotaStatTounamentTeam.team_id == teams[0].id).one_or_none(),
+            db.session.query(DotaStatTounamentTeam).filter(DotaStatTounamentTeam.tn_id == tournament_id,
+                                                           DotaStatTounamentTeam.team_id == teams[1].id).one_or_none()
+        ]
+        heroes = db.session.query(DotaHero).all()
+
+        # Top Picks & Success
+        picks = [[], []]
+        picks_stat = [[], []]
+        successful = [[], []]
+        successful_stat = [[], []]
+        bans = [[], []]
+        bans_stat = [[], []]
+        for i in range(0, 2):
+            for hero_stat in db.session.query(DotaStatTounamentTeamHero)\
+                                       .filter(DotaStatTounamentTeamHero.id_tn==tournament_id,
+                                               DotaStatTounamentTeamHero.team_id == teams[i].id)\
+                                       .order_by(desc(DotaStatTounamentTeamHero.nb_pick))\
+                                       .limit(5).all():
+                hero = next((hero for hero in heroes if hero.id == int(hero_stat.hero_id)), None)
+                if hero is not None:
+                    picks[i].append(hero)
+                    picks_stat[i].append(hero_stat)
+            for hero_stat in db.session.query(DotaStatTounamentTeamHero)\
+                                       .filter(DotaStatTounamentTeamHero.id_tn==tournament_id,
+                                               DotaStatTounamentTeamHero.team_id == teams[i].id,
+                                               DotaStatTounamentTeamHero.nb_pick >= 4)\
+                                       .order_by(desc(DotaStatTounamentTeamHero.mean_is_win))\
+                                       .limit(5).all():
+                hero = next((hero for hero in heroes if hero.id == int(hero_stat.hero_id)), None)
+                if hero is not None:
+                    successful[i].append(hero)
+                    successful_stat[i].append(hero_stat)
+            for hero_stat in db.session.query(DotaStatTounamentTeamHero)\
+                                       .filter(DotaStatTounamentTeamHero.id_tn==tournament_id,
+                                               DotaStatTounamentTeamHero.team_id == teams[i].id,
+                                               DotaStatTounamentTeamHero.nb_pick >= 5)\
+                                       .order_by(desc(DotaStatTounamentTeamHero.mean_is_win))\
+                                       .limit(3).all():
+                hero = next((hero for hero in heroes if hero.id == int(hero_stat.hero_id)), None)
+                if hero is not None:
+                    bans[i].append(hero)
+                    bans_stat[i].append(hero_stat)
+
         # Delete previous image
         image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], 'team_faceoff-{0}-{1}.png'.format(team_id_1, team_id_2))
         if os.path.isfile(image_path): os.remove(image_path)
 
-        # Generate image
+        # Image variables
         composition = Image.open(
             os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'preti8_teams-background.png')).convert('RGBA')
-
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 72)
-        image_draw.text([500, 100], '{0}'.format(team_id_1), font=rift_title, fill=self.colors['ti_green'])
-        image_draw.text([500, 400], 'VS', font=rift_title, fill=self.colors['ti_green'])
-        image_draw.text([500, 700], '{0}'.format(team_id_2), font=rift_title, fill=self.colors['ti_green'])
+        rift_middle = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 48)
+        rift_text = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_regular.otf'), 50)
+
+        hero_height = 90
+        hero_width = int(256 * hero_height / 144)
+        hero_padding = 5
+        hero_x_picks = [0, 0]
+        hero_x_picks[0] = 40
+        hero_x_picks[1] = 1920 - hero_x_picks[0] - 5*hero_width - 4*hero_padding
+        hero_y_text_padding = image_draw.textsize('1', rift_text)[1]
+        rows = [0, 0, 0, 0, 0, 0]
+        rows[0] = 170
+        rows[1] = rows[0] + hero_height + 2*hero_y_text_padding + 8*hero_padding
+        rows[2] = rows[1] + hero_height + 2*hero_y_text_padding + 8*hero_padding
+        rows[3] = rows[2] + hero_height + hero_y_text_padding + 8*hero_padding + 10
+        rows[4] = rows[3] + 120
+        rows[5] = rows[2]
+        hero_x_bans = [
+            hero_x_picks[0] + 2*(hero_width + hero_padding),
+            hero_x_picks[1]
+        ]
+        hero_x_duration = [180, 330]
+        games_x = 775
+        logo_x = 700
+
+        # Paste
+        composition = self.draw_team_logo(composition, teams[0].id, [960-logo_x, 930], [None, 300], 0.7)
+        composition = self.draw_team_logo(composition, teams[1].id, [960+logo_x, 930], [None, 300], 0.7)
+        for i in range(0, 2):
+            for j in range(0, len(picks[i])):
+                hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
+                                                     'hero_rectangle', picks[i][j].short_name + '.png')).convert('RGBA')
+                self.draw_image(composition, hero_image, [hero_x_picks[i] + j*(hero_width + hero_padding),
+                                                          rows[0]], [None, hero_height])
+            for j in range(0, len(successful[i])):
+                hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
+                                                     'hero_rectangle', successful[i][j].short_name + '.png')).convert('RGBA')
+                self.draw_image(composition, hero_image, [hero_x_picks[i] + j*(hero_width + hero_padding),
+                                                          rows[1]], [None, hero_height])
+            for j in range(0, len(bans[i])):
+                hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
+                                                     'hero_rectangle', bans[i][j].short_name + '.png')).convert('RGBA')
+                self.draw_image(composition, hero_image, [hero_x_bans[i] + j*(hero_width + hero_padding),
+                                                          rows[2]], [None, hero_height])
+
+
+        # Draw
+        image_draw = ImageDraw.Draw(composition)
+        self.draw_text_center_align(image_draw, [960, rows[0] + 15], 'PICKS', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960, rows[1] + 15], 'SUCCESS', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960, rows[2]-5], 'BAN', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960, rows[2] + 40], 'TARGETS', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960, rows[3]], 'DURATION', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960-hero_x_duration[1], rows[3]],
+                                    self.duration_to_string(team_stats[0].win_duration), font=rift_text,
+                                    fill=self.colors['ti_green'])
+        self.draw_text_center_align(image_draw, [960-hero_x_duration[0], rows[3]],
+                                    self.duration_to_string(team_stats[0].lose_duration), font=rift_text,
+                                    fill=self.colors['light_red'])
+        self.draw_text_center_align(image_draw, [960 + hero_x_duration[0], rows[3]],
+                                    self.duration_to_string(team_stats[1].win_duration), font=rift_text,
+                                    fill=self.colors['ti_green'])
+        self.draw_text_center_align(image_draw, [960 + hero_x_duration[1], rows[3]],
+                                    self.duration_to_string(team_stats[1].lose_duration), font=rift_text,
+                                    fill=self.colors['light_red'])
+
+        self.draw_text_center_align(image_draw, [960, rows[4]], 'BOUNTIES', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960 - hero_x_duration[0], rows[4]],
+                                    '{0:.1f} %'.format(team_stats[0].mean_pct_bounty*100), font=rift_text,
+                                    fill=self.colors['yellow'])
+        self.draw_text_center_align(image_draw, [960 + hero_x_duration[0], rows[4]],
+                                    '{0:.1f} %'.format(team_stats[1].mean_pct_bounty * 100), font=rift_text,
+                                    fill=self.colors['yellow'])
+        self.draw_text_center_align(image_draw, [480, 30], '{0}'.format(teams[0].name), font=rift_title, fill=self.colors['ti_green'])
+        self.draw_text_center_align(image_draw, [1440, 30], '{0}'.format(teams[1].name), font=rift_title, fill=self.colors['ti_green'])
+        self.draw_text_center_align(image_draw, [960-games_x, rows[5]], 'GAMES', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960-games_x, rows[5] + 50],
+                                    '{0:.0f}'.format(team_stats[0].nb_match), font=rift_text,
+                                    fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960+games_x, rows[5]], 'GAMES', font=rift_middle, fill=self.colors['white'])
+        self.draw_text_center_align(image_draw, [960+games_x, rows[5] + 50],
+                                    '{0:.0f}'.format(team_stats[1].nb_match), font=rift_text,
+                                    fill=self.colors['white'])
+
+        for i in range(0, 2):
+            for j in range(0, len(picks[i])):
+                self.draw_text_center_align(image_draw,
+                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                             rows[0] + hero_height],
+                                            '{0:.0f}'.format(picks_stat[i][j].nb_pick),
+                                            font=rift_text,
+                                            fill=self.colors['white'])
+                self.draw_text_center_align(image_draw,
+                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                             rows[0] + hero_height + hero_y_text_padding],
+                                            '{0:.1f} %'.format(100*picks_stat[i][j].mean_is_win),
+                                            font=rift_text,
+                                            fill=self.colors['white'])
+            for j in range(0, len(successful[i])):
+                self.draw_text_center_align(image_draw,
+                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                             rows[1] + hero_height],
+                                            '{0:.1f} %'.format(100*successful_stat[i][j].mean_is_win),
+                                            font=rift_text,
+                                            fill=self.colors['white'])
+                self.draw_text_center_align(image_draw,
+                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                             rows[1] + hero_height + hero_y_text_padding],
+                                            '{0:.0f}'.format(successful_stat[i][j].nb_pick),
+                                            font=rift_text,
+                                            fill=self.colors['white'])
+            for j in range(0, len(bans[i])):
+                self.draw_text_center_align(image_draw,
+                                            [hero_x_bans[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                             rows[2] + hero_height],
+                                            '{0:.0f}'.format(bans_stat[i][j].nb_pick),
+                                            font=rift_text,
+                                            fill=self.colors['white'])
 
         composition.save(image_path)
         return True
+
+    @staticmethod
+    def duration_to_string(duration):
+        duration_sec = math.ceil(duration) % 60
+        duration_min = int(math.ceil(duration - duration_sec) / 60)
+        return '{0:02}:{1:02}'.format(duration_min, duration_sec)
 
     @staticmethod
     def draw_image(composition, image, position, size):
@@ -824,7 +998,7 @@ class ImageGenerator:
         team_logo = Image.open(os.path.join(os.path.dirname(__file__),
                                              '..', 'ressources', 'img',
                                             'team_logos',
-                                            team_id + '.png')).convert('RGBA')
+                                            '{0}.png'.format(team_id))).convert('RGBA')
 
         new_width = int(team_logo.size[0] * size[1] / team_logo.size[1])
         new_height = size[1]

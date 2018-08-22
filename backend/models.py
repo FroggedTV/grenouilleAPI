@@ -480,6 +480,7 @@ class DotaStatTounamentTeamHero(db.Model):
 
     nb_pick = db.Column(db.Numeric())
     nb_ban = db.Column(db.Numeric())
+    nb_ban_against = db.Column(db.Numeric())
     nb_match = db.Column(db.Numeric())
     mean_is_win = db.Column(db.Numeric())
 

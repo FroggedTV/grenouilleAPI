@@ -826,9 +826,8 @@ class ImageGenerator:
                     successful_stat[i].append(hero_stat)
             for hero_stat in db.session.query(DotaStatTounamentTeamHero)\
                                        .filter(DotaStatTounamentTeamHero.id_tn==tournament_id,
-                                               DotaStatTounamentTeamHero.team_id == teams[i].id,
-                                               DotaStatTounamentTeamHero.nb_pick >= 5)\
-                                       .order_by(desc(DotaStatTounamentTeamHero.mean_is_win))\
+                                               DotaStatTounamentTeamHero.team_id == teams[i].id)\
+                                       .order_by(desc(DotaStatTounamentTeamHero.nb_ban_against))\
                                        .limit(3).all():
                 hero = next((hero for hero in heroes if hero.id == int(hero_stat.hero_id)), None)
                 if hero is not None:
@@ -841,7 +840,7 @@ class ImageGenerator:
 
         # Image variables
         composition = Image.open(
-            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'preti8_teams-background.png')).convert('RGBA')
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'faceoff-background.png')).convert('RGBA')
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 72)
         rift_middle = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'rift', 'fort_foundry_rift_bold.otf'), 48)
@@ -872,23 +871,24 @@ class ImageGenerator:
         # Paste
         composition = self.draw_team_logo(composition, teams[0].id, [960-logo_x, 930], [None, 300], 0.7)
         composition = self.draw_team_logo(composition, teams[1].id, [960+logo_x, 930], [None, 300], 0.7)
+
+        # Left is reverse
         for i in range(0, 2):
             for j in range(0, len(picks[i])):
                 hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
                                                      'hero_rectangle', picks[i][j].short_name + '.png')).convert('RGBA')
-                self.draw_image(composition, hero_image, [hero_x_picks[i] + j*(hero_width + hero_padding),
+                self.draw_image(composition, hero_image, [hero_x_picks[i] + (1-i)*(len(picks[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding),
                                                           rows[0]], [None, hero_height])
             for j in range(0, len(successful[i])):
                 hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
                                                      'hero_rectangle', successful[i][j].short_name + '.png')).convert('RGBA')
-                self.draw_image(composition, hero_image, [hero_x_picks[i] + j*(hero_width + hero_padding),
+                self.draw_image(composition, hero_image, [hero_x_picks[i] + (1-i)*(len(successful[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding),
                                                           rows[1]], [None, hero_height])
             for j in range(0, len(bans[i])):
                 hero_image = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
                                                      'hero_rectangle', bans[i][j].short_name + '.png')).convert('RGBA')
-                self.draw_image(composition, hero_image, [hero_x_bans[i] + j*(hero_width + hero_padding),
+                self.draw_image(composition, hero_image, [hero_x_bans[i] + (1-i)*(len(bans[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding),
                                                           rows[2]], [None, hero_height])
-
 
         # Draw
         image_draw = ImageDraw.Draw(composition)
@@ -897,10 +897,10 @@ class ImageGenerator:
         self.draw_text_center_align(image_draw, [960, rows[2]-5], 'BAN', font=rift_middle, fill=self.colors['white'])
         self.draw_text_center_align(image_draw, [960, rows[2] + 40], 'TARGETS', font=rift_middle, fill=self.colors['white'])
         self.draw_text_center_align(image_draw, [960, rows[3]], 'DURATION', font=rift_middle, fill=self.colors['white'])
-        self.draw_text_center_align(image_draw, [960-hero_x_duration[1], rows[3]],
+        self.draw_text_center_align(image_draw, [960-hero_x_duration[0], rows[3]],
                                     self.duration_to_string(team_stats[0].win_duration), font=rift_text,
                                     fill=self.colors['ti_green'])
-        self.draw_text_center_align(image_draw, [960-hero_x_duration[0], rows[3]],
+        self.draw_text_center_align(image_draw, [960-hero_x_duration[1], rows[3]],
                                     self.duration_to_string(team_stats[0].lose_duration), font=rift_text,
                                     fill=self.colors['light_red'])
         self.draw_text_center_align(image_draw, [960 + hero_x_duration[0], rows[3]],
@@ -931,35 +931,35 @@ class ImageGenerator:
         for i in range(0, 2):
             for j in range(0, len(picks[i])):
                 self.draw_text_center_align(image_draw,
-                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                            [hero_x_picks[i] + (1-i)*(len(picks[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding) + int(hero_width/2),
                                              rows[0] + hero_height],
                                             '{0:.0f}'.format(picks_stat[i][j].nb_pick),
                                             font=rift_text,
                                             fill=self.colors['white'])
                 self.draw_text_center_align(image_draw,
-                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                            [hero_x_picks[i] + (1-i)*(len(picks[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding) + int(hero_width/2),
                                              rows[0] + hero_height + hero_y_text_padding],
                                             '{0:.1f} %'.format(100*picks_stat[i][j].mean_is_win),
                                             font=rift_text,
                                             fill=self.colors['white'])
             for j in range(0, len(successful[i])):
                 self.draw_text_center_align(image_draw,
-                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                            [hero_x_picks[i] + (1-i)*(len(successful[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding) + int(hero_width/2),
                                              rows[1] + hero_height],
                                             '{0:.1f} %'.format(100*successful_stat[i][j].mean_is_win),
                                             font=rift_text,
                                             fill=self.colors['white'])
                 self.draw_text_center_align(image_draw,
-                                            [hero_x_picks[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                            [hero_x_picks[i] + (1-i)*(len(successful[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding) + int(hero_width/2),
                                              rows[1] + hero_height + hero_y_text_padding],
                                             '{0:.0f}'.format(successful_stat[i][j].nb_pick),
                                             font=rift_text,
                                             fill=self.colors['white'])
             for j in range(0, len(bans[i])):
                 self.draw_text_center_align(image_draw,
-                                            [hero_x_bans[i] + j*(hero_width + hero_padding) + int(hero_width/2),
+                                            [hero_x_bans[i] + (1-i)*(len(bans[i])-j-1)*(hero_width + hero_padding) + i*j*(hero_width + hero_padding) + int(hero_width/2),
                                              rows[2] + hero_height],
-                                            '{0:.0f}'.format(bans_stat[i][j].nb_pick),
+                                            '{0:.0f}'.format(bans_stat[i][j].nb_ban_against),
                                             font=rift_text,
                                             fill=self.colors['white'])
 

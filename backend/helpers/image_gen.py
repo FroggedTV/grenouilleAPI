@@ -966,6 +966,107 @@ class ImageGenerator:
         composition.save(image_path)
         return True
 
+    def generate_calendar_image(self, image_name, calendar_data):
+
+        # Delete previous image
+        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], image_name + '.png')
+        if os.path.isfile(image_path): os.remove(image_path)
+
+        # Generate image
+        composition = Image.open(
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'calendar-background.png')).convert('RGBA')
+
+        image_draw = ImageDraw.Draw(composition)
+        rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'futura', 'futurastd_condensed.otf'), 48)
+
+        first_day_x = 122
+        day_offset_x = 240
+        day_width = 235
+
+        first_day_y = 178
+        hour_start = 10
+        hour_offset_y = 50
+
+        border_width = 4
+        # First Pass: Draw all rectangles
+        for event in calendar_data:
+
+            event_duration = (event['end'] - event['start'])
+
+            # Find start and end of event
+            x0 = first_day_x + day_offset_x*event['start'].weekday()
+            y0 = first_day_y + hour_offset_y*(event['start'].hour - hour_start) \
+                 + int(math.floor(event['start'].minute/30)*hour_offset_y/2)
+            x1 = x0 + day_width
+            y1 = y0 + int((event_duration.seconds/1800)*hour_offset_y/2)
+
+            # Draw black line before and after
+            image_draw.rectangle([x0, y0, x1, y0+4],
+                                 fill=ImageColor.getrgb('rgb(0,0,0)'))
+            image_draw.rectangle([x0, y1+1, x1, y1+5],
+                                 fill=ImageColor.getrgb('rgb(0,0,0)'))
+
+            y0 = y0 + 4
+            if "Dota 2 avec" in event['title']:
+                image_draw.rectangle([x0, y0, x1, y1],
+                                     fill=ImageColor.getrgb('rgb(62,0,0)'))
+                image_draw.rectangle([x0 + border_width,
+                                      y0 + border_width,
+                                      x1 - border_width,
+                                      y1 - border_width],
+                                     fill=ImageColor.getrgb('rgb(142,0,0)'))
+            else:
+                image_draw.rectangle([x0, y0, x1, y1],
+                                     fill=ImageColor.getrgb('rgb(142,0,0)'))
+                image_draw.rectangle([x0 + border_width,
+                                      y0 + border_width,
+                                      x1 - border_width,
+                                      y1 - border_width],
+                                     fill=ImageColor.getrgb('rgb(62,0,0)'))
+
+        # Second pass: draw images (so they can overlap with multiple rectangles)
+        for event in calendar_data:
+
+            event_duration = (event['end'] - event['start'])
+
+            # Find start and end of event
+            x0 = first_day_x + day_offset_x * event['start'].weekday()
+            y0 = first_day_y + hour_offset_y * (event['start'].hour - hour_start) \
+                 + int(math.floor(event['start'].minute / 30) * hour_offset_y / 2)
+            x1 = x0 + day_width
+            y1 = y0 + int((event_duration.seconds / 1800) * hour_offset_y / 2)
+
+            # Calculate center
+            center_x = int((x1 + x0) / 2)
+            center_y = int((y1 + y0) / 2)
+
+            y0 = y0 + 4
+            if "Dota 2 avec" in event['title']:
+                # Add streamer name
+                streamer = event['title'][12:]
+                self.draw_text_center_vertical_align(image_draw, [center_x, center_y], streamer, rift_title, ImageColor.getrgb('#000000'))
+            else:
+                # Add frog background
+                frog = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'calendar-grenouille.png'))
+                rectangle_height = (y1 - border_width - y0 - border_width)
+                if frog.size[1] > rectangle_height:
+                    diff = frog.size[1] - rectangle_height
+                    frog = frog.crop([0, int(diff / 2), frog.size[0], frog.size[1] - int(diff / 2)])
+                composition.paste(frog, [x1 - border_width - frog.size[0], y1 - border_width - frog.size[1]],
+                                  frog)
+
+                # Add show image if detected
+                show = event['title'].lower().replace(' ', '_').replace("'", '_').replace('+', 'plus')
+                url = os.path.join(os.path.dirname(__file__),  '..', 'ressources', 'img', 'shows', '{}.png'.format(show))
+                if os.path.exists(url):
+                    show_image = Image.open(url)
+                    composition.paste(show_image,
+                                      [center_x - int(show_image.size[0] / 2), center_y - int(show_image.size[1] / 2)],
+                                      show_image)
+
+        composition.save(image_path)
+
+
     @staticmethod
     def duration_to_string(duration):
         duration_sec = math.ceil(duration) % 60
@@ -1075,6 +1176,13 @@ class ImageGenerator:
         w, h = draw.textsize(text=text, font=font)
         new_x = position[0] - int(w/2)
         draw.text([new_x, position[1]], text, font=font, fill=fill)
+
+    @staticmethod
+    def draw_text_center_vertical_align(draw, position, text, font, fill):
+        w, h = draw.textsize(text=text, font=font)
+        new_x = position[0] - int(w/2)
+        new_y = position[1] - int(h/2)
+        draw.text([new_x, new_y], text, font=font, fill=fill)
 
     @staticmethod
     def draw_text_left_align(draw, position, text, font, fill):

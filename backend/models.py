@@ -78,6 +78,7 @@ class Scope(enum.Enum):
     VOD_DELETE = 'vod_delete'                 # Delete VODs on disk
     STATS_MANAGE = 'stats_manage'             # Work on stats
     STATS_MANAGE_SCENE = 'stats_manage_scene' # Modify the stat displayed on scene
+    CALENDAR = 'calendar'                     # Update and see the calendar
 
 class UserScope(db.Model):
     """All scopes available for a user.

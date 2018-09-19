@@ -1303,6 +1303,71 @@
     "groupTitle": "Authentication"
   },
   {
+    "type": "",
+    "url": "{post",
+    "title": "/api/calendar/generate CalendarGenerate",
+    "version": "1.1.0",
+    "name": "CalendarGenerate",
+    "group": "Calendar",
+    "description": "<p>Generate the calendar backgrounds.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "GoogleCalendarError",
+            "description": "<p>Impossible to get data events from GoogleCalendar.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/calendar.py",
+    "groupTitle": "Calendar"
+  },
+  {
     "type": "get",
     "url": "/api/stats/img/generate",
     "title": "StatsCSVGenerateIMG",
@@ -1372,22 +1437,8 @@
             "group": "Errors",
             "type": "String",
             "optional": false,
-            "field": "KeyDataDoesntExist",
-            "description": "<p>key has no data associated.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "TeamIdInvalid",
-            "description": "<p>key is not a valid string.</p>"
-          },
-          {
-            "group": "Errors",
-            "type": "String",
-            "optional": false,
-            "field": "PlayerIdInvalid",
-            "description": "<p>key is not a valid string.</p>"
+            "field": "OpenDotaNotReady",
+            "description": "<p>Data is not ready on OpenDota.</p>"
           }
         ]
       }
@@ -1406,15 +1457,8 @@
             "group": "Parameter",
             "type": "Number",
             "optional": true,
-            "field": "team_id",
-            "description": "<p>Optional team id to refine the generation with.</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Number",
-            "optional": true,
-            "field": "player_id",
-            "description": "<p>Optional player id to refine the generation with.</p>"
+            "field": "payload",
+            "description": "<p>Optional payload to refine the generation with.</p>"
           }
         ]
       }

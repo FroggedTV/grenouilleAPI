@@ -1,0 +1,1 @@
+0 5 * * * python3 /grenouille/backend/scripts.py restart_stream_if_live >> /var/log/cron.log 2>&1

@@ -1,5 +1,6 @@
 import logging
 import json
+import time
 import os
 from datetime import datetime
 import hashlib
@@ -8,10 +9,10 @@ from flask_script import Manager
 
 from app import create_app
 from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType, DotaHero, DotaItem, DotaProPlayer, DotaProTeam
+from helpers.obs import send_command_to_obs
 
 app = create_app()
 manager = Manager(app)
-
 
 ###########
 # Scripts #
@@ -162,6 +163,19 @@ def init_database():
         for team in teams_json['teams']:
             DotaProTeam.upsert(team['id'], team['name'])
 
+@manager.command
+def restart_stream_if_live():
+    """Command to restart the streaming by disconnecting the obs live, then reconnecting it."""
+    try:
+        ret = send_command_to_obs('GetStreamingStatus', {})
+        if not ret['streaming']:
+            return
+
+        send_command_to_obs('StopStreaming', {})
+        time.sleep(5)
+        send_command_to_obs('StartStreaming', {})
+    except Exception as e:
+        logging.exception(e)
 
 #######################
 # Setup Manage Script #

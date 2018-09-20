@@ -9,11 +9,14 @@ RUN apt-get -y install \
     libpq-dev \
     libffi-dev \
     git-core \
-    locales
+    locales \
+    cron
 
 RUN echo 'fr_FR.UTF-8 UTF-8' > /etc/locale.gen && locale-gen
 
 ADD backend/requirements.txt .
+ADD docker/grenouilleapi/cron.txt .
+RUN crontab cron.txt
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 

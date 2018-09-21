@@ -14,11 +14,13 @@ RUN apt-get -y install \
 
 RUN echo 'fr_FR.UTF-8 UTF-8' > /etc/locale.gen && locale-gen
 
+RUN pip3 install --upgrade pip
 ADD backend/requirements.txt .
+RUN pip3 install -r requirements.txt
+
 ADD docker/grenouilleapi/cron.txt .
 RUN crontab cron.txt
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
+RUN service cron start
 
 ENV PYTHONPATH $PYTHONPATH:/grenouilleapi
 COPY . /grenouille/

@@ -2,6 +2,7 @@ import logging
 import os
 import json
 import docker
+import shutil
 
 from flask import request, jsonify
 
@@ -309,7 +310,10 @@ def build_api_stream_system(app):
         @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
-        @apiSuccess {Integer} size Size of the root directory in octets.
+        @apiSuccess {Integer} vod_size Size of the root directory in octets.
+        @apiSuccess {Integer} disk_total Size of the disk in octets.
+        @apiSuccess {Integer} disk_used Used space of disk in octets.
+        @apiSuccess {Integer} disk_free Free space of disk in octets.
         @apiError (Errors){String} FileSystemError Internal error manipulating the filesystem.
         """
         try:
@@ -317,10 +321,14 @@ def build_api_stream_system(app):
             for root, dirs, files in os.walk(app.config['VOD_PATH']):
                 for file in files:
                     disk_usage += os.path.getsize(os.path.join(root, file))
+            data_stats = shutil.disk_usage('/data')
             return jsonify({'success': 'yes',
                             'error': '',
                             'payload': {
-                                'size': disk_usage
+                                'vod_size': disk_usage,
+                                'disk_total': data_stats.total,
+                                'disk_used': data_stats.used,
+                                'disk_free': data_stats.free
                             }}), 200
         except Exception as e:
             logging.error(e)
@@ -618,7 +626,6 @@ def build_api_stream_system(app):
             files = []
             result = send_command_to_obs('GetSourceSettings', {'sourceName': 'RediffPlaylist'})
             if result['status'] == 'error' or 'playlist' not in result['sourceSettings']:
-                logging.error(result)
                 return jsonify({'success': 'no',
                                 'error': 'InternalOBSError',
                                 'payload': {}}), 200

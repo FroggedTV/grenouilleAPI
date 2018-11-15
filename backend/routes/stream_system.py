@@ -4,6 +4,8 @@ import json
 import docker
 import shutil
 
+from apiclient import discovery
+from apiclient.http import MediaFileUpload
 from flask import request, jsonify
 
 from helpers.general import safe_json_loads
@@ -454,6 +456,87 @@ def build_api_stream_system(app):
             return jsonify({'success': 'no',
                         'error': 'FileSystemError',
                         'payload': {}}), 200
+
+    @app.route('/api/vod/file/youtube/upload', methods=['POST'])
+    @secure(app, ['key', 'user'], ['vod_manage'])
+    def post_vod_file_youtube_upload(auth_token):
+        """
+        @api {post} /api/vod/file/youtube/upload VODFileYoutubeUpload
+        @apiVersion 1.1.0
+        @apiName VODFileYoutubeUpload
+        @apiGroup StreamSystem
+        @apiDescription Upload a VOD file to Youtube.
+
+        @apiHeader {String} Authorization 'Bearer <Auth_Token>'
+        @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
+        @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
+        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
+
+        @apiError (Errors){String} FileSystemError Internal error manipulating the filesystem.
+
+        @apiParam {String} filename Path of the file to upload to Youtube (equal to what vod_file_list returns).
+        @apiError (Errors){String} FilenameParameterMissing Filename is not present in the parameters.
+        @apiError (Errors){String} FilenameParameterInvalid Filename is not valid String.
+        @apiError (Errors){String} VODFileDoesntExist There is no VOD file or directory with the specified filename.
+        """
+        data = request.get_json(force=True)
+
+        # filename checks
+        filename = data.get('filename', None)
+        if filename is None:
+            return jsonify({'success': 'no',
+                            'error': 'FilenameParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(filename, str) or len(filename) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'FilenameParameterInvalid',
+                            'payload': {}
+                            }), 200
+
+        try:
+            # Check if path is valid and delete
+            path = os.path.join(app.config['VOD_PATH'], filename)
+            if not os.path.isfile(path):
+                return jsonify({'success': 'no',
+                                'error': 'VODFileDoesntExist',
+                                'payload': {}
+                                }), 200
+            # Upload
+            from google.oauth2 import service_account
+            SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+            SERVICE_ACCOUNT_FILE = os.path.join(os.path.dirname(__file__), '..', 'cfg', 'client_secret.json')
+            cred = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+            service = discovery.build('youtube', 'v3',
+                                      credentials=cred,
+                                      cache_discovery=False)
+            upload_file = MediaFileUpload(path, chunksize=-1, resumable=True)
+            upload_request = service.videos().insert(
+                part='snippet,status',
+                media_body = upload_file,
+                body={'snippet': {'title': 'Test video upload'}, 'status': {'privacyStatus': 'private'}},
+            )
+
+            upload_response = None
+            while upload_response is None:
+                logging.error('uploading')
+                upload_status, upload_response = upload_request.next_chunk()
+                logging(upload_status)
+                logging(upload_response)
+
+            logging.error('toto')
+            return jsonify({'success': 'yes',
+                            'error': '',
+                            'payload': {}}), 200
+        except Exception as e:
+            logging.error(e)
+            return jsonify({'success': 'no',
+                        'error': 'FileSystemError',
+                        'payload': {}}), 200
+
 
     @app.route('/api/vod/dir/create', methods=['POST'])
     @secure(app, ['key', 'user'], ['vod_delete'])

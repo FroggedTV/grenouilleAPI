@@ -966,7 +966,15 @@ class ImageGenerator:
         composition.save(image_path)
         return True
 
-    def generate_calendar_image(self, image_name, calendar_data):
+    def generate_calendar_image(self, theme, image_name, calendar_data):
+        theme_data = {
+            'frogged' : {
+                'ladder_string': 'Dota 2 avec'
+            },
+            'artifact' : {
+                'ladder_string': 'Artifact avec'
+            }
+        }
 
         # Delete previous image
         image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], image_name + '.png')
@@ -1007,7 +1015,7 @@ class ImageGenerator:
                                  fill=ImageColor.getrgb('rgb(0,0,0)'))
 
             y0 = y0 + 4
-            if "Dota 2 avec" in event['title']:
+            if theme_data[theme]['ladder_string'] in event['title']:
                 image_draw.rectangle([x0, y0, x1, y1],
                                      fill=ImageColor.getrgb('rgb(62,0,0)'))
                 image_draw.rectangle([x0 + border_width,
@@ -1041,9 +1049,9 @@ class ImageGenerator:
             center_y = int((y1 + y0) / 2)
 
             y0 = y0 + 4
-            if "Dota 2 avec" in event['title']:
+            if theme_data[theme]['ladder_string'] in event['title']:
                 # Add streamer name
-                streamer = event['title'][12:]
+                streamer = event['title'][len(theme_data[theme]['ladder_string']):]
                 self.draw_text_center_vertical_align(image_draw, [center_x, center_y], streamer, rift_title, ImageColor.getrgb('#000000'))
             else:
                 # Add frog background

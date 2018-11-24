@@ -856,6 +856,17 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/auth/login/twitter",
+    "title": "RefreshTokenGetTwitter",
+    "version": "1.1.0",
+    "name": "RefreshTokenGetWithTwitter",
+    "group": "Authentication",
+    "description": "<p>First endpoint to call in the auth process with user. Calling it redirects to the twitter login page. After login, the user is redirected to a callback url with the refresh token as a parameter. The URL is defined in the backend config. Frontend must be able to manage the token incoming as a parameter.</p>",
+    "filename": "backend/routes/auth.py",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "get",
     "url": "/api/auth/scope/list",
     "title": "ScopeList",
     "version": "1.1.0",
@@ -3054,8 +3065,29 @@ define({ "api": [
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
-            "field": "size",
+            "field": "vod_size",
             "description": "<p>Size of the root directory in octets.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "disk_total",
+            "description": "<p>Size of the disk in octets.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "disk_used",
+            "description": "<p>Used space of disk in octets.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "disk_free",
+            "description": "<p>Free space of disk in octets.</p>"
           }
         ]
       }
@@ -3428,10 +3460,116 @@ define({ "api": [
     "groupTitle": "StreamSystem"
   },
   {
+    "type": "post",
+    "url": "/api/vod/file/youtube/upload",
+    "title": "VODFileYoutubeUpload",
+    "version": "1.1.0",
+    "name": "VODFileYoutubeUpload",
+    "group": "StreamSystem",
+    "description": "<p>Upload a VOD file to Youtube.</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>'Bearer &lt;Auth_Token&gt;'</p>"
+          }
+        ]
+      }
+    },
+    "error": {
+      "fields": {
+        "Errors": [
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthorizationHeaderInvalid",
+            "description": "<p>Authorization Header is Invalid.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenExpired",
+            "description": "<p>Token has expired, must be refreshed by client.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "AuthTokenInvalid",
+            "description": "<p>Token is invalid, decode is impossible.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessImpossible",
+            "description": "<p>This type of client can't access target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "ClientAccessRefused",
+            "description": "<p>Client has no scope access to target endpoint.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FileSystemError",
+            "description": "<p>Internal error manipulating the filesystem.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilenameParameterMissing",
+            "description": "<p>Filename is not present in the parameters.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "FilenameParameterInvalid",
+            "description": "<p>Filename is not valid String.</p>"
+          },
+          {
+            "group": "Errors",
+            "type": "String",
+            "optional": false,
+            "field": "VODFileDoesntExist",
+            "description": "<p>There is no VOD file or directory with the specified filename.</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "filename",
+            "description": "<p>Path of the file to upload to Youtube (equal to what vod_file_list returns).</p>"
+          }
+        ]
+      }
+    },
+    "filename": "backend/routes/stream_system.py",
+    "groupTitle": "StreamSystem"
+  },
+  {
     "type": "get",
     "url": "/api/user/me/details",
     "title": "UserMeDetails",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "name": "UserMeDetails",
     "group": "User",
     "description": "<p>Get detailed information of myself, scopes, id...</p>",
@@ -3494,10 +3632,24 @@ define({ "api": [
           },
           {
             "group": "Success 200",
-            "type": "String[]",
+            "type": "Dictionnary",
             "optional": false,
             "field": "scopes",
-            "description": "<p>List of scopes this user has access to.</p>"
+            "description": "<p>List of scopes this user has access to for each channels.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "scopes.key",
+            "description": "<p>Channel.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String[]",
+            "optional": false,
+            "field": "scopes.value",
+            "description": "<p>List of scopes this user has access to for each channels.</p>"
           }
         ]
       }

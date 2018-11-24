@@ -24,6 +24,8 @@ class Config(object):
 
     STEAM_KEY='XXX'
     FRONTEND_LOGIN_REDIRECT='http://127.0.0.1:9999/api/auth/token_test'
+    TWITTER_CONSUMER_API_KEY='XXX'
+    TWITTER_CONSUMER_API_KEY_SECRET='XXX'
     API_KEY_SALT = 'XXX'
 
     VOD_PATH='/tmp'

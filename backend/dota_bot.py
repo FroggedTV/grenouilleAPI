@@ -9,7 +9,8 @@ import dota2
 from dota2.enums import DOTA_GC_TEAM, DOTA_CM_PICK, EMatchOutcome
 
 from app import create_app
-from models import db, Game, GameStatus
+from database import db
+from models.DotaBots import Game, GameStatus
 
 class DotaBotState(enum.Enum):
     STARTING = 0

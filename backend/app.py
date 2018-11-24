@@ -9,10 +9,13 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_openid import OpenID
+from authlib.flask.client import OAuth
+from lru import LRU
 from flask_migrate import Migrate
 
 from cfg.configuration import load_config
-from models import db
+from database import db
+from models.Stream import Stream
 
 
 def create_app():
@@ -25,6 +28,7 @@ def create_app():
 app = create_app()
 CORS(app)
 oid = OpenID(app, store_factory=lambda: None)
+oauth = OAuth(app, cache=LRU(40))
 migrate = Migrate(app, db)
 limiter = Limiter(
     app,
@@ -43,18 +47,16 @@ def access_docs(path):
 
 from routes.user import build_api_user
 from routes.auth import build_api_auth
-from routes.game import build_api_game
-from routes.community import build_api_community
-from routes.stream_system import build_api_stream_system
-from routes.stats import build_api_stats
+#from routes.game import build_api_game
+#from routes.stream_system import build_api_stream_system
+#from routes.stats import build_api_stats
 from routes.calendar import build_api_calendar
 
-build_api_auth(app, oid)
+build_api_auth(app, oid, oauth)
 build_api_user(app)
-build_api_game(app)
-build_api_community(app)
-build_api_stream_system(app)
-build_api_stats(app)
+#build_api_game(app)
+#build_api_stream_system(app)
+#build_api_stats(app)
 build_api_calendar(app)
 
 ########################

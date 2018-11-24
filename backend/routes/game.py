@@ -2,7 +2,9 @@ import logging
 import collections
 
 from flask import request, jsonify
-from models import db, Game, GameVIP, GameVIPType, DynamicConfiguration
+from database import db
+from models.DotaBots import Game, GameVIP, GameVIPType
+from models.DynamicConfiguration import DynamicConfiguration
 from helpers.general import safe_json_loads
 from helpers.endpoint import secure
 

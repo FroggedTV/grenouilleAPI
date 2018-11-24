@@ -10,7 +10,10 @@ from sqlalchemy import desc
 
 from PIL import Image, ImageDraw, ImageColor, ImageFont
 
-from models import db, CSVData, DotaHero, DotaItem, DotaProPlayer, DotaProTeam, DotaStatTounamentHero, DotaStatTounamentTeamHero, DotaStatTournament, DotaStatTounamentTeam
+from database import db
+from models.DynamicConfiguration import CSVData
+from models.DotaData import DotaHero, DotaItem, DotaProPlayer, DotaProTeam, DotaStatTounamentHero,\
+    DotaStatTounamentTeamHero, DotaStatTournament, DotaStatTounamentTeam
 
 class ImageGenerator:
     """Class helper to generate stats images.

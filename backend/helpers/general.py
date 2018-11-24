@@ -5,7 +5,8 @@ import logging
 from datetime import datetime, timedelta
 from apiclient import discovery
 
-from models import GameVIPType
+from database import db
+from models.DotaBots import GameVIPType
 
 def safe_json_loads(string):
     """Loads a JSON or return empty JSON."""

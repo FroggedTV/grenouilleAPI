@@ -19,3 +19,5 @@ docker==3.4.1
 Pillow==5.2.0
 google-auth
 google-auth-httplib2
+Authlib
+lru-dict

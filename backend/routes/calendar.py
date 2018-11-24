@@ -11,11 +11,11 @@ def build_api_calendar(app):
     """Factory to setup the routes for the calendar api."""
 
     @app.route('/api/calendar/generate', methods=['POST'])
-    @secure(app, ['key', 'user'], ['calendar'])
+    @secure(app)
     def post_calendar_generate(auth_token):
         """
         @api {post /api/calendar/generate CalendarGenerate
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName CalendarGenerate
         @apiGroup Calendar
         @apiDescription Generate the calendar backgrounds.
@@ -24,12 +24,29 @@ def build_api_calendar(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to generate the calendar from.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiError (Errors){String} GoogleCalendarError Impossible to get data events from GoogleCalendar.
         """
+        data = request.get_json(force=True)
 
-        ig = ImageGenerator(app)
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['calendar']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
 
         # Get events for frogged google calendar
         calendar_events = get_calendar_events(app.config['GOOGLE_API_KEY'],

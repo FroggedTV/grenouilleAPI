@@ -11,7 +11,6 @@ from flask import request, jsonify
 from helpers.general import safe_json_loads
 from helpers.endpoint import secure
 from helpers.obs import send_command_to_obs
-from models import User
 
 def build_api_stream_system(app):
     """Factory to setup the routes for the stream system api."""

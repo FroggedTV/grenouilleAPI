@@ -6,7 +6,9 @@ from threading import Lock
 
 from app import create_app
 from dota_bot import DotaBot
-from models import db, DynamicConfiguration, Game, GameStatus, GameVIP
+from database import db
+from models.DynamicConfiguration import DynamicConfiguration
+from models.DotaBots import Game, GameStatus, GameVIP
 from helpers.general import divide_vip_list_per_type
 
 # Log

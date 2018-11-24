@@ -4,7 +4,8 @@ import os
 from io import StringIO
 
 from flask import request, jsonify, send_file
-from models import db, CSVData, DynamicConfiguration
+from database import db
+from models.DynamicConfiguration import CSVData, DynamicConfiguration
 
 from helpers.general import safe_json_loads
 from helpers.endpoint import secure

@@ -8,7 +8,11 @@ import hashlib
 from flask_script import Manager
 
 from app import create_app
-from models import db, APIKey, APIKeyScope, User, UserScope, Scope, Game, GameStatus, GameVIP, GameVIPType, DotaHero, DotaItem, DotaProPlayer, DotaProTeam
+from database import db
+from models.User import User, APIKey
+from models.UserScope import Scope, UserScope, APIKeyScope
+from models.DotaBots import Game, GameStatus, GameVIP, GameVIPType
+from models.DotaData import DotaHero, DotaItem, DotaProPlayer, DotaProTeam
 from helpers.obs import send_command_to_obs
 
 app = create_app()
@@ -53,16 +57,21 @@ def add_api_key(key, description):
         print('Key added')
 
 @manager.option('--key', dest='key', default=None)
+@manager.option('--channel', dest='channel', default=None)
 @manager.option('--scope', dest='scope', default=None)
-def add_scope_api_key(key, scope):
+def add_scope_api_key(key, channel, scope):
     """Add a scope to target APIKey
 
     Args:
         key: key value.
+        channel: channel to add the scope to.
         scope: scope to add.
     """
     if key is None:
         print('No API key specified')
+        return
+    if channel is None:
+        print('No channel specified')
         return
     if scope is None:
         print('No scope specified')
@@ -79,22 +88,27 @@ def add_scope_api_key(key, scope):
     if api_key is None:
         print('Key not present!')
     else:
-        APIKeyScope.upsert(api_key.key_hash, scope)
+        APIKeyScope.upsert(api_key.key_hash, channel, scope)
         print('Scope added')
 
 @manager.option('--id', dest='id', default=None)
+@manager.option('--channel', dest='channel', default=None)
 @manager.option('--scope', dest='scope', default=None)
 @manager.option('--force', dest='force', default=False)
-def add_scope_user(id, scope, force):
+def add_scope_user(id, channel, scope, force):
     """Add a scope to a steam ID.
 
     Args:
         id: user steam ID value.
+        channel: channel to add the scope to.
         scope: scope to add.
         force: force adding user to database.
     """
     if id is None:
         print('No user steamId')
+        return
+    if channel is None:
+        print('No channel specified')
         return
     if scope is None:
         print('No scope specified')
@@ -113,7 +127,7 @@ def add_scope_user(id, scope, force):
             db.session.add(user)
             db.session.commit()
 
-    UserScope.upsert(user.id, scope)
+    UserScope.upsert(user.id, channel, scope)
     print('Scope added')
 
 @manager.command

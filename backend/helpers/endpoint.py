@@ -4,7 +4,7 @@ import logging
 
 from flask import request, jsonify
 
-def secure(app, type, scopes):
+def secure(app):
     """Decorator to turn a endpoint into a secure endpoint where a AuthToken is necessary, and scopes too.
 
     May raise AuthorizationHeaderInvalid, AuthTokenExpired, AuthTokenInvalid, ClientAccessImpossible,
@@ -13,8 +13,6 @@ def secure(app, type, scopes):
 
     Args:
         app: Flask app to access config where the API_KEY is stored.
-        type: List of type of Auth token accepted.
-        scopes: list of scopes necessary to call the endpoint.
     Returns:
         Decorated function.
     """
@@ -46,20 +44,18 @@ def secure(app, type, scopes):
                                 'error': 'AuthTokenInvalid',
                                 'payload': {}
                                 }), 401
-            if auth_token['client']['type'] not in type:
-                return jsonify({'success': 'no',
-                                'error': 'ClientAccessImpossible',
-                                'payload': {}
-                                }), 200
-            for scope in scopes:
-                if scope not in auth_token['client']['scopes']:
-                    return jsonify({'success': 'no',
-                                    'error': 'ClientAccessRefused',
-                                    'payload': {}
-                                    }), 200
 
             return f(auth_token, *args, **kwargs)
-
         return wrap
-
     return secured
+
+def is_client_authorized(auth_token, type):
+    return auth_token['client']['type'] in type
+
+def has_client_scope(auth_token, channel, scopes):
+    for scope in scopes:
+        if channel not in auth_token['client']['scopes']:
+            return False
+        if scope not in auth_token['client']['scopes'][channel]:
+            return False
+    return True

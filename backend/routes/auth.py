@@ -6,14 +6,44 @@ import hashlib
 
 from datetime import datetime, timedelta
 from steam import SteamID
+from flask import session
+from flask import url_for, jsonify, redirect, request
 
-from flask import jsonify, redirect, request
 from helpers.general import safe_json_loads
-from helpers.endpoint import secure
-from models import db, User, APIKey, UserScope, APIKeyScope, Scope
+from helpers.endpoint import secure, has_client_scope
+from database import db
+from models.User import User, APIKey
+from models.UserScope import Scope, UserScope, APIKeyScope
 
-def build_api_auth(app, oid):
+def build_api_auth(app, oid, oauth):
     """Factory to setup the routes for the auth api."""
+
+    # TODO Login twitter is a work in progress...
+    twitter = oauth.register('twitter',
+                   api_base_url='https://api.twitter.com/1.1/',
+                   request_token_url='https://api.twitter.com/oauth/request_token',
+                   request_token_params=None,
+                   access_token_url='https://api.twitter.com/oauth/access_token',
+                   access_token_params=None,
+                   refresh_token_url=None,
+                   authorize_url='https://api.twitter.com/oauth/authenticate',
+                   client_id=app.config['TWITTER_CONSUMER_API_KEY'],
+                   client_secret=app.config['TWITTER_CONSUMER_API_KEY_SECRET'],
+                   client_kwargs=None
+                   )
+
+    def login_twitter():
+        redirect_uri = url_for('login_twitter_callback', _external=True)
+        return twitter.authorize_redirect(redirect_uri)
+
+    def login_twitter_callback():
+        token = twitter.authorize_access_token()
+        redirect(app.config['FRONTEND_LOGIN_REDIRECT'])
+
+        url = '{0}?token={1}'.format(app.config['FRONTEND_LOGIN_REDIRECT'],
+                                     '')
+        return redirect(url)
+    # End TODO
 
     @app.route('/api/auth/login/steam', methods=['GET'])
     @oid.loginhandler
@@ -36,7 +66,6 @@ def build_api_auth(app, oid):
     def login_callback(resp):
         """Callback fired after steam login, log user in the application by generating a refresh token.
         Also create a basic user entry from steam id if this is the first login.
-
         Args:
             resp: OpenID response.
         Returns:
@@ -212,11 +241,11 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/scope/list', methods=['GET'])
-    @secure(app, ['key', 'user'], [])
+    @secure(app)
     def get_scope_list(auth_token):
         """
         @api {get} /api/auth/scope/list ScopeList
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName ScopeList
         @apiGroup Authentication
         @apiDescription List all available scopes for APIKey and users.
@@ -225,7 +254,6 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
 
         @apiSuccess {String[]} scopes All available scopes.
         """
@@ -238,11 +266,11 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/key/list', methods=['GET'])
-    @secure(app, ['key', 'user'], ['api_key_scope'])
+    @secure(app)
     def get_api_key_list(auth_token):
         """
         @api {get} /api/auth/key/list APIKeyList
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName APIKeyList
         @apiGroup Authentication
         @apiDescription List all APIKeys.
@@ -251,7 +279,6 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
@@ -259,11 +286,16 @@ def build_api_auth(app, oid):
         @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
         @apiError (Errors){String} OffsetInvalid Offset is not a positive integer in waited range.
 
-        @apiSuccess {Object[]} keys All available scopes.
+        @apiSuccess {Object[]} keys All available keys.
         @apiSuccess {String} keys.hash Hash of the API_KEY.
         @apiSuccess {String} keys.description API Key description.
-        @apiSuccess {String[]} keys.scopes List of scopes this KEY has access to.
+        @apiSuccess {Dictionary} keys.scopes Dictionary of scopes this KEY has access to.
+        @apiSuccess {String} keys.scopes.key id of a channel.
+        @apiSuccess {String[]} keys.scopes.value List of scopes this KEY has access.
         """
+        if not has_client_scope(auth_token, '*', ['api_key_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         data = safe_json_loads(request.args.get('data', '{}'))
 
         # limit check
@@ -289,10 +321,9 @@ def build_api_auth(app, oid):
                                    .limit(limit)\
                                    .offset(offset)\
                                    .all():
-            scopes = []
-            for scope in db.session().query(APIKeyScope).filter(APIKeyScope.key_hash==api_key.key_hash).all():
-                scopes.append(scope.scope)
-            keys.append({ 'hash': api_key.key_hash, 'description': api_key.description, 'scopes': scopes })
+            keys.append({ 'hash': api_key.key_hash,
+                          'description': api_key.description,
+                          'scopes': APIKeyScope.get_all(api_key.key_hash) })
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {
@@ -301,11 +332,11 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/key/add', methods=['POST'])
-    @secure(app, ['key', 'user'], ['api_key_scope'])
+    @secure(app)
     def post_api_key_add(auth_token):
         """
         @api {post} /api/auth/key/add APIKeyAdd
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName APIKeyAdd
         @apiGroup Authentication
         @apiDescription Add a new APIKey into the system.
@@ -314,7 +345,6 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} key APIKey to add to the system.
@@ -325,6 +355,9 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} DescriptionParameterMissing Description is not present in the parameters.
         @apiError (Errors){String} DescriptionParameterInvalid Description is not valid String.
         """
+        if not has_client_scope(auth_token, '*', ['api_key_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         data = request.get_json(force=True)
 
         # key checks
@@ -373,11 +406,11 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/key/remove', methods=['POST'])
-    @secure(app, ['key', 'user'], ['api_key_scope'])
+    @secure(app)
     def post_api_key_remove(auth_token):
         """
         @api {post} /api/auth/key/remove APIKeyRemove
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName APIKeyRemove
         @apiGroup Authentication
         @apiDescription Remove an APIKey from the system.
@@ -386,7 +419,6 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} key APIKey to add to the system.
@@ -394,6 +426,9 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
         @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
         """
+        if not has_client_scope(auth_token, '*', ['api_key_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         data = request.get_json(force=True)
 
         # key checks
@@ -428,11 +463,11 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/key/description/update', methods=['POST'])
-    @secure(app, ['key', 'user'], ['api_key_scope'])
+    @secure(app)
     def post_api_key_description_update(auth_token):
         """
         @api {post} /api/auth/key/description/update APIKeyDescriptionUpdate
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName APIKeyDescriptionUpdate
         @apiGroup Authentication
         @apiDescription Update the description of an APIKey.
@@ -441,7 +476,6 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} key APIKey to update the description.
@@ -452,6 +486,9 @@ def build_api_auth(app, oid):
         @apiError (Errors){String} DescriptionParameterMissing Description is not present in the parameters.
         @apiError (Errors){String} DescriptionParameterInvalid Description is not valid String.
         """
+        if not has_client_scope(auth_token, '*', ['api_key_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         data = request.get_json(force=True)
 
         # key checks
@@ -499,30 +536,35 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/key/scope/add', methods=['POST'])
-    @secure(app, ['key', 'user'], ['api_key_scope'])
+    @secure(app)
     def post_api_key_scope_add(auth_token):
         """
         @api {post} /api/auth/key/scope/add APIKeyScopeAdd
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName APIKeyScopeAdd
         @apiGroup Authentication
-        @apiDescription Add scope access to the APIKey.
+        @apiDescription Add scope access to the APIKey on a specific channel.
 
         @apiHeader {String} Authorization 'Bearer <Auth_Token>'
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
-        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
+        @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible..
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} key APIKey to add scopes to.
         @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
         @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
         @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
+        @apiParam {String} channel Channel to add the scopes to.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiParam {String[]} scopes Scopes to add to the key.
         @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
         @apiError (Errors){String} ScopesParameterInvalid Scope is not list of valid scope Strings.
         """
+        if not has_client_scope(auth_token, '*', ['api_key_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         data = request.get_json(force=True)
 
         # key checks
@@ -535,6 +577,18 @@ def build_api_auth(app, oid):
         if not isinstance(key, str) or len(key) == 0:
             return jsonify({'success': 'no',
                             'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
                             'payload': {}
                             }), 200
 
@@ -571,37 +625,42 @@ def build_api_auth(app, oid):
 
         # add scopes
         for scope in scopes:
-            APIKeyScope.upsert(hash_key, scope)
+            APIKeyScope.upsert(hash_key, channel, scope)
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {}
                         }), 200
 
     @app.route('/api/auth/key/scope/remove', methods=['POST'])
-    @secure(app, ['key', 'user'], ['api_key_scope'])
+    @secure(app)
     def post_api_key_scope_remove(auth_token):
         """
         @api {post} /api/auth/key/scope/remove APIKeyScopeRemove
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName APIKeyScopeRemove
         @apiGroup Authentication
-        @apiDescription Remove scope access to the APIKey.
+        @apiDescription Remove scope access to the APIKey from a specific channel.
 
         @apiHeader {String} Authorization 'Bearer <Auth_Token>'
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} key APIKey to remove scopes from.
         @apiError (Errors){String} KeyParameterMissing Key is not present in the parameters.
         @apiError (Errors){String} KeyParameterInvalid Key is not valid String.
         @apiError (Errors){String} KeyDoesntExists There is no such key in the system.
+        @apiParam {String} channel Channel to add the scopes to.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiParam {String[]} scopes Scopes to remove from the key.
         @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
         @apiError (Errors){String} ScopesParameterInvalid Scope is not list of valid scope Strings.
         """
+        if not has_client_scope(auth_token, '*', ['api_key_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         data = request.get_json(force=True)
 
         # key checks
@@ -614,6 +673,18 @@ def build_api_auth(app, oid):
         if not isinstance(key, str) or len(key) == 0:
             return jsonify({'success': 'no',
                             'error': 'KeyParameterInvalid',
+                            'payload': {}
+                            }), 200
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
                             'payload': {}
                             }), 200
 
@@ -650,7 +721,7 @@ def build_api_auth(app, oid):
 
         # remove scopes
         for scope in scopes:
-            api_scope = db.session.query(APIKeyScope).filter(APIKeyScope.key_hash==hash_key, APIKeyScope.scope==scope).one_or_none()
+            api_scope = db.session.query(APIKeyScope).filter(APIKeyScope.key_hash==hash_key, APIKeyScope.channel==channel, APIKeyScope.scope==scope).one_or_none()
             if api_scope is not None:
                 db.session.delete(api_scope)
         db.session.commit()
@@ -660,22 +731,24 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/user/scope/list', methods=['GET'])
-    @secure(app, ['key', 'user'], ['user_scope'])
+    @secure(app)
     def get_user_scope_list(auth_token):
         """
         @api {get} /api/auth/user/scope/list UserScopeList
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName UserScopeList
         @apiGroup Authentication
-        @apiDescription List all users with their scopes.
+        @apiDescription List all users with their scopes on a specific channel.
 
         @apiHeader {String} Authorization 'Bearer <Auth_Token>'
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to list the scopes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiParam {Integer{1-100}} [limit=10] Optional number of entries to return.
         @apiError (Errors){String} LimitInvalid Limit is not a positive integer in waited range.
         @apiParam {Integer{0-..}} [offset=0] Optional offset for database fetch.
@@ -684,8 +757,9 @@ def build_api_auth(app, oid):
         @apiSuccess {Number} total Total number of users.
         @apiSuccess {Object[]} users All available users.
         @apiSuccess {String} users.id Id of the user.
-        @apiSuccess {String[]} users.scopes List of scopes this user has access to.
+        @apiSuccess {String[]} users.scopes List of scopes this user has access to on this channel.
         """
+
         data = safe_json_loads(request.args.get('data', '{}'))
 
         # limit check
@@ -695,7 +769,6 @@ def build_api_auth(app, oid):
                             'error': 'LimitInvalid',
                             'payload': {}
                             }), 200
-
         # offset check
         offset = data.get('offset', 0)
         if not isinstance(offset, int) or offset < 0 :
@@ -703,6 +776,20 @@ def build_api_auth(app, oid):
                             'error': 'OffsetInvalid',
                             'payload': {}
                             }), 200
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['user_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
 
         # Return results
         total = db.session().query(User).count()
@@ -712,10 +799,8 @@ def build_api_auth(app, oid):
                                    .limit(limit)\
                                    .offset(offset)\
                                    .all():
-            scopes = []
-            for scope in db.session().query(UserScope).filter(UserScope.id==user.id).all():
-                scopes.append(scope.scope)
-            users.append({ 'id': str(user.id), 'scopes': scopes })
+            scopes = UserScope.get_channel_specific(user.id, channel)
+            users.append({ 'id': str(user.id), 'name': user.name, 'scopes': scopes })
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {
@@ -725,25 +810,27 @@ def build_api_auth(app, oid):
                         }), 200
 
     @app.route('/api/auth/user/scope/add', methods=['POST'])
-    @secure(app, ['key', 'user'], ['user_scope'])
+    @secure(app)
     def post_user_scope_add(auth_token):
         """
         @api {post} /api/auth/user/scope/add UserScopeAdd
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName UserScopeAdd
         @apiGroup Authentication
-        @apiDescription Add scope access to a user.
+        @apiDescription Add scope access to a user on a specific channel.
 
         @apiHeader {String} Authorization 'Bearer <Auth_Token>'
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} id User id to add scopes to.
         @apiError (Errors){String} IdParameterMissing id is not present in the parameters.
         @apiError (Errors){String} IdParameterInvalid id is not valid String.
+        @apiParam {String} channel Channel to list the scopes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiError (Errors){String} UserWithIdDoesntExists There is no user with such id in the system.
         @apiParam {String[]} scopes Scopes to add to the user.
         @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
@@ -765,6 +852,21 @@ def build_api_auth(app, oid):
                             }), 200
         id = int(id)
 
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['user_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         # scopes checks
         scopes = data.get('scopes', None)
         if scopes is None:
@@ -796,32 +898,34 @@ def build_api_auth(app, oid):
 
         # add scopes
         for scope in scopes:
-            UserScope.upsert(id, scope)
+            UserScope.upsert(id, channel, scope)
         return jsonify({'success': 'yes',
                         'error': '',
                         'payload': {}
                         }), 200
 
     @app.route('/api/auth/user/scope/remove', methods=['POST'])
-    @secure(app, ['key', 'user'], ['user_scope'])
+    @secure(app)
     def post_user_scope_remove(auth_token):
         """
         @api {post} /api/auth/user/scope/remove UserScopeRemove
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName UserScopeRemove
         @apiGroup Authentication
-        @apiDescription Remove scope access from a user.
+        @apiDescription Remove scope access from a user on a specific channel.
 
         @apiHeader {String} Authorization 'Bearer <Auth_Token>'
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
         @apiParam {String} id User id to remove scopes from.
         @apiError (Errors){String} IdParameterMissing id is not present in the parameters.
         @apiError (Errors){String} IdParameterInvalid id is not valid String.
+        @apiParam {String} channel Channel to list the scopes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiError (Errors){String} UserWithIdDoesntExists There is no user with such id in the system.
         @apiParam {String[]} scopes Scopes to remove from the user.
         @apiError (Errors){String} ScopesParameterMissing Scope is not present in the parameters.
@@ -843,6 +947,21 @@ def build_api_auth(app, oid):
                             }), 200
         id = int(id)
 
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['user_scope']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
         # scopes checks
         scopes = data.get('scopes', None)
         if scopes is None:
@@ -873,7 +992,9 @@ def build_api_auth(app, oid):
 
         # add scopes
         for scope in scopes:
-            user_scope = db.session.query(UserScope).filter(UserScope.id==user.id, UserScope.scope==scope).one_or_none()
+            user_scope = db.session.query(UserScope).filter(UserScope.id==user.id,
+                                                            UserScope.scope==scope,
+                                                            UserScope.channel==channel).one_or_none()
             if user_scope is not None:
                 db.session.delete(user_scope)
         db.session.commit()

@@ -966,23 +966,14 @@ class ImageGenerator:
         composition.save(image_path)
         return True
 
-    def generate_calendar_image(self, theme, image_name, calendar_data):
-        theme_data = {
-            'frogged' : {
-                'ladder_string': 'Dota 2 avec'
-            },
-            'artifact' : {
-                'ladder_string': 'Artifact avec'
-            }
-        }
-
+    def generate_froggedtv_calendar(self, image_name, calendar_data):
         # Delete previous image
-        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], image_name + '.png')
+        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], 'calendar_froggedtv_{0}.png'.format(image_name))
         if os.path.isfile(image_path): os.remove(image_path)
 
         # Generate image
         composition = Image.open(
-            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'calendar-background.png')).convert('RGBA')
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'froggedtv_calendar-background-16h.png')).convert('RGBA')
 
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'futura', 'futurastd_condensed.otf'), 48)
@@ -1015,7 +1006,7 @@ class ImageGenerator:
                                  fill=ImageColor.getrgb('rgb(0,0,0)'))
 
             y0 = y0 + 4
-            if theme_data[theme]['ladder_string'] in event['title']:
+            if 'Dota 2 avec' in event['title']:
                 image_draw.rectangle([x0, y0, x1, y1],
                                      fill=ImageColor.getrgb('rgb(62,0,0)'))
                 image_draw.rectangle([x0 + border_width,
@@ -1049,9 +1040,9 @@ class ImageGenerator:
             center_y = int((y1 + y0) / 2)
 
             y0 = y0 + 4
-            if theme_data[theme]['ladder_string'] in event['title']:
+            if 'Dota 2 avec' in event['title']:
                 # Add streamer name
-                streamer = event['title'][len(theme_data[theme]['ladder_string']):]
+                streamer = event['title'][len('Dota 2 avec'):]
                 self.draw_text_center_vertical_align(image_draw, [center_x, center_y], streamer, rift_title, ImageColor.getrgb('#000000'))
             else:
                 # Add frog background
@@ -1071,8 +1062,110 @@ class ImageGenerator:
                     composition.paste(show_image,
                                       [center_x - int(show_image.size[0] / 2), center_y - int(show_image.size[1] / 2)],
                                       show_image)
-
         composition.save(image_path)
+
+    def generate_artifact_fr_calendar(self, image_name, calendar_data):
+        # Delete previous image
+        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], 'calendar_artifact_fr_{0}.png'.format(image_name))
+        if os.path.isfile(image_path): os.remove(image_path)
+
+        # Generate image
+        composition = Image.open(
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'artifact_fr_calendar-background-16h.png')).convert('RGBA')
+
+        image_draw = ImageDraw.Draw(composition)
+        rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'hypatia', 'hypatiasanspro_regular.otf'), 48)
+
+        first_day_x = 122
+        day_offset_x = 240
+        day_width = 235
+
+        first_day_y = 178
+        hour_start = 10
+        hour_offset_y = 50
+
+        border_width = 4
+        # First Pass: Draw all rectangles
+        for event in calendar_data:
+
+            event_duration = (event['end'] - event['start'])
+
+            # Find start and end of event
+            x0 = first_day_x + day_offset_x*event['start'].weekday()
+            y0 = first_day_y + hour_offset_y*(event['start'].hour - hour_start) \
+                 + int(math.floor(event['start'].minute/30)*hour_offset_y/2)
+            x1 = x0 + day_width
+            y1 = y0 + int((event_duration.seconds/1800)*hour_offset_y/2)
+
+            # Draw black line before and after
+            image_draw.rectangle([x0, y0, x1, y0+4],
+                                 fill=ImageColor.getrgb('rgb(0,0,0)'))
+            image_draw.rectangle([x0, y1+1, x1, y1+5],
+                                 fill=ImageColor.getrgb('rgb(0,0,0)'))
+
+            y0 = y0 + 4
+            image_draw.rectangle([x0, y0, x1, y1],
+                                 fill=ImageColor.getrgb('rgb(255,255,255)'))
+            if 'Artifact avec' in event['title']:
+                image_draw.rectangle([x0 + border_width,
+                                      y0 + border_width,
+                                      x1 - border_width,
+                                      y1 - border_width],
+                                     fill=ImageColor.getrgb('rgb(0,0,0)'))
+            else:
+                # Draw second border for show
+                image_draw.rectangle([x0 + border_width,
+                                      y0 + border_width,
+                                      x1 - border_width,
+                                      y1 - border_width],
+                                     fill=ImageColor.getrgb('rgb(0,174,255)'))
+                image_draw.rectangle([x0 + int(border_width/2) + border_width,
+                                      y0 + int(border_width/2) + border_width,
+                                      x1 - int(border_width/2) - border_width,
+                                      y1 - int(border_width/2) - border_width],
+                                     fill=ImageColor.getrgb('rgb(0,0,0)'))
+
+        # Second pass: draw images (so they can overlap with multiple rectangles)
+        for event in calendar_data:
+
+            event_duration = (event['end'] - event['start'])
+
+            # Find start and end of event
+            x0 = first_day_x + day_offset_x * event['start'].weekday()
+            y0 = first_day_y + hour_offset_y * (event['start'].hour - hour_start) \
+                 + int(math.floor(event['start'].minute / 30) * hour_offset_y / 2)
+            x1 = x0 + day_width
+            y1 = y0 + int((event_duration.seconds / 1800) * hour_offset_y / 2)
+
+            # Calculate center
+            center_x = int((x1 + x0) / 2)
+            center_y = int((y1 + y0) / 2)
+
+            y0 = y0 + 4
+            if 'Artifact avec' in event['title']:
+                # Add artifact background
+                artifact = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'calendar-artifact.png'))
+                rectangle_width = (x1 - border_width - x0 - border_width)
+                rectangle_height = (y1 - border_width - y0 - border_width)
+                resized_image = artifact.resize([rectangle_width, rectangle_height], Image.LANCZOS)
+                composition.paste(resized_image, box=[x0+border_width, y0+border_width])
+
+                # Add streamer name
+                streamer = event['title'][len('Artifact avec'):]
+                self.draw_text_center_vertical_align(image_draw, [center_x, center_y], streamer, rift_title, ImageColor.getrgb('#FFFFFF'))
+
+            else:
+
+                # Add show image if detected
+                show = event['title'].lower().replace(' ', '_').replace("'", '_').replace('+', 'plus')
+                url = os.path.join(os.path.dirname(__file__),  '..', 'ressources', 'img', 'shows', '{}.png'.format(show))
+                if os.path.exists(url):
+                    show_image = Image.open(url)
+                    composition.paste(show_image,
+                                      [center_x - int(show_image.size[0] / 2), center_y - int(show_image.size[1] / 2)],
+                                      show_image)
+        composition.save(image_path)
+
 
 
     @staticmethod

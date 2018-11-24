@@ -78,8 +78,6 @@ def get_calendar_events(google_api_key, calendar_id):
                 end = event['end'].get('dateTime')
                 end = datetime.strptime(''.join(end.rsplit(':', 1))[:18],
                                         "%Y-%m-%dT%H:%M:%S")
-                if start.hour < 10:
-                    start = start.replace(hour=10, minute=0, second=0)
                 if end > end_datetime[i]:
                     end = end_datetime[i]
                 title = event['summary']
@@ -88,3 +86,17 @@ def get_calendar_events(google_api_key, calendar_id):
     except Exception as e:
         logging.exception(e)
         return None
+
+def sanitize_events(events, hour_start, hour_end):
+    sanitized_events = []
+    for event in events:
+        sanitized_event = {
+            'title': event['title'],
+            'start': event['start'],
+            'end': event['end']
+        }
+        if sanitized_event['start'].hour < hour_start:
+            sanitized_event['start'] = sanitized_event['start'].replace(hour=hour_start)
+        sanitized_events.append(sanitized_event)
+
+    return sanitized_events

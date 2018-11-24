@@ -3,7 +3,7 @@ import logging
 from flask import request, jsonify
 from apiclient import discovery
 
-from helpers.general import get_calendar_events
+from helpers.general import get_calendar_events, sanitize_events
 from helpers.endpoint import secure
 from helpers.image_gen import ImageGenerator
 
@@ -39,8 +39,8 @@ def build_api_calendar(app):
                             'error': 'GoogleCalendarError',
                             'payload': {}
                            }), 200
-        ig.generate_calendar_image('frogged', 'calendar_frogged_now', calendar_events[0])
-        ig.generate_calendar_image('frogged', 'calendar_frogged_next', calendar_events[1])
+        ig.generate_froggedtv_calendar('now', sanitize_events(calendar_events[0], 10, 2))
+        ig.generate_froggedtv_calendar('next', sanitize_events(calendar_events[1], 10, 2))
 
         # Get events for frogged google calendar
         calendar_events = get_calendar_events(app.config['GOOGLE_API_KEY'],
@@ -50,8 +50,8 @@ def build_api_calendar(app):
                             'error': 'GoogleCalendarError',
                             'payload': {}
                             }), 200
-        ig.generate_calendar_image('artifact', 'calendar_artifact_now', calendar_events[0])
-        ig.generate_calendar_image('artifact', 'calendar_artifact_next', calendar_events[1])
+        ig.generate_artifact_fr_calendar('now', sanitize_events(calendar_events[0], 10, 2))
+        ig.generate_artifact_fr_calendar('next', sanitize_events(calendar_events[1], 10, 2))
 
         return jsonify({'success': 'yes',
                         'error': '',

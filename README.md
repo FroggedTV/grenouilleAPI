@@ -1,26 +1,7 @@
 # GrenouilleAPI
 
-## TODO List
-
-### API
-
-General:
-- [ ] Add the ability to run specific CRON jobs inside the grenouilleAPI worker.
-
-Game:
-- [ ] Revamp endpoints
-- [ ] Add a `ListGames(limit, offset)`, ordered by `id desc`
-- [ ] Add `limit` and `offset` to `ListGameVIPs(limit, offset)`
-
-Community:
-- [ ] Implement the calendar fetcher (Update and Get). Similar to GrenouilleIRC.
-- [ ] Create a CRON job to update calendar (every 1 hour).
-
-Stats:
-- [ ] Integrate stats scripts inside the grenouilleAPI to prepare for TI image generation (from deposit GameStatAnalyzer).
-
-Calendar:
-- [ ] Integrate the calendar image generation inside the website (from deposit CalendarImageGenerator).
+This deposit is now deprecated. 
+The new StreamProxy deposit is now a modular service with a [backend](https://github.com/FroggedTV/StreamProxyBackend) and a [frontend](https://github.com/FroggedTV/StreamProxyFrontend) exclusivly designed for the stream proxy. Other services specificaly designed for Dota 2 and the FroggedTV will be created in a new deposit.
 
 ### BOT
 

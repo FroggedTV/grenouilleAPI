@@ -9,6 +9,7 @@ from flask_script import Manager
 
 from app import create_app
 from database import db
+from models.Stream import Stream
 from models.User import User, APIKey
 from models.UserScope import Scope, UserScope, APIKeyScope
 from models.DotaBots import Game, GameStatus, GameVIP, GameVIPType
@@ -145,6 +146,10 @@ def clean_rogue_scopes():
 @manager.command
 def init_database():
     """Initialize database with dota value."""
+    # Insert Streams
+    Stream.upsert(id='froggedtv', name='FroggedTV', hostname='127.0.0.1', port=4444, google_calendar_id='qnv4k3c3upl94sj41pui158k3c@group.calendar.google.com')
+    Stream.upsert(id='artifact_fr', name='Artifact_FR', hostname='127.0.0.1', port=4445, google_calendar_id='j2e6a18f0bqm8h21vko77vbag0@group.calendar.google.com')
+
     # Insert Heroes
     hero_json_path = os.path.join(os.path.dirname(__file__), 'ressources', 'json', 'dota_heroes.json')
     if os.path.isfile(hero_json_path):

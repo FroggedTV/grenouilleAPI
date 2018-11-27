@@ -9,18 +9,21 @@ from apiclient.http import MediaFileUpload
 from flask import request, jsonify
 
 from helpers.general import safe_json_loads
-from helpers.endpoint import secure
+from helpers.endpoint import secure, has_client_scope
 from helpers.obs import send_command_to_obs
+
+from database import db
+from models.Stream import Stream
 
 def build_api_stream_system(app):
     """Factory to setup the routes for the stream system api."""
 
     @app.route('/api/obs/scene/list', methods=['GET'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def get_obs_scene_list(auth_token):
         """
         @api {get} /api/obs/scene/list OBSSceneList
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSSceneList
         @apiGroup StreamSystem
         @apiDescription List the available scenes in OBS.
@@ -29,18 +32,48 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to list the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
         @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         @apiSuccess {String[]} scenes All available scenes with their name as Strings.
         @apiSuccess {String} active_scene Active scene.
         """
+        data = safe_json_loads(request.args.get('data', '{}'))
+
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
+        # Get all scenes with 'stream_id#' as prefix
         scenes = []
         try:
-            result = send_command_to_obs('GetSceneList', {})
+            result = send_command_to_obs(stream.hostname, stream.port, 'GetSceneList', {})
             for scene in result['scenes']:
-                scenes.append(scene['name'])
+                if scene['name'].startswith(stream.id):
+                    scenes.append(scene['name'])
             return jsonify({'success': 'yes',
                             'error': '',
                             'payload': {
@@ -54,11 +87,11 @@ def build_api_stream_system(app):
                             'payload': {}}), 200
 
     @app.route('/api/obs/scene/update', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def post_obs_scene_update(auth_token):
         """
         @api {post} /api/obs/scene/update OBSSceneUpdate
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSSceneUpdate
         @apiGroup StreamSystem
         @apiDescription Change the OBS active scene to a new one.
@@ -67,15 +100,17 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
-        @apiError (Errors){String} OBSInternalError Error communicating to OBS.
-
+        @apiParam {String} channel Channel to change the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
         @apiParam {String} scene Name of the scene to change to.
         @apiError (Errors){String} SceneParameterMissing Scene is not present in the parameters.
         @apiError (Errors){String} SceneParameterInvalid Scene is not valid String.
         @apiError (Errors){String} SceneDoesNotExist Specified scene does not exist in OBS.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
+        @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         """
         data = request.get_json(force=True)
 
@@ -92,9 +127,32 @@ def build_api_stream_system(app):
                             'payload': {}
                             }), 200
 
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
         # Send command to obs
         try:
-            result = send_command_to_obs('SetCurrentScene', {'scene-name': scene})
+            result = send_command_to_obs(stream.hostname, stream.port, 'SetCurrentScene', {'scene-name': scene})
             if ('status' in result
                     and result['status'] == 'error'
                     and result['error'] == 'requested scene does not exist'):
@@ -111,11 +169,11 @@ def build_api_stream_system(app):
                             'payload': {}}), 200
 
     @app.route('/api/obs/record/start', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def post_obs_record_start(auth_token):
         """
         @api {post} /api/obs/record/start OBSRecordStart
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSRecordStart
         @apiGroup StreamSystem
         @apiDescription Start the recording by OBS.
@@ -124,14 +182,42 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to change the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
         @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         @apiError (Errors){String} OBSAlreadyRecording OBS is already recording.
         """
+        data = request.get_json(force=True)
+
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
         try:
-            result = send_command_to_obs('StartRecording', {})
+            result = send_command_to_obs(stream.hostname, stream.port, 'StartRecording', {})
             if ('status' in result
                     and result['status'] == 'error'
                     and result['error'] == 'recording already active'):
@@ -148,11 +234,11 @@ def build_api_stream_system(app):
                             'payload': {}}), 200
 
     @app.route('/api/obs/record/stop', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def post_obs_record_stop(auth_token):
         """
         @api {post} /api/obs/record/stop OBSRecordStop
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSRecordStop
         @apiGroup StreamSystem
         @apiDescription Stop the recording by OBS.
@@ -161,14 +247,42 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to change the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
         @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         @apiError (Errors){String} OBSNotRecording OBS is not currently recording.
         """
+        data = request.get_json(force=True)
+
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
         try:
-            result = send_command_to_obs('StopRecording', {})
+            result = send_command_to_obs(stream.hostname, stream.port, 'StopRecording', {})
             if ('status' in result
                     and result['status'] == 'error'
                     and result['error'] == 'recording not active'):
@@ -186,11 +300,11 @@ def build_api_stream_system(app):
 
 
     @app.route('/api/obs/stream/start', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def post_obs_stream_start(auth_token):
         """
         @api {post} /api/obs/stream/start OBSStreamStart
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSStreamStart
         @apiGroup StreamSystem
         @apiDescription Start the streaming by OBS.
@@ -199,14 +313,42 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to change the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
         @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         @apiError (Errors){String} OBSAlreadyStreaming OBS already streaming to endpoint.
         """
+        data = request.get_json(force=True)
+
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
         try:
-            result = send_command_to_obs('StartStreaming', {})
+            result = send_command_to_obs(stream.hostname, stream.port, 'StartStreaming', {})
             if ('status' in result
                     and result['status'] == 'error'
                     and result['error'] == 'streaming already active'):
@@ -223,11 +365,11 @@ def build_api_stream_system(app):
                             'payload': {}}), 200
 
     @app.route('/api/obs/stream/stop', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def post_obs_stream_stop(auth_token):
         """
         @api {post} /api/obs/stream/stop OBSStreamStop
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSStreamStop
         @apiGroup StreamSystem
         @apiDescription Stop the streaming by OBS.
@@ -236,14 +378,42 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
+        @apiParam {String} channel Channel to change the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
         @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         @apiError (Errors){String} OBSNotStreaming OBS is not currently streaming.
         """
+        data = request.get_json(force=True)
+
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
         try:
-            result = send_command_to_obs('StopStreaming', {})
+            result = send_command_to_obs(stream.hostname, stream.port, 'StopStreaming', {})
             if ('status' in result
                     and result['status'] == 'error'
                     and result['error'] == 'streaming not active'):
@@ -260,11 +430,11 @@ def build_api_stream_system(app):
                             'payload': {}}), 200
 
     @app.route('/api/obs/status', methods=['GET'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    @secure(app)
     def get_obs_status(auth_token):
         """
         @api {get} /api/obs/status OBSStatus
-        @apiVersion 1.1.0
+        @apiVersion 1.2.0
         @apiName OBSStatus
         @apiGroup StreamSystem
         @apiDescription Get OBS streaming and recording status.
@@ -273,15 +443,43 @@ def build_api_stream_system(app):
         @apiError (Errors){String} AuthorizationHeaderInvalid Authorization Header is Invalid.
         @apiError (Errors){String} AuthTokenExpired Token has expired, must be refreshed by client.
         @apiError (Errors){String} AuthTokenInvalid Token is invalid, decode is impossible.
-        @apiError (Errors){String} ClientAccessImpossible This type of client can't access target endpoint.
         @apiError (Errors){String} ClientAccessRefused Client has no scope access to target endpoint.
 
-        @apiError (Errors){String} OBSInternalError Error communicating to OBS.
+        @apiParam {String} channel Channel to list the scenes of.
+        @apiError (Errors){String} ChannelParameterMissing Channel is not present in the parameters.
+        @apiError (Errors){String} ChannelParameterInvalid Channel is not a valid String.
+        @apiError (Errors){String} NoOBSInformationInDatabase OBS hostname and port are not defined in the database.
         @apiSuccess {Boolean} recording Status of the OBS record.
         @apiSuccess {Boolean} streaming Status of the OBS stream.
+        @apiError (Errors){String} OBSInternalError Error communicating to OBS.
         """
+        data = safe_json_loads(request.args.get('data', '{}'))
+
+        # channel check
+        channel = data.get('channel', None)
+        if channel is None:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterMissing',
+                            'payload': {}
+                            }), 200
+        if not isinstance(channel, str) or len(channel) == 0:
+            return jsonify({'success': 'no',
+                            'error': 'ChannelParameterInvalid',
+                            'payload': {}
+                            }), 200
+        if not has_client_scope(auth_token, channel, ['obs_control']):
+            return jsonify({'success': 'no', 'error': 'ClientAccessRefused', 'payload': {}}), 403
+
+        # Get stream information from database
+        stream = Stream.get(channel)
+        if stream is None or stream.hostname is None or stream.port is None:
+            return jsonify({'success': 'no',
+                            'error': 'NoOBSInformationInDatabase',
+                            'payload': {}
+                            }), 200
+
         try:
-            result = send_command_to_obs('GetStreamingStatus', {})
+            result = send_command_to_obs(stream.hostname, stream.port, 'GetStreamingStatus', {})
             return jsonify({'success': 'yes',
                             'error': '',
                             'payload': {
@@ -294,8 +492,8 @@ def build_api_stream_system(app):
                             'error': 'InternalOBSError',
                             'payload': {}}), 200
 
-    @app.route('/api/vod/disk_usage', methods=['GET'])
-    @secure(app, ['key', 'user'], ['vod_manage'])
+    #@app.route('/api/vod/disk_usage', methods=['GET'])
+    #@secure(app, ['key', 'user'], ['vod_manage'])
     def get_vod_disk_usage(auth_token):
         """
         @api {get} /api/vod/disk_usage VODDiskUsage
@@ -337,8 +535,8 @@ def build_api_stream_system(app):
                             'error': 'FileSystemError',
                             'payload': {}}), 200
 
-    @app.route('/api/vod/file/list', methods=['GET'])
-    @secure(app, ['key', 'user'], ['vod_manage'])
+    #@app.route('/api/vod/file/list', methods=['GET'])
+    #@secure(app, ['key', 'user'], ['vod_manage'])
     def get_vod_list(auth_token):
         """
         @api {get} /api/vod/file/list VODFileList
@@ -388,8 +586,8 @@ def build_api_stream_system(app):
                         'payload': {}}), 200
 
 
-    @app.route('/api/vod/file/delete', methods=['POST'])
-    @secure(app, ['key', 'user'], ['vod_delete'])
+    #@app.route('/api/vod/file/delete', methods=['POST'])
+    #@secure(app, ['key', 'user'], ['vod_delete'])
     def post_vod_file_delete(auth_token):
         """
         @api {post} /api/vod/file/delete VODFileDelete
@@ -456,8 +654,8 @@ def build_api_stream_system(app):
                         'error': 'FileSystemError',
                         'payload': {}}), 200
 
-    @app.route('/api/vod/file/youtube/upload', methods=['POST'])
-    @secure(app, ['key', 'user'], ['vod_manage'])
+    #@app.route('/api/vod/file/youtube/upload', methods=['POST'])
+    #@secure(app, ['key', 'user'], ['vod_manage'])
     def post_vod_file_youtube_upload(auth_token):
         """
         @api {post} /api/vod/file/youtube/upload VODFileYoutubeUpload
@@ -537,8 +735,8 @@ def build_api_stream_system(app):
                         'payload': {}}), 200
 
 
-    @app.route('/api/vod/dir/create', methods=['POST'])
-    @secure(app, ['key', 'user'], ['vod_delete'])
+    #@app.route('/api/vod/dir/create', methods=['POST'])
+    #@secure(app, ['key', 'user'], ['vod_delete'])
     def post_vod_dir_create(auth_token):
         """
         @api {post} /api/vod/dir/create VODDirCreate
@@ -594,8 +792,8 @@ def build_api_stream_system(app):
                         'error': 'FileSystemError',
                         'payload': {}}), 200
 
-    @app.route('/api/vod/file/move', methods=['POST'])
-    @secure(app, ['key', 'user'], ['vod_manage'])
+    #@app.route('/api/vod/file/move', methods=['POST'])
+    #@secure(app, ['key', 'user'], ['vod_manage'])
     def post_vod_file_move(auth_token):
         """
         @api {post} /api/vod/file/move VODFileMove
@@ -683,8 +881,8 @@ def build_api_stream_system(app):
                         'error': 'FileSystemError',
                         'payload': {}}), 200
 
-    @app.route('/api/obs/playlist/get', methods=['GET'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    #@app.route('/api/obs/playlist/get', methods=['GET'])
+    #@secure(app, ['key', 'user'], ['obs_control'])
     def get_playlist(auth_token):
         """
         @api {get} /api/obs/playlist/get OBSPlaylistGet
@@ -725,8 +923,8 @@ def build_api_stream_system(app):
                             'error': 'InternalOBSError',
                             'payload': {}}), 200
 
-    @app.route('/api/obs/playlist/update', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    #@app.route('/api/obs/playlist/update', methods=['POST'])
+    #@secure(app, ['key', 'user'], ['obs_control'])
     def post_playlist_update(auth_token):
         """
         @api {post} /api/obs/playlist/update OBSPlaylistUpdate
@@ -795,8 +993,8 @@ def build_api_stream_system(app):
                             'error': 'InternalOBSError',
                             'payload': {}}), 200
 
-    @app.route('/api/obs/rtmp/restart', methods=['POST'])
-    @secure(app, ['key', 'user'], ['obs_control'])
+    #@app.route('/api/obs/rtmp/restart', methods=['POST'])
+    #@secure(app, ['key', 'user'], ['obs_control'])
     def post_restart_rtmp(auth_token):
         """
         @api {post} /api/obs/rtmp/restart OBSRestartRTMP

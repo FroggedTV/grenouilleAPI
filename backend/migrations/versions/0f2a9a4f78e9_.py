@@ -46,6 +46,7 @@ def upgrade():
 
     op.create_table('stream',
     sa.Column('id', sa.String(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
     sa.Column('hostname', sa.String(), nullable=True),
     sa.Column('port', sa.Integer(), nullable=True),
     sa.Column('google_calendar_id', sa.String(), nullable=True),

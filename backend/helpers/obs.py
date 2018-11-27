@@ -1,7 +1,7 @@
 import websocket
 import json
 
-def send_command_to_obs(command, options):
+def send_command_to_obs(hostname, port, command, options):
     """Send a command to obs through the WebSocket.
 
     Args:
@@ -11,7 +11,7 @@ def send_command_to_obs(command, options):
         JSON Answer from the WebSocket.
     """
     ws = websocket.WebSocket()
-    ws.connect("ws://{}:{}".format('127.0.0.1', '4444'))
+    ws.connect("ws://{}:{}".format(hostname, port))
 
     payload = options
     payload['message-id'] = 1

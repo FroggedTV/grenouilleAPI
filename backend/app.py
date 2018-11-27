@@ -48,14 +48,14 @@ def access_docs(path):
 from routes.user import build_api_user
 from routes.auth import build_api_auth
 #from routes.game import build_api_game
-#from routes.stream_system import build_api_stream_system
+from routes.stream_system import build_api_stream_system
 #from routes.stats import build_api_stats
 from routes.calendar import build_api_calendar
 
 build_api_auth(app, oid, oauth)
 build_api_user(app)
 #build_api_game(app)
-#build_api_stream_system(app)
+build_api_stream_system(app)
 #build_api_stats(app)
 build_api_calendar(app)
 

@@ -969,14 +969,26 @@ class ImageGenerator:
         composition.save(image_path)
         return True
 
-    def generate_froggedtv_calendar(self, image_name, calendar_data):
-        # Delete previous image
-        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], 'calendar_froggedtv_{0}.png'.format(image_name))
+    def generate_calendar(self, stream_id, week, time_scale, calendar_data):
+        # Prepare new Image object
+        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'],
+                                  'calendar_{0}_{1}_{2}.png'.format(stream_id, week, time_scale))
         if os.path.isfile(image_path): os.remove(image_path)
+        composition = Image.open(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img',
+                                              'calendar-background_{0}_{1}.png'.format(stream_id, time_scale))).convert('RGBA')
 
-        # Generate image
-        composition = Image.open(
-            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'froggedtv_calendar-background-16h.png')).convert('RGBA')
+        # Draw specifics
+        if stream_id == 'froggedtv':
+            self.generate_froggedtv_calendar(composition, time_scale, calendar_data)
+        elif stream_id == 'artifact_fr':
+            self.generate_artifact_fr_calendar(composition, time_scale, calendar_data)
+
+        # Save
+        composition.save(image_path)
+
+    def generate_froggedtv_calendar(self, composition, time_scale, calendar_data):
+        if time_scale == '0h0h':
+            return
 
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'futura', 'futurastd_condensed.otf'), 48)
@@ -1065,16 +1077,11 @@ class ImageGenerator:
                     composition.paste(show_image,
                                       [center_x - int(show_image.size[0] / 2), center_y - int(show_image.size[1] / 2)],
                                       show_image)
-        composition.save(image_path)
 
-    def generate_artifact_fr_calendar(self, image_name, calendar_data):
-        # Delete previous image
-        image_path = os.path.join(self.app.config['IMG_GENERATE_PATH'], 'calendar_artifact_fr_{0}.png'.format(image_name))
-        if os.path.isfile(image_path): os.remove(image_path)
 
-        # Generate image
-        composition = Image.open(
-            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'artifact_fr_calendar-background-16h.png')).convert('RGBA')
+    def generate_artifact_fr_calendar(self, composition, time_scale, calendar_data):
+        if time_scale == '0h0h':
+            return
 
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'hypatia', 'hypatiasanspro_regular.otf'), 48)
@@ -1167,9 +1174,6 @@ class ImageGenerator:
                     composition.paste(show_image,
                                       [center_x - int(show_image.size[0] / 2), center_y - int(show_image.size[1] / 2)],
                                       show_image)
-        composition.save(image_path)
-
-
 
     @staticmethod
     def duration_to_string(duration):

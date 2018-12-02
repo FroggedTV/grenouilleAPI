@@ -95,6 +95,8 @@ def sanitize_events(events, hour_start, hour_end):
             'start': event['start'],
             'end': event['end']
         }
+        if sanitized_event['start'].hour < hour_start and sanitized_event['end'].hour < hour_start:
+            continue
         if sanitized_event['start'].hour < hour_start:
             sanitized_event['start'] = sanitized_event['start'].replace(hour=hour_start)
         sanitized_events.append(sanitized_event)

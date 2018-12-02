@@ -973,7 +973,7 @@ class ImageGenerator:
 
         # Generate image
         composition = Image.open(
-            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'froggedtv_calendar-background-16h.png')).convert('RGBA')
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'calendar-background_froggedtv_10h2h.png')).convert('RGBA')
 
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'futura', 'futurastd_condensed.otf'), 48)
@@ -1071,7 +1071,7 @@ class ImageGenerator:
 
         # Generate image
         composition = Image.open(
-            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'artifact_fr_calendar-background-16h.png')).convert('RGBA')
+            os.path.join(os.path.dirname(__file__), '..', 'ressources', 'img', 'calendar-background_artifact_fr_10h2h.png')).convert('RGBA')
 
         image_draw = ImageDraw.Draw(composition)
         rift_title = ImageFont.truetype(os.path.join(os.path.dirname(__file__), '..', 'ressources', 'fonts', 'hypatia', 'hypatiasanspro_regular.otf'), 48)

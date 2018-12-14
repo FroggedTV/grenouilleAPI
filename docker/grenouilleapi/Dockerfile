@@ -21,7 +21,7 @@ RUN pip3 install -r requirements.txt
 ADD docker/grenouilleapi/cron.txt .
 RUN touch /cron.log
 RUN crontab cron.txt
-RUN service cron start
+RUN service cron restart
 
 ENV PYTHONPATH $PYTHONPATH:/grenouilleapi
 COPY . /grenouille/

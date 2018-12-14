@@ -1,1 +1,1 @@
-0 6 * * * python3 /grenouille/backend/scripts.py restart_stream_if_live >> cron.log  2>&1
+0 6 * * * python3 /grenouille/backend/scripts.py restart_stream_if_live >> /cron.log  2>&1
